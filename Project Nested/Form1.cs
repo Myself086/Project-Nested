@@ -130,7 +130,7 @@ namespace Project_Nested
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
 #if !DEBUG
-                try
+                //try
 #endif
                 {
                     injector = new Injector(File.ReadAllBytes(fileDialog.FileName));
@@ -154,10 +154,10 @@ namespace Project_Nested
                     //vScrollBar1.Value = 0;
                 }
 #if !DEBUG
-                catch (Exception ex)
+                /*catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error!");
-                }
+                }*/
 #endif
             }
         }
@@ -174,7 +174,7 @@ namespace Project_Nested
             }
 
 #if !DEBUG
-            try
+            //try
 #endif
             {
                 injector.GameName.SetValue(profileLoaded != null ? profileLoaded : string.Empty);
@@ -182,10 +182,10 @@ namespace Project_Nested
                 File.WriteAllBytes(filename + ".smc", data);
             }
 #if !DEBUG
-            catch (Exception ex)
+            /*catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error!");
-            }
+            }*/
 #endif
         }
 
