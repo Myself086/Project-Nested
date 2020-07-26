@@ -9,5 +9,3 @@ If you have legally owned ROM dump of NES games, they may be playable on SNES by
 See compatiblity list here: https://docs.google.com/spreadsheets/d/1xKZIyNz1DSI3ZBdMfaTEaa_9b6IEABx-ZPwOb6XqcLQ/edit?usp=sharing
 
 Instructions on how to use Project Nested can be found on the exe's main window.
-
-Thank you for playing!
