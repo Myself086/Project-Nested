@@ -7,7 +7,7 @@
     <ProjectGuid>{1428DDD8-6690-42E6-8611-CE86EE7124C7}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Project_Nested</RootNamespace>
-    <AssemblyName>Project Nested</AssemblyName>
+    <AssemblyName>Project_Nested</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -86,7 +86,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="Project Nested.smc">
+    <None Include="Project_Nested.smc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Properties\Settings.settings">

@@ -25,7 +25,7 @@ namespace Project_Nested
 
         string filename;
 
-        string profilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Profiles\\";
+        string profilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Profiles" + Path.DirectorySeparatorChar;
 
         string profileLoaded;
         ProfileListing profileSelected { get => (ProfileListing)comboGameProfile.SelectedItem; }
@@ -156,7 +156,7 @@ namespace Project_Nested
 #if !DEBUG
                 /*catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Error!");
+                    MessageBox.Show(ex, "Error!");
                 }*/
 #endif
             }
@@ -184,7 +184,7 @@ namespace Project_Nested
 #if !DEBUG
             /*catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error!");
+                MessageBox.Show(ex, "Error!");
             }*/
 #endif
         }
@@ -237,7 +237,7 @@ namespace Project_Nested
 
         private string ConvertPathToTitle(string path)
         {
-            int lastSlash = path.LastIndexOf('\\');
+            int lastSlash = path.LastIndexOf(Path.DirectorySeparatorChar);
             int lastDot = path.LastIndexOf('.');
 
             if ((lastSlash | lastDot) >= 0)
@@ -359,7 +359,7 @@ namespace Project_Nested
                     var point = this.comboGameProfile.PointToScreen(new Point(0, this.comboGameProfile.Bottom));
 
                     // Get NES file name
-                    var slash = this.filename.LastIndexOf('\\');
+                    var slash = this.filename.LastIndexOf(Path.DirectorySeparatorChar);
                     var dot = this.filename.LastIndexOf('.');
                     if (dot < 0) dot = this.filename.Length;
                     var filename = this.filename.Substring(slash + 1, dot - slash - 1);

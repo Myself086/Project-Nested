@@ -26,7 +26,7 @@ namespace Project_Nested.Injection
 
         // Emulator ROM, can be edited without cloning but not recommended
         static readonly byte[] NestedEmulator = File.ReadAllBytes(
-            Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\Project Nested.smc");
+            Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Project_Nested.smc");
 
         #endregion
         // --------------------------------------------------------------------
