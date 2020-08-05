@@ -1,0 +1,58 @@
+
+----------------------------------------------------------------
+	CPU
+
+- Use a more optimized memory emulation for AND (ZP),Y
+- Add register&flag assumption for JIT to ignore non conditional branches
+- Identify and fix RTS used as indirect JMP, example:
+	lda $8000,x
+	pha
+	lda $8001,x
+	pha
+	rts
+- Identify and fix return address being pushed by PHA, example:
+	lda #$80
+	pha
+	lda #$00
+	pha
+- Fix indirect JMP reading from $6000-$FFFF
+- Fix indirect JMP page wrapping
+- Fix original interrupt flag for PHP and PLP
+
+----------------------------------------------------------------
+	IO ports
+
+- Support indirect access to IO ports
+- Add ports $2003 and $2004
+- Optimize $2007
+- Add inline capability
+
+----------------------------------------------------------------
+	PPU
+
+- Add color emphasis
+- Fix disabling background, seems to not work when left column is disabled
+- Randomize VRAM allocation for CHR when 2 or more CHR tables are found to have the same amount of different bytes
+- Fix sprite transfer from pages $60-$FF
+- Add option to resize VramQ and throw exception when it overflows
+
+----------------------------------------------------------------
+	APU
+
+- Remove delayed silencing through $4015
+- Add DMC channel
+- Add APU IRQ
+- Fix noise channel volume
+
+----------------------------------------------------------------
+	GUI
+
+- Add blue screen of death
+- Replace BG3's font
+
+----------------------------------------------------------------
+	EXE
+
+- AOT optimizations
+- Better bank allocation
+

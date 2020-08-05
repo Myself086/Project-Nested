@@ -82,7 +82,8 @@ namespace Project_Nested
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Keep form name
+            // Keep form name with version number
+            this.Text += $" v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
             formTitle = this.Text;
 
             // Non resizable
@@ -465,6 +466,10 @@ namespace Project_Nested
 
                         // Condition for applying feedback to current profile
                         bool pass = ConvertPathToTitle(profileName) == this.profileLoaded;
+
+                        // Is the profile name valid?
+                        if (profileName == NO_PROFILE)
+                            profileName = string.Empty;
 
                         if (profileName == string.Empty)
                         {
