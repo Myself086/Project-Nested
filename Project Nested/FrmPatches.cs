@@ -40,11 +40,13 @@ namespace Project_Nested
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            var lines = textBox1.Text.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            var lines = textBox1.Text.Split(new char[] { '\n', '\r', ';' }, StringSplitOptions.RemoveEmptyEntries);
             var lineNum = 0;
             List<Patch> patchList = new List<Patch>();
 
+#if !DEBUG
             try
+#endif
             {
                 // Read patches from the textbox
                 for (lineNum = 0; lineNum < lines.Length; lineNum++)
@@ -57,10 +59,12 @@ namespace Project_Nested
 
                 this.Close();
             }
+#if !DEBUG
             catch (Exception)
             {
                 MessageBox.Show($"Error on line {lineNum + 1}");
             }
+#endif
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

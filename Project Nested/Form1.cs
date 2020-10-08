@@ -83,7 +83,8 @@ namespace Project_Nested
         private void Form1_Load(object sender, EventArgs e)
         {
             // Keep form name with version number
-            this.Text += $" v{Assembly.GetEntryAssembly().GetName().Version.ToString(3)}";
+            var version = Assembly.GetEntryAssembly().GetName().Version;
+            this.Text += $" v{version.ToString(version.Build > 0 ? 3 : 2)}";
             formTitle = this.Text;
 
             // Non resizable
