@@ -27,6 +27,7 @@
 - Add color emphasis
 - Fix disabling background, seems to not work when left column is disabled
 - Randomize VRAM allocation for CHR when 2 or more CHR buffers are found to have the same amount of different bytes
+- Fix 8 sprites per scanline sometimes showing 9 for 8x8 and 8x16 sprite size.
 
 ----------------------------------------------------------------
 	APU
