@@ -1,0 +1,18 @@
+
+v1.1
+- Fixed sprite pattern table swap made by mappers when sprites are 8x16 in size.
+- Fixed sprite transfer from pages $08-$1f and $60-$ff
+- VramQ is now optionally resizable
+- Fixed CHR pattern swapping for mapper 4
+- Added nametable mirror select for mapper 4
+- Partly fixed nametable mirror select for mapper 1
+- Fixed STX/STY to $2000 and $4014
+- Sprite size and pattern table are now decided at the beginning of each frame rather than during transfer
+- Fixed RTS used as indirect jump
+- Fixed pushing constant return address with PHA
+- Fixed indirect JMP reading from pages $08-$1f and $60-$ff
+- Added blue screen of death
+- Fixed black screen on repro carts (thanks to soniccd123)
+- Fixed compatibility with Mesen-S
+- Added ; as a line separator when editing patches
+- Added a reset code to the SPC, necessary for combo randomizers (write $F5 to port $2140)
