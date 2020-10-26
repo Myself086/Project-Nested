@@ -1,0 +1,443 @@
+
+	.pushaddr
+		.addr	=MapperTable+1*2
+		.data16	_Mapper1__Main
+
+		.addr	=Mapper_Memory
+Mapper1_temp:
+		.fill	1
+Mapper1_value:
+		.fill	1
+Mapper1_control:
+		.fill	1
+Mapper1_chrbank0:
+		.fill	1
+Mapper1_chrbank1:
+		.fill	1
+Mapper1_prgbank:
+		.fill	1
+	.pulladdr
+
+	.mx	0x00
+
+Mapper1__Main:
+	// Load current bank address
+	ldx	#_Mapper1__Main/0x10000
+	stx	$.DP_ZeroBank
+
+	// Is it 0xe000?
+	cmp	#0xe000
+	bcc	$+Mapper1__Main_SkipE000
+		ldx	#_Mapper1__e000
+		jmp	$=Recompiler__GetIOAccess_ReturnMapper
+Mapper1__Main_SkipE000:
+
+	// Is it 0xc000?
+	cmp	#0xc000
+	bcc	$+Mapper1__Main_SkipC000
+		ldx	#_Mapper1__c000
+		jmp	$=Recompiler__GetIOAccess_ReturnMapper
+Mapper1__Main_SkipC000:
+
+	// Is it 0xa000?
+	cmp	#0xa000
+	bcc	$+Mapper1__Main_SkipA000
+		ldx	#_Mapper1__a000
+		jmp	$=Recompiler__GetIOAccess_ReturnMapper
+Mapper1__Main_SkipA000:
+
+	// Is it 0x8000?
+	cmp	#0x8000
+	bcc	$+Mapper1__Main_Skip8000
+		ldx	#_Mapper1__8000
+		jmp	$=Recompiler__GetIOAccess_ReturnMapper
+Mapper1__Main_Skip8000:
+
+	// Nothing was found
+	jmp	$=Recompiler__GetIOAccess_DefaultMapper
+
+Mapper1__8000:
+	iIOPort_InterfaceSwitch		Mapper1__Error
+		caseat	iIOPort_sta		Mapper1__w8000_a
+		caseat	iIOPort_stx		Mapper1__w8000_x
+		caseat	iIOPort_sty		Mapper1__w8000_y
+Mapper1__a000:
+	iIOPort_InterfaceSwitch		Mapper1__Error
+		caseat	iIOPort_sta		Mapper1__wa000_a
+		caseat	iIOPort_stx		Mapper1__wa000_x
+		caseat	iIOPort_sty		Mapper1__wa000_y
+Mapper1__c000:
+	iIOPort_InterfaceSwitch		Mapper1__Error
+		caseat	iIOPort_sta		Mapper1__wc000_a
+		caseat	iIOPort_stx		Mapper1__wc000_x
+		caseat	iIOPort_sty		Mapper1__wc000_y
+Mapper1__e000:
+	iIOPort_InterfaceSwitch		Mapper1__Error
+		caseat	iIOPort_sta		Mapper1__we000_a
+		caseat	iIOPort_stx		Mapper1__we000_x
+		caseat	iIOPort_sty		Mapper1__we000_y
+
+	//	-----------------------------------------------------------------------
+
+	.mx	0x30
+
+Mapper1__Error:
+	rtl
+
+Mapper1__w8000_ResetBits:
+	// Reset shift and return
+	xba
+	lda	#0xf0
+	sta	$_Mapper1_value
+	xba
+	rtl
+
+Mapper1__w8000_x:
+	stx	$_Mapper1_temp
+	bra	$+Mapper1__w8000
+Mapper1__w8000_y:
+	sty	$_Mapper1_temp
+	bra	$+Mapper1__w8000
+Mapper1__w8000_a:
+	sta	$_Mapper1_temp
+	//bra	$+Mapper1__w8000
+Mapper1__w8000:
+	// Do we reset bits? Most likely not so we moved the code up
+	bit	$_Mapper1_temp
+	bmi	$-Mapper1__w8000_ResetBits
+
+	// Shift bit
+	lsr	$_Mapper1_temp
+	ror	$_Mapper1_value
+	bcs	$+Mapper1__w8000_DoStuff
+	rtl
+
+Mapper1__w8000_DoStuff:
+	php
+	xba
+
+	// Control (internal, $8000-$9FFF)
+	// Bits: CPPMM
+	// M = BG mirrors
+	// P = Program bank mode
+	// C = Chr ROM bank mode
+
+	// Save value
+	lda	$_Mapper1_value
+	sta	$_Mapper1_control
+
+	// BG mirrors (TODO: Fix showing single second screen)
+	phx
+	and	#0x18
+	tax
+	lda	#.VramQ_NameTableMirrorChange
+	lock
+	sta	$0x2180
+	lda	$=Mapper1__w8000_BGmirrorsLUT+0,x
+	sta	$_IO_BG_MIRRORS
+	and	#0x03
+	//lda	$=Mapper1__w8000_BGmirrorsLUT+1,x
+	sta	$0x2180
+	plx
+
+	// Reset bits
+	lda	#0xf0
+	sta	$_Mapper1_value
+
+	xba
+	plp
+	rtl
+
+Mapper1__w8000_BGmirrorsLUT:
+	.data8	0x24
+	.fill	7
+	.data8	0x20
+	.fill	7
+	.data8	0x21
+	.fill	7
+	.data8	0x22
+	.fill	7
+
+	//	-----------------------------------------------------------------------
+
+Mapper1__wa000_ResetBits:
+	// Reset shift and return
+	xba
+	lda	#0xf0
+	sta	$_Mapper1_value
+	xba
+	rtl
+
+Mapper1__wa000_x:
+	stx	$_Mapper1_temp
+	bra	$+Mapper1__wa000
+Mapper1__wa000_y:
+	sty	$_Mapper1_temp
+	bra	$+Mapper1__wa000
+Mapper1__wa000_a:
+	sta	$_Mapper1_temp
+	//bra	$+Mapper1__wa000
+Mapper1__wa000:
+	// Do we reset bits? Most likely not so we moved the code up
+	bit	$_Mapper1_temp
+	bmi	$-Mapper1__wa000_ResetBits
+
+	// Shift bit
+	lsr	$_Mapper1_temp
+	ror	$_Mapper1_value
+	bcs	$+Mapper1__wa000_DoStuff
+	rtl
+
+Mapper1__wa000_DoStuff:
+	phx
+	xba
+
+	// CHR bank 0 (internal, $A000-$BFFF)
+	// Bits: CCCCC
+	// C = Select 4 KB or 8 KB CHR bank at PPU $0000 (low bit ignored in 8 KB mode)
+
+	// Load bits
+	lda	$_Mapper1_value
+
+	// Are we loading the same CHR bank?
+	cmp	$_Mapper1_chrbank0
+	beq	$+b_1
+		lsr	a
+		lsr	a
+		lsr	a
+
+		// Is CHR in 8kb mode?
+		bit	$_Mapper1_control
+		bmi	$+b_2
+			// 8kb mode
+			ora	#0x01
+			sta	$_Mapper1_chrbank1
+			sta	$_CHR_1_NesBank
+			and	#0xfe
+b_2:
+		// This 4kb
+		sta	$_Mapper1_chrbank0
+		sta	$_CHR_0_NesBank
+b_1:
+
+	// Reset bits
+	lda	#0xf0
+	sta	$_Mapper1_value
+
+	// Return
+	xba
+	plx
+	rtl
+
+	//	-----------------------------------------------------------------------
+	
+Mapper1__wc000_ResetBits:
+	// Reset shift and return
+	xba
+	lda	#0xf0
+	sta	$_Mapper1_value
+	xba
+	rtl
+
+Mapper1__wc000_x:
+	stx	$_Mapper1_temp
+	bra	$+Mapper1__wc000
+Mapper1__wc000_y:
+	sty	$_Mapper1_temp
+	bra	$+Mapper1__wc000
+Mapper1__wc000_a:
+	sta	$_Mapper1_temp
+	//bra	$+Mapper1__wc000
+Mapper1__wc000:
+	// Do we reset bits? Most likely not so we moved the code up
+	bit	$_Mapper1_temp
+	bmi	$-Mapper1__wc000_ResetBits
+
+	// Shift bit
+	lsr	$_Mapper1_temp
+	ror	$_Mapper1_value
+	bcs	$+Mapper1__wc000_DoStuff
+	rtl
+
+Mapper1__wc000_DoStuff:
+	phx
+	xba
+
+	// CHR bank 1 (internal, $A000-$BFFF)
+	// Bits: CCCCC
+	// C = Select 4 KB or 8 KB CHR bank at PPU $0000 (low bit ignored in 8 KB mode)
+
+	// Load bits
+	lda	$_Mapper1_value
+
+	// Are we loading the same CHR bank?
+	cmp	$_Mapper1_chrbank1
+	beq	$+Mapper1__wc000_Return
+
+	// Are we loading the same CHR bank?
+	cmp	$_Mapper1_chrbank0
+	beq	$+b_1
+		lsr	a
+		lsr	a
+		lsr	a
+
+		// Is CHR in 8kb mode?
+		bit	$_Mapper1_control
+		bpl	$+b_2
+			// 4kb mode
+			sta	$_Mapper1_chrbank0
+			sta	$_CHR_1_NesBank
+b_2:
+		// Nothing in 8kb mode
+b_1:
+
+	// Reset bits
+	lda	#0xf0
+	sta	$_Mapper1_value
+
+	// Return
+	xba
+	plx
+	rtl
+
+	//	-----------------------------------------------------------------------
+	
+	.mx	0x30
+
+Mapper1__we000_ResetBits:
+	// Reset shift and return
+	xba
+	lda	#0xf0
+	sta	$_Mapper1_value
+	xba
+	rtl
+
+Mapper1__we000_x:
+	stx	$_Mapper1_temp
+	bra	$+Mapper1__we000
+Mapper1__we000_y:
+	sty	$_Mapper1_temp
+	bra	$+Mapper1__we000
+Mapper1__we000_a:
+	sta	$_Mapper1_temp
+	//bra	$+Mapper1__we000
+Mapper1__we000:
+	// Do we reset bits? Most likely not so we moved the code up
+	bit	$_Mapper1_temp
+	bmi	$-Mapper1__we000_ResetBits
+	
+	// Shift bit
+	lsr	$_Mapper1_temp
+	ror	$_Mapper1_value
+	bcs	$+Mapper1__we000_DoStuff
+	rtl
+
+Mapper1__we000_DoStuff:
+	phx
+	xba
+
+	// PRG bank (internal, $E000-$FFFF)
+	// Bits: RPPPP
+	// P = Select 16 KB PRG ROM bank (low bit ignored in 32 KB mode)
+	// R = PRG RAM chip enable (0: enabled; 1: disabled; ignored on MMC1A)
+
+	// Which PRG mode?
+	lda	$_Mapper1_control
+	asl	a
+	bmi	$+Mapper1__we000_16kb
+		// 32kb mode
+
+		// Load bits
+		lda	$_Mapper1_value
+		lsr	a
+		lsr	a
+		lsr	a
+		and	#0x0e
+		tax
+
+		// Snes side banks
+		lda	$=RomInfo_BankLut,x
+		sta	$_Program_Bank_0+2
+		sta	$_Program_Bank_1+2
+		lda	$=RomInfo_BankLut+1,x
+		sta	$_Program_Bank_2+2
+		sta	$_Program_Bank_3+2
+
+		// Nes side banks
+		stx	$_Program_BankNum_8000
+		stx	$_Program_BankNum_a000
+		inx
+		stx	$_Program_BankNum_c000
+		stx	$_Program_BankNum_e000
+
+		// Done
+		bra	$+Mapper1__we000_Return
+
+Mapper1__we000_16kb:
+	asl	a
+	bpl	$+Mapper1__we000_16kb_high
+		// 16kb low bank
+
+		// Load bits
+		lda	$_Mapper1_value
+		lsr	a
+		lsr	a
+		lsr	a
+		and	#0x0f
+		tax
+
+		// Snes side banks
+		lda	$=RomInfo_BankLut,x
+		sta	$_Program_Bank_0+2
+		sta	$_Program_Bank_1+2
+		lda	$=RomInfo_BankLut+0xf
+		sta	$_Program_Bank_2+2
+		sta	$_Program_Bank_3+2
+
+		// Nes side banks
+		stx	$_Program_BankNum_8000
+		stx	$_Program_BankNum_a000
+		lda	#0x0f
+		sta	$_Program_BankNum_c000
+		sta	$_Program_BankNum_e000
+
+		// Done
+		bra	$+Mapper1__we000_Return
+
+Mapper1__we000_16kb_high:
+		// 16kb high bank
+
+		// Load bits
+		lda	$_Mapper1_value
+		lsr	a
+		lsr	a
+		lsr	a
+		and	#0x0f
+		tax
+
+		// Snes side banks
+		lda	$=RomInfo_BankLut,x
+		sta	$_Program_Bank_2+2
+		sta	$_Program_Bank_3+2
+		lda	$=RomInfo_BankLut+0x0
+		sta	$_Program_Bank_0+2
+		sta	$_Program_Bank_1+2
+
+		// Nes side banks
+		stx	$_Program_BankNum_c000
+		stx	$_Program_BankNum_e000
+		stz	$_Program_BankNum_8000
+		stz	$_Program_BankNum_a000
+
+Mapper1__we000_Return:
+	// Reset bits
+	lda	#0xf0
+	sta	$_Mapper1_value
+
+	// Reset active bank (TODO: Load the actual current active bank for later optimizations)
+	stz	$_Memory_NesBank
+
+	// Return
+	xba
+	plx
+	rtl

@@ -1,0 +1,206 @@
+	// Myself086's 65816 assembler syntax notes
+
+	// ---------------------------------------------------------------------------
+
+	// Code is best viewed on Visual Studio with 4 spaces per tab
+
+	// ---------------------------------------------------------------------------
+
+	// Comments use double slash but can't be placed after some lines due to a bug.
+
+	// Opcodes and addressing modes use their original name and format but operands are written differently.
+	// There are 2 prefixes to the operand.
+	// First prefix:
+	//  $ means address instead of hex
+	//  # means constant where originally used
+	// Second prefix:
+	//  .	1 byte operand
+	//  _	2 bytes operand
+	//  =	3 bytes operand
+	//  ^	1 byte operand for bank number, same as >> 16
+	//  +	1 byte nearlabel down
+	//  -	1 byte nearlabel up
+	// The operand itself has its own set of rules:
+	//  0	Decimal
+	//  0h	Hexa-decimal
+	//  0x0 Hexa-decimal
+	//  0b	Binary
+	//  x	Variable name followed by assembler operations
+
+	// Examples:
+	lda	#0
+	lda	#.OneByteConstant
+	lda	#_TwoBytesConstant
+	lda	$.OneByteAddress
+	lda	$_TwoBytesAddress
+	lda	$=ThreeBytesAddress
+	jsr	$_ShortCall
+	jsr	$=LongCall
+
+	// Loading constants will throw an error if mx flags aren't set properly
+	.mx	0x20
+	lda	#.Mset
+	ldx	#_Xclear
+
+	// .mx + sep
+	smx	#0x20
+	// .mx + rep
+	cmx	#0x20
+	rmx	#0x20
+
+	// ---------------------------------------------------------------------------
+
+	// There are 2 ways to assign values to assembler variables
+	.def	defined		12345
+Label:
+
+	// Macros use a different naming list than .def and labels
+	// The 'Zero' is to bypass an assembler bug that I have yet to fix, letting us use variables or constants
+	// Macros use the .NET String.Format directly
+	.macro	UseSomeMacro
+		lda	#.Zero+{0}
+		ldx	#.Zero+{1}
+		ldy	#.Zero+{2}
+	.endm
+UseSomeMacro:
+	UseSomeMacro	1, 2, 3
+	UseSomeMacro	3, 2, UseSomeMacro
+	// Using UseSomeMacro as parameter will load label UseSomeMacro's LSB
+
+	// ---------------------------------------------------------------------------
+
+	// Function calls with pre-calculated "variables stack" or "virtual stack" (vstack). Not sure which name I like better.
+	// This stack only exists while assembling, every local variable will have a static address from the CPU's perspective.
+	// The static address then allows DP to be used for better performance and better access to addressing modes such as pointers.
+
+	// Example:
+	//  Vstack starts at 0.
+	//  Function "A" has 2 bytes of local variables.
+	//  Function "B" has 3 bytes of local variables.
+	//  Function "C" has 4 bytes of local variables.
+	// If A calls both B and C, then B and C start at address 2. Vstack uses a total of 6 bytes.
+	// If we then add a call from B to C, C now starts at address 5. Vstack uses a total of 9 bytes.
+
+	// Vstack must be initialized like this and is usually located in the direct page.
+	.vstack		0x0000
+	// Optionally, the top of the stack can be defined and an error is thrown by the assembler when it overflows.
+	.vstacktop	0x007f
+
+	// .func	<Label>	<Params>
+	// Declares a function by an existing label and optionally reserves vstack space for its parameters.
+	// Parameters are written the same way as local variables. See .local below.
+	.func	Woo		_hoo
+Woo:
+
+	// .local	<Variables>
+	// Variable names can have the following prefixes:
+	//  .	Allocate 1 byte
+	//  _	Allocate 2 bytes
+	//  =	Allocate 3 bytes
+	//  4	Allocate the number of bytes specified, number must be followed by a space
+	.local	_x, _y, 16 buffer
+
+	// Variables at the top of vstack can be removed so other variables can take their place.
+	.unlocal	16 buffer
+
+	// Calling functions declared with .func should be called using the "call" keyword instead of jsr.
+	// This keyword will either write a jsr or jsl based on where the callers are located.
+	// Recursive calls aren't supported.
+	call	Woo
+
+	// Functions with parameters must use the "precall" keyword.
+	// Each parameter can be accessed with their name prefixed with "Param_".
+	.precall	Woo
+	stz	$.Param_hoo
+	call
+
+	// Returning from functions declared with .func must use the "return" keyword instead of rts or rtl.
+	// This keyword will either write a rts or rtl based on where the callers are located.
+	return
+
+	// ---------------------------------------------------------------------------
+
+	// .addr	<Start>, <End>
+	// Adjusts where the assembler is writing into the ROM from the SNES perspective
+	// Throws an error
+	.addr	0x808000, 0x80feff
+
+	// Address can be pushed to a stack and recovered later
+	.pushaddr
+	.pulladdr
+
+	// .align	<Dividend>, <Remainder>
+	// Aligns or misaligns the address that the assembler is currently writing to
+	// Bank number is ignored when calculating the alignment
+	// Skipped bytes are always filled with zero
+	.align		0x100
+	.align		0x100, 0
+	.misalign	0x100, 0
+
+	// ---------------------------------------------------------------------------
+
+	// Writing raw data or numbers, supports up to 32-bit
+	.db		0, 1, 2, 3
+	.data8	0, 1, 2, 3
+	.data16	0, 1, 2, 3
+	.data24	0, 1, 2, 3
+	.data32	0, 1, 2, 3
+
+	// .fill	<Amount>, <Data>
+	// Writes Data for Amount of times
+	// Amount is not a byte count, .fill32 0x100 will write 0x400 bytes
+	.fill	0x100
+	.fill	0x100, 0x12
+	.fill16	0x100, 0x1234
+	.fill24	0x100, 0x123456
+	.fill32	0x100, 0x12345678
+
+	// Writes a RGB555 color but takes RGB888 as input
+	.rgb888	0xff0000
+
+	// ---------------------------------------------------------------------------
+
+	// .include		<File>
+	// Include source file for the 65816
+
+	// .includespc	<File>
+	// Include source file for the SPC700
+
+	// .import		<File>
+	// Imports raw data
+
+	// ---------------------------------------------------------------------------
+
+	// .outfile		<File>
+	// Sets the output file's name
+
+	// .finalsize	<size>
+	// Sets the output file's length
+
+	// ---------------------------------------------------------------------------
+
+	// .palette		<Colors>
+	// Sets expected palette for converting image
+	// Colors are in RGB888 format
+
+	// .image		<File>, <Bpp>, <Format>
+	// Converts and imports an image file
+	// Format can be "byte" or "word"
+	// Requires using .palette before .image
+
+	// ---------------------------------------------------------------------------
+
+	// .string		"Hello world!"
+	// Writes string
+
+	// .string0		"Hello world!"
+	// Writes string followed by a \0 character
+
+	// ---------------------------------------------------------------------------
+
+
+
+
+
+
+
