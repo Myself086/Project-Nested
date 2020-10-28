@@ -1,3 +1,9 @@
 .vs/
+Assembly/*.exe
+Assembly/*.smc
+Assembly/*.srm
+Assembly/PatchList.txt
+Assembly/Games
+Assembly/Profiles
 project nested/bin
 project nested/obj
