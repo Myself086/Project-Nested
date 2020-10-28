@@ -5,7 +5,7 @@ Rom_Title:
 	// Must be 20 characters long for the feedback string
 	.string	"Nested Emulator      "
 
-	// Version number in RomInfo.txt
+	// Version number in RomInfo.asm
 	//[80ffdB] = 
 
 	// ROM mapper: fast HiROM

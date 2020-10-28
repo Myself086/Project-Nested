@@ -651,7 +651,7 @@ IRQ_VSTACK_START:
 	// ---------------------------------------------------------------------------
 	// Memory allocation addresses
 
-	// HeapStack is where the next free word is for the heap stack, see Memory.txt for more information
+	// HeapStack is where the next free word is for the heap stack, see Memory.asm for more information
 	.def	Memory_HeapStack			0xfffa
 	// Bottom is a constant based on how much memory was statically allocated
 	.def	Memory_Bottom				0xfffc

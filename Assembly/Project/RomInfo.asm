@@ -145,7 +145,7 @@ RomInfo_Version:
 		.data16	_Zero+{2}
 	.endm
 
-	// Pointer used in Header.txt
+	// Pointer used in Header.asm
 RomInfo_Description:
 
 	RomInfo_DefineMac	"public void Tab_Version : smc version 1.1 (beta)", 0, 0

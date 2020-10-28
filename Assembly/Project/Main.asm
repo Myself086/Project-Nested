@@ -110,7 +110,7 @@ Main:
 		sta	$0x420b
 b_1:
 
-	// Clear memory from 0x0800 to last clear address, whatever it is set to in Variables.txt
+	// Clear memory from 0x0800 to last clear address, whatever it is set to in Variables.asm
 	ldy	#0x0008
 	stz	$0x81
 	sty	$0x82

@@ -2538,7 +2538,7 @@ Recompiler__Build_Inline2_LoopEnd:
 
 	.mx	0x00
 	.func	Recompiler__GetIOAccess
-	// Entry: X = Original address, Y = Access type "iIOPort" (found in Macros.txt)
+	// Entry: X = Original address, Y = Access type "iIOPort" (found in Macros.asm)
 	// Return: A = Call address, ZeroBank = Bank for call address
 Recompiler__GetIOAccess:
 	// Load default bank address
