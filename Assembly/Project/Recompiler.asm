@@ -1796,7 +1796,7 @@ Recompiler__Build_OpcodeType_Jmp:
 		lda	[$.readAddr],y
 		sta	[$.writeAddr],y
 		lda	#_Interpreter__Execute
-		ldy	#8
+		ldy	#4
 		sta	[$.writeAddr],y
 		lda	#_Interpreter__Execute/0x100
 		iny
