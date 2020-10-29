@@ -41,7 +41,8 @@ Interpreter__Execute:
 	sta	$.pc+1
 
 	// Internal variables
-	.local	_addr
+	.local	=addr
+	.local	_temp
 
 Interpreter__Execute_Next:
 	// Load next instruction
@@ -94,4 +95,29 @@ b_else:
 				sta	$.pc
 				break
 
+		case	0x6c
+			// Read indirect address
+			Interpreter_ReadPCinc
+			sta	$.addr
+			Interpreter_ReadPCinc
+			sta	$.addr+1
+			and	#0xe0
+			tax
+			lda	$_Program_Bank+2,x
+			sta	$.addr+2
+			// Read destination (with page wrapping)
+			lda	[$.addr]
+			sta	$.temp
+			inc	$.addr
+			lda	[$.addr]
+			sta	$.temp+1
+
+			// Use indirect JMP
+			lda	$.a
+			ldx	$.x
+			ldy	$.y
+			pea	$0x0000
+			pld
+			pea	$_temp
+			jmp	$=Interpret__JmpI
 

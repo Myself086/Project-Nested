@@ -1,6 +1,7 @@
 
 Dev build:
 - Fixed JMP to WRAM
+- Added indirect JMP executed from WRAM
 
 v1.1
 - Fixed sprite pattern table swap made by mappers when sprites are 8x16 in size.
