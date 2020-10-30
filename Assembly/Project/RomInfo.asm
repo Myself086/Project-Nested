@@ -1,15 +1,15 @@
 
-	// 0x0000, mapper number in 16-bit
+	// Mapper number in 16-bit
 RomInfo_Mapper:
 	.data16	0
 
-	// 0x0002, starting SNES banks for PRG and CHR
+	// Starting SNES banks for PRG and CHR
 RomInfo_StartBankPRG:
 	.data8	0x84
 RomInfo_StartBankCHR:
 	.data8	0xc5
 
-	// 0x0004, 16 bits of "Memory emulation" flags
+	// 16 bits of "Memory emulation" flags
 RomInfo_MemoryEmulation:
 	.data16	0x000f
 	.def	RomInfo_MemEmu_Load					0x0001
@@ -19,31 +19,31 @@ RomInfo_MemoryEmulation:
 	// TODO
 	.def	RomInfo_MemEmu_IndCrossBank			0x0010
 
-	// 0x0006, initial bank numbers on reset
+	// Initial bank numbers on reset
 RomInfo_PrgBankNumbers:
 	.data8	0,0,0,0
 
-	// 0x000a, which bits of PRG count towards bank boundaries
+	// Which bits of PRG count towards bank boundaries
 RomInfo_PrgBankingMask:
 	.data16	0
 	
-	// 0x000c, maximum range for JMP to count as a branch (negative if unused)
+	// Maximum range for JMP to count as a branch (negative if unused)
 RomInfo_JmpRange:
 	.data16	0xffff
 RomInfo_JmpRange_x2:
 	.data16	0xffff
 
-	// 0x0010, negative when debugging calls with dummy STA to destination
+	// Negative when debugging calls with dummy STA to destination
 RomInfo_DebugCalls:
 	.data8	0x00
 
-	// 0x0011, bit 0 and 1 used for screen size
+	// Bit 0 and 1 used for screen size
 RomInfo_ScreenMode:
 	.data8	0x01
 
-	// 0x0012, 32 bytes string for game name
-	// 0x0032, 4 bytes for Checksum
-	// 0x0036, 4 bytes for CRC32
+	// 32 bytes string for game name
+	// 4 bytes for Checksum
+	// 4 bytes for CRC32
 RomInfo_GameName:
 	.fill	32, 0
 RomInfo_GameCheckSum:
@@ -51,11 +51,11 @@ RomInfo_GameCheckSum:
 RomInfo_GameCRC32:
 	.fill	4, 0
 
-	// 0x003a, ROM banks range reserved for allocating statically recompiled code
+	// ROM banks range reserved for allocating statically recompiled code
 RomInfo_StaticRecBanks:
 	.data8	0xc8, 0xcf
 
-	// 0x003c, Flags for NMI emulation
+	// Flags for NMI emulation
 RomInfo_NmiMode:
 	.data16	0x0003
 	.def	RomInfo_NmiMode_DetectIdling		0x0001
@@ -104,7 +104,7 @@ RomInfo_VramQBufferSize:
 
 	.align	0x100
 
-	// 0x0400, 4x 256 bytes of Nes bank to Snes bank translation
+	// 4x 256 bytes of Nes bank to Snes bank translation
 RomInfo_BankLut:
 RomInfo_BankLut_80:
 	.fill	0x100
@@ -115,7 +115,7 @@ RomInfo_BankLut_c0:
 RomInfo_BankLut_e0:
 	.fill	0x100
 
-	// 0x0200, 256 Chr banks; low bits on first half, high bits on second half
+	// 256 CHR banks; low bits on first half, high bits on second half
 RomInfo_ChrBankLut:
 RomInfo_ChrBankLut_lo:
 	.fill	0x100
