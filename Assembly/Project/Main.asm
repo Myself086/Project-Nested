@@ -335,7 +335,9 @@ b_loop:
 	txs
 	sep	#0x30
 	.mx	0x30
-	lda	$=RomInfo_StartBankPRG
+	lda	#0xe0
+	sta	$_Memory_NesBank
+	lda	$_Program_Bank_3+2
 	pha
 	plb
 	unlock
@@ -358,22 +360,15 @@ b_TrapBit15:
 	.mx	0x00
 	.func	Main__InitEmulation
 Main__InitEmulation:
-	// Set current ROM banks
-	stz	$_Program_Bank_0+0
-	stz	$_Program_Bank_1+0
-	stz	$_Program_Bank_2+0
-	stz	$_Program_Bank_3+0
-	lda	$=RomInfo_StartBankPRG-1
-	and	#0xff00
-	ora	#0x0080
-	sta	$_Program_Bank_0+1
-	clc
-	adc	#0x0020
-	sta	$_Program_Bank_1+1
-	adc	#0x0020
-	sta	$_Program_Bank_2+1
-	adc	#0x0020
-	sta	$_Program_Bank_3+1
+	// Set bank base addresses
+	lda	#0x8000
+	sta	$_Program_Bank_0
+	lda	#0xa000
+	sta	$_Program_Bank_1
+	lda	#0xc000
+	sta	$_Program_Bank_2
+	lda	#0xe000
+	sta	$_Program_Bank_3
 
 	// Set mapper
 	lda	$=RomInfo_Mapper

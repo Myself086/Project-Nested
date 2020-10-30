@@ -215,8 +215,8 @@ namespace Project_Nested.Injection
 
         private void ResetBankManagement()
         {
-            NewLoRomBank = 0x84;
-            NewHiRomBank = 0xc4;
+            NewLoRomBank = StartBankPrg.Value;
+            NewHiRomBank = StartBankChr.Value;
             PrgBanks = new List<byte>();
             ChrBanks_low = new List<byte>();
             ChrBanks_high = new List<byte>();
@@ -275,9 +275,6 @@ namespace Project_Nested.Injection
             }
             // Write data
             OutData.WriteArrayMirrored(NewLoRomBank_FileAddress, data, 0x8000);
-            // First bank needs its own reference
-            if (PrgBanks.Count == 0)
-                this.StartBankPrg.SetValue(NewLoRomBank);
             // Add reference to this bank
             PrgBanks.Add(NewLoRomBank);
             // Increment bank number
@@ -287,10 +284,6 @@ namespace Project_Nested.Injection
         private void AddChrBanks(Int32 start, Int32 length, Int32 bankSize)
         {
             // TODO: Rebuild this
-
-            // First bank needs its own reference
-            if (ChrBanks_low.Count == 0)
-                this.StartBankChr.SetValue(NewHiRomBank);
 
             int i;
             for (i = 0; i < length; i += 0x2000)

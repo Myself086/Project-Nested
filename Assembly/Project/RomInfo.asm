@@ -158,9 +158,9 @@ RomInfo_Description:
 
 		RomInfo_DefineMac	"private hex byte ScreenMode", RomInfo_ScreenMode, 0
 
-		RomInfo_DefineMac	"private hex byte StartBankPRG", RomInfo_StartBankPRG, 0
+		RomInfo_DefineMac	"private readonly hex byte StartBankPRG", RomInfo_StartBankPRG, 0
 
-		RomInfo_DefineMac	"private hex byte StartBankCHR", RomInfo_StartBankCHR, 0
+		RomInfo_DefineMac	"private readonly hex byte StartBankCHR", RomInfo_StartBankCHR, 0
 
 		RomInfo_DefineMac	"private hex byte[0x100] PrgBankLut_80", RomInfo_BankLut_80, 0
 		RomInfo_DefineMac	"private hex byte[0x100] PrgBankLut_a0", RomInfo_BankLut_a0, 0
