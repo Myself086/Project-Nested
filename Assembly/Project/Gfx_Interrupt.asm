@@ -26,8 +26,8 @@ Gfx_PaletteOffset:
 	Gfx_PaletteOffset_mac
 
 	// Palette layout
-	//	10 -- -- -- -- -- -- --  -- 81 82 83 -- 85 86 87 <- First palette for BGs
-	//	-- -- -- -- -- -- -- --  -- 89 8a 8b -- 8d 8e 8f
+	//	10 !! !! !! -- !! !! !!  -- !! !! !! -- !! !! !! <- First palette for BGs
+	//	-- !! !! !! -- !! !! !!  -- !! !! !! -- !! !! !!
 	//	-- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
 	//	-- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
 	//	-- 01 21 41 02 03 -- 42  22 -- 23 -- -- -- -- 43
@@ -45,11 +45,11 @@ Gfx_PaletteOffset:
 	// Ranges:
 	//  00-0f = background colors, first region
 	//  10-1f = sprite colors, first region
-	//  20-2f = background colors, first region (concept only)
-	//  30-3f = sprite colors, first region (concept only)
-	//  40-4f = background colors, first region (concept only)
-	//  50-5f = sprite colors, first region (concept only)
-	//  80-8f = debug background colors (concept only)
+	//  20-2f = background colors, second region (concept only)
+	//  30-3f = sprite colors, second region (concept only)
+	//  40-4f = background colors, third region (concept only)
+	//  50-5f = sprite colors, third region (concept only)
+	//  !!    = debug background colors (concept only)
 
 	// ---------------------------------------------------------------------------
 	
