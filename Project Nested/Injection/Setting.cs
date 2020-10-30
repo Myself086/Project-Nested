@@ -128,6 +128,7 @@ namespace Project_Nested.Injection
                         case "enum":
                             this.EnumList = new List<Setting>();
                             break;
+                        case "readonly":
                         case "value":
                             this.IsVariable = false;
                             break;
@@ -157,6 +158,12 @@ namespace Project_Nested.Injection
                 if (parts.Length > 1)
                     this.Title = parts[1];
             }
+        }
+
+        private void AttemptWrite()
+        {
+            if (!IsVariable)
+                throw new AccessViolationException($"Setting {this.Title} is read only.");
         }
 
         public bool TrySetValue(string value)
@@ -201,6 +208,8 @@ namespace Project_Nested.Injection
                     //throw new IndexOutOfRangeException();
                     return;
 
+                AttemptWrite();
+
                 switch (type)
                 {
                     default:
@@ -236,6 +245,8 @@ namespace Project_Nested.Injection
                 SetValues(value);
             else if (type == SettingType.Char)
             {
+                AttemptWrite();
+
                 if (Length >= 0)
                     data.WriteString(SnesAddress, value, Length, '\0');
                 else
