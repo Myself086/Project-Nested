@@ -1036,6 +1036,14 @@ IO__w4014_8x8_nolimit:
 	// Nes:  Y, T, A, X
 	// Snes: X, Y, T, A
 
+	// Update sprite 0 hit, assume carry clear from REP
+	lda	$0x00
+	adc	$=RomInfo_SpriteZeroOffset
+	bcc	$+b_1
+		lda	#0xf0
+b_1:
+	sta	$_Sprite0Line
+
 	// Which sprite bank to use?
 	lda	$_IO_2000_EarlyValue
 	lsr	a
@@ -1044,14 +1052,6 @@ IO__w4014_8x8_nolimit:
 	eor	$_IO_MapperChrBankSwap
 	and	#0x01
 	sta	$_IO_Temp
-
-	// Update sprite 0 hit, assume carry clear from LSR
-	lda	$0x00
-	adc	$=RomInfo_SpriteZeroOffset
-	bcc	$+b_1
-		lda	#0xf0
-b_1:
-	sta	$_Sprite0Line
 
 	// Convert all sprites
 	ldy	#0xef
@@ -1196,6 +1196,14 @@ IO__w4014_8x8_limit:
 	// Nes:  Y, T, A, X
 	// Snes: X, Y, T, A
 
+	// Update sprite 0 hit, assume carry clear from REP
+	lda	$0x00
+	adc	$=RomInfo_SpriteZeroOffset
+	bcc	$+b_1
+		lda	#0xf0
+b_1:
+	sta	$_Sprite0Line
+
 	// Which sprite bank to use?
 	lda	$_IO_2000_EarlyValue
 	lsr	a
@@ -1204,14 +1212,6 @@ IO__w4014_8x8_limit:
 	eor	$_IO_MapperChrBankSwap
 	and	#0x01
 	sta	$_IO_Temp
-
-	// Update sprite 0 hit, assume carry clear from LSR
-	lda	$0x00
-	adc	$=RomInfo_SpriteZeroOffset
-	bcc	$+b_1
-		lda	#0xf0
-b_1:
-	sta	$_Sprite0Line
 
 	// Convert all sprites
 	ldy	#0xef
