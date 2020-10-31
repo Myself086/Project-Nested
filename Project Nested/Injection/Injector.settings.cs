@@ -45,7 +45,7 @@ namespace Project_Nested.Injection
                 Setting setting = new Setting(this.OutData, def, summary, snesAddr, mask);
 
                 // Add new setting
-                if (setting.IsVariable)
+                if (!setting.IsEnumValue)
                     _settings.Add(setting.Name, setting);
             }
         }

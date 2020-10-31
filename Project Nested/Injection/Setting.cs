@@ -20,6 +20,7 @@ namespace Project_Nested.Injection
         public bool IsGlobal { get; private set; }
         public bool IsPublic { get; private set; }
         public bool IsVariable { get; private set; } = true;
+        public bool IsEnumValue { get; private set; }
         public bool IsResizable { get; private set; }
         public bool IsHex { get; private set; }
 
@@ -129,8 +130,10 @@ namespace Project_Nested.Injection
                             this.EnumList = new List<Setting>();
                             break;
                         case "readonly":
-                        case "value":
                             this.IsVariable = false;
+                            break;
+                        case "value":
+                            this.IsEnumValue = true;
                             break;
                         case "mapper":
                             if (lesserGreater != null)
