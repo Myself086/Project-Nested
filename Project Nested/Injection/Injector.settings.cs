@@ -222,7 +222,13 @@ namespace Project_Nested.Injection
 
             public T Value
             {
-                get => (T)Convert.ChangeType(varObj.GetValue(), typeof(T));
+                get
+                {
+                    var value = varObj.GetValue();
+                    if (varObj.IsHex)
+                        return (T)Convert.ChangeType(value.ReadInt(), typeof(T));
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
                 set => varObj.SetValue(value.ToString());
             }
 
