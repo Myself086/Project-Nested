@@ -1,5 +1,5 @@
 
-	// NOTE: There are more macros in other files but those are the global macros
+	// NOTE: There are more macros in other files but macros in this file are global
 
 	// ---------------------------------------------------------------------------
 	// Thread lock/unlock (prevent IRQ)
@@ -104,7 +104,7 @@ trap__:
 
 	.macro	ExceptionStart
 		.pushaddr
-		.addr	ExceptionData		ExceptionData|0x7fff
+		.addr	ExceptionData,		ExceptionData|0x7fff
 ExceptionStart__:
 		// Pointer to next element
 		.data16	0
@@ -117,9 +117,9 @@ ExceptionStart__:
 	.macro	ExceptionEnd
 this__:
 		// Link this element to the next
-		.addr	ExceptionData		ExceptionData|0x7fff
+		.addr	ExceptionData,		ExceptionData|0x7fff
 		.data16	this__
-		.def	ExceptionData		this__
+		.def	ExceptionData,		this__
 		.pulladdr
 	.endm
 
@@ -210,7 +210,7 @@ case_destination__:
 	.endm
 
 	// ---------------------------------------------------------------------------
-	// Dictionary relatd macros
+	// Dictionary related macros
 
 	.macro	Dict_NodeBegin		string
 Dict_Node__:
