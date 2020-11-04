@@ -30,6 +30,10 @@ Game "Empty                ", 0x00, 0x00
 
 	.addr	0x808000, 0x80feff
 
+	// Interpret_Indirect.asm is first in the bank because it starts with a page alignment
+	// Must be in the same bank as Interpret_and_Inline.asm and can't be bank 0x00
+	.include	"Project/Interpret_Indirect.asm"
+
 	.include	"Project/Chr.asm"
 	.include	"Project/IO.asm"
 	.include	"Project/Interpret_and_Inline.asm"

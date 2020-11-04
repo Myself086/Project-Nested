@@ -533,11 +533,11 @@ IRQ_VSTACK_START:
 	// Channel 0: x x x x x x x !-!-0-! _
 	// Channel 1: x x x x x !-! ! x x x _
 	// Channel 2: x x x x x !-! ! x x x _ <- Unused HDMA channel
-	// Channel 3: x x x x x _ ! ! x x x _
+	// Channel 3: x x x x x _ _ ! x x x _
 	// Channel 4: x x x x x _ _ _ x x x _
 	// Channel 5: x x x x x _ _ _ x x x _
-	// Channel 6: x x x x x _ _ _ x x x _
-	// Channel 7: x x x x x _ _ _ x x x _ <- Unused HDMA channel
+	// Channel 6: x x x x x !-!-! x x x _
+	// Channel 7: x x x x x !-!-! x x x _ <- Unused HDMA channel
 
 	// 16-bit Used to store temporary read/write value for IO ports (directly before zero)
 	.def	IO_Temp16					0x4307
@@ -555,10 +555,14 @@ IRQ_VSTACK_START:
 	// Port 0x2005-0x2006's high/low access, only uses bit 7 (low = 0, high = 1)
 	.def	IO_HILO						0x4327
 
-	// Defines which memory range is represented by register DB
-	.def	Memory_NesBank				0x4336
 	// $2002's last value
 	.def	IO_2002						0x4337
+
+	// Defines which memory range is represented by register DB, shares a byte with LoadIndirect_Action
+	.def	Memory_NesBank				0x4365
+	// Indirect load/store, indirect 24-bit JMP destinations
+	.def	LoadIndirect_Action			0x4365
+	.def	StoreIndirect_Action		0x4375
 
 	// ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------

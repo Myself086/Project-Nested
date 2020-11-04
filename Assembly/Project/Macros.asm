@@ -326,3 +326,33 @@ b_skip__:
 	.endm
 
 	// ---------------------------------------------------------------------------
+	// Data segmentation related macros
+
+	.macro	SegmentStart	ByteCount
+		.pushaddr
+		.def	segmentByteCount__	{0}
+		.align	segmentByteCount__
+	.endm
+	.macro	SegmentEnd
+		// Workaround for keeping end address
+this__:
+		// Pull address and verify that we haven't gone over the original limit (+1)
+		.pulladdr
+		.addrlow	this__
+		.pushaddr
+		.data8	0
+		.pulladdr
+	.endm
+
+	.macro	Segment
+this__:
+		// Uncap address limit temporarily so we can align to the next segment
+		.addr		this__
+		.misalign	segmentByteCount__
+		.align		segmentByteCount__
+this__:
+
+		// Lock address range to the new segment
+		.def	temp__	segmentByteCount__-1
+		.addr	this__, this__|temp__
+	.endm

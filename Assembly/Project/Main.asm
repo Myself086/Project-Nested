@@ -305,6 +305,12 @@ b_loop:
 	rep	#0x30
 	.mx	0x00
 
+	// Prepare indirect load/store
+	lda	#_Interpret__LoadIndirect_Page/0x100
+	sta	$_LoadIndirect_Action+1
+	lda	#_Interpret__StoreIndirect_Page/0x100
+	sta	$_StoreIndirect_Action+1
+
 	// Recompile from reset vector's address at 0xFFFC
 	.precall	Recompiler__Build		_romAddr, _compileType
 	lda	$_Program_Bank_3+1
