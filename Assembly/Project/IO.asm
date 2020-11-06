@@ -2113,7 +2113,7 @@ IO__r4001_y:
 
 IO__w4001_ind:
 	lda	#0x40
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_ExtraControl
 	xba
 	sta	$_Sound_NesRegs+0x1
 	IO_w40xx_Return
@@ -2129,7 +2129,7 @@ b_in:
 	php
 	xba
 	lda	#0x40
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_ExtraControl
 	xba
 	// TODO: Sweep compare
 //	lda	$_Sound_NesRegs+0x1
@@ -2146,19 +2146,15 @@ IO__r4002_y:
 IO__w4002_ind:
 	xba
 	sta	$_Sound_NesRegs+0x2
-	sta	$_Sound_CopyRegs+0x2
 	IO_w40xx_Return
 IO__w4002_a:
 	sta	$_Sound_NesRegs+0x2
-	sta	$_Sound_CopyRegs+0x2
 	rtl
 IO__w4002_x:
 	stx	$_Sound_NesRegs+0x2
-	stx	$_Sound_CopyRegs+0x2
 	rtl
 IO__w4002_y:
 	sty	$_Sound_NesRegs+0x2
-	sty	$_Sound_CopyRegs+0x2
 	rtl
 
 
@@ -2170,36 +2166,32 @@ IO__r4003_y:
 IO__w4003_ind:
 	xba
 	sta	$_Sound_NesRegs+0x3
-	sta	$_Sound_CopyRegs+0x3
 	tax
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_square0_length
 	lda	#0x01
-	tsb	$_Sound_CopyRegs+0x15
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_NesRegs+0x15
+	tsb	$_Sound_ExtraControl
 	txa
 	IO_w40xx_Return
 IO__w4003_x:
 	stx	$_Sound_NesRegs+0x3
-	stx	$_Sound_CopyRegs+0x3
 	bra	$+b_in
 IO__w4003_y:
 	sty	$_Sound_NesRegs+0x3
-	sty	$_Sound_CopyRegs+0x3
 	bra	$+b_in
 IO__w4003_a:
 	sta	$_Sound_NesRegs+0x3
-	sta	$_Sound_CopyRegs+0x3
 b_in:
 	php
 	phx
 	xba
-	ldx	$_Sound_CopyRegs+0x3
+	ldx	$_Sound_NesRegs+0x3
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_square0_length
 	lda	#0x01
-	tsb	$_Sound_CopyRegs+0x15
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_NesRegs+0x15
+	tsb	$_Sound_ExtraControl
 	xba
 	plx
 	plp
@@ -2233,7 +2225,7 @@ IO__r4005_y:
 
 IO__w4005_ind:
 	lda	#0x80
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_ExtraControl
 	xba
 	sta	$_Sound_NesRegs+0x5
 	IO_w40xx_Return
@@ -2249,7 +2241,7 @@ b_in:
 	php
 	xba
 	lda	#0x80
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_ExtraControl
 	xba
 	// TODO: Sweep compare
 //	lda	$_Sound_NesRegs+0x5
@@ -2266,19 +2258,15 @@ IO__r4006_y:
 IO__w4006_ind:
 	xba
 	sta	$_Sound_NesRegs+0x6
-	sta	$_Sound_CopyRegs+0x6
 	IO_w40xx_Return
 IO__w4006_a:
 	sta	$_Sound_NesRegs+0x6
-	sta	$_Sound_CopyRegs+0x6
 	rtl
 IO__w4006_x:
 	stx	$_Sound_NesRegs+0x6
-	stx	$_Sound_CopyRegs+0x6
 	rtl
 IO__w4006_y:
 	sty	$_Sound_NesRegs+0x6
-	sty	$_Sound_CopyRegs+0x6
 	rtl
 
 
@@ -2290,26 +2278,22 @@ IO__r4007_y:
 IO__w4007_ind:
 	xba
 	sta	$_Sound_NesRegs+0x7
-	sta	$_Sound_CopyRegs+0x7
 	tax
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_square1_length
 	lda	#0x02
-	tsb	$_Sound_CopyRegs+0x15
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_NesRegs+0x15
+	tsb	$_Sound_ExtraControl
 	txa
 	IO_w40xx_Return
 IO__w4007_x:
 	stx	$_Sound_NesRegs+0x7
-	stx	$_Sound_CopyRegs+0x7
 	bra	$+b_in
 IO__w4007_y:
 	sty	$_Sound_NesRegs+0x7
-	sty	$_Sound_CopyRegs+0x7
 	bra	$+b_in
 IO__w4007_a:
 	sta	$_Sound_NesRegs+0x7
-	sta	$_Sound_CopyRegs+0x7
 b_in:
 	php
 	phx
@@ -2318,8 +2302,8 @@ b_in:
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_square1_length
 	lda	#0x02
-	tsb	$_Sound_CopyRegs+0x15
-	tsb	$_Sound_NesRegs+0x16
+	tsb	$_Sound_NesRegs+0x15
+	tsb	$_Sound_ExtraControl
 	xba
 	plx
 	plp
@@ -2333,7 +2317,7 @@ IO__r4008_y:
 
 IO__w4008_ind:
 	//lda	#0x04
-	//tsb	$_Sound_NesRegs+0x16
+	//tsb	$_Sound_ExtraControl
 	xba
 	sta	$_Sound_NesRegs+0x8
 	IO_w40xx_Return
@@ -2349,7 +2333,7 @@ b_in:
 	php
 	xba
 	//lda	#0x04
-	//tsb	$_Sound_NesRegs+0x16
+	//tsb	$_Sound_ExtraControl
 	xba
 	plp
 	rtl
@@ -2403,19 +2387,15 @@ IO__r400b_y:
 IO__w400b_ind:
 	xba
 	sta	$_Sound_NesRegs+0xb
-	sta	$_Sound_CopyRegs+0xb
 	bra	$+b_in2
 IO__w400b_x:
 	stx	$_Sound_NesRegs+0xb
-	stx	$_Sound_CopyRegs+0xb
 	bra	$+b_in
 IO__w400b_y:
 	sty	$_Sound_NesRegs+0xb
-	sty	$_Sound_CopyRegs+0xb
 	bra	$+b_in
 IO__w400b_a:
 	sta	$_Sound_NesRegs+0xb
-	sta	$_Sound_CopyRegs+0xb
 b_in:
 	php
 	phx
@@ -2423,10 +2403,10 @@ b_in2:
 	xba
 
 	lda	#0x04
-	tsb	$_Sound_NesRegs+0x16
-	tsb	$_Sound_CopyRegs+0x15
+	tsb	$_Sound_ExtraControl
+	tsb	$_Sound_NesRegs+0x15
 
-	ldx	$_Sound_CopyRegs+0xb
+	ldx	$_Sound_NesRegs+0xb
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_triangle_length
 
@@ -2504,34 +2484,30 @@ IO__r400f_y:
 IO__w400f_ind:
 	xba
 	sta	$_Sound_NesRegs+0xf
-	sta	$_Sound_CopyRegs+0xf
 	tax
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_noise_length
 	lda	#0x08
-	tsb	$_Sound_CopyRegs+0x15
+	tsb	$_Sound_NesRegs+0x15
 	txa
 	IO_w40xx_Return
 IO__w400f_x:
 	stx	$_Sound_NesRegs+0xf
-	stx	$_Sound_CopyRegs+0xf
 	bra	$+b_in
 IO__w400f_y:
 	sty	$_Sound_NesRegs+0xf
-	sty	$_Sound_CopyRegs+0xf
 	bra	$+b_in
 IO__w400f_a:
 	sta	$_Sound_NesRegs+0xf
-	sta	$_Sound_CopyRegs+0xf
 b_in:
 	php
 	phx
 	xba
-	ldx	$_Sound_CopyRegs+0xf
+	ldx	$_Sound_NesRegs+0xf
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_noise_length
 	lda	#0x08
-	tsb	$_Sound_CopyRegs+0x15
+	tsb	$_Sound_NesRegs+0x15
 	xba
 	plx
 	plp
@@ -2624,7 +2600,7 @@ IO__r4015_y:
 	php
 	xba
 
-	lda	$_Sound_CopyRegs+0x15
+	lda	$_Sound_NesRegs+0x15
 	and	#0x1f
 	sta	$_IO_Temp
 
@@ -2655,9 +2631,9 @@ IO__w4015_in:
 IO__w4015_in2:
 	eor	#0xff
 	and	#0x1f
-	trb	$_Sound_CopyRegs+0x15
+	trb	$_Sound_NesRegs+0x15
+	trb	$_Sound_ExtraControl
 	trb	$_Sound_NesRegs+0x16
-	trb	$_Sound_CopyRegs+0x16
 
 	lsr	$_IO_Temp
 	bcs	$+b_1

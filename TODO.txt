@@ -36,7 +36,6 @@
 - Add DMC channel
 - Add APU IRQ
 - Fix noise channel volume
-- Optimize CPU side code, mainly removing leftover code from the old way of detecting changes.
 - Fix SPC code address range (private assembler bug)
 
 ----------------------------------------------------------------

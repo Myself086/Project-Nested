@@ -359,13 +359,13 @@ HDMA_VSTACK_START:
 	.def	HDMA_VSTACK_PAGE			Zero+HDMA_VSTACK_START&0xff00
 
 
-	// Reserve 24 bytes for original sound registers
+	// Reserve 0x18 bytes for original sound registers
 Sound_NesRegs:
-	.fill	24
+	.fill	0x18
 
-	// Reserve 24 bytes for detecting sound registers
-Sound_CopyRegs:
-	.fill	24
+	// Extra control bits passed to Sound_NesRegs+0x16
+Sound_ExtraControl:
+	.fill	1
 
 	// Sound is active when this variable is -1
 Sound_Active:

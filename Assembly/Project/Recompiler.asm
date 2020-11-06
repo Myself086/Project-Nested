@@ -1252,23 +1252,6 @@ Recompiler__Build_OpcodeType_StaAbs_HighRange:
 	lda	[$.readAddr],y
 	sta	[$.writeAddr],y
 
-	// Is it in audio range?
-	cmp	#0x4000
-	bcc	$+b_SkipAudio
-	cmp	#0x4014
-	bcs	$+b_SkipAudio
-		// Audio range, assume carry clear from BCS
-		adc	#_Sound_NesRegs-0x4000
-		sta	[$.writeAddr],y
-		
-		// Add to write address
-		lda	#0x0003
-		clc
-		adc	$.writeAddr
-		sta	$.writeAddr
-		rts
-b_SkipAudio:
-
 	// Are we using banking emulation?
 	lda	$=RomInfo_MemoryEmulation
 	and	#_RomInfo_MemEmu_AbsBank

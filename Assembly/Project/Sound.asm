@@ -169,10 +169,9 @@ Sound__Init_HdmaTable_End:
 	// ------------------------------------------------------------------------
 	// ------------------------------------------------------------------------
 
+	.mx	0x20
 	.func	Sound__Update
 Sound__Update:
-	php
-
 	// Change DP
 	phd
 	pea	$_HDMA_VSTACK_PAGE
@@ -180,349 +179,82 @@ Sound__Update:
 
 	sep	#0x30
 	.mx	0x30
-	//lda	$.Sound_Active
-	//bpl	$+b_1
 
 	// Update sound
-	call	Sound__EmulateLengthCounter
-	call	Sound__BackupRegs
-	call	Sound__UpdateDsp
+	Sound__EmulateLengthCounter
+	smx	#0x20
+	Sound__UpdateDsp
 
 	// Update HDMA buffer if ready
 	lda	$.Sound_Ready
 	bne	$+b_1
-		lda	$.Sound_NesRegs+0x16
-		sta	$.Sound_CopyRegs+0x16
-		stz	$.Sound_NesRegs+0x16
+		lda	$.Sound_ExtraControl
+		sta	$.Sound_NesRegs+0x16
+		stz	$.Sound_ExtraControl
 
 		dec	$.Sound_Ready
 b_1:
 
 	pld
-	plp
 	return
 
 	// ------------------------------------------------------------------------
 
 	.mx	0x30
-	.func	Sound__DetectChanges
-Sound__DetectChanges:
-
-	lda	$_Sound_NesRegs+0x0
-	and	#0x20
-	bne	$+Sound__DetectChanges_DedayDisabled0
-
-		lda $_Sound_NesRegs+0x3
-		beq $+Sound__DetectChanges_Plus0
-			sta $_Sound_CopyRegs+0x3
-			stz	$_Sound_NesRegs+0x3
-
-			lda	#0x41
-			tsb	$_Sound_CopyRegs+0x16
-			bra $+Sound__DetectChanges_EndSquare0
-
-Sound__DetectChanges_Plus0:
-			lda	#0x41
-			trb	$_Sound_CopyRegs+0x16
-			bra $+Sound__DetectChanges_EndSquare0
-
-Sound__DetectChanges_DedayDisabled0:
-		lda	$_Sound_NesRegs+0x3
-		sta	$_Sound_CopyRegs+0x3
-
-Sound__DetectChanges_EndSquare0:
-
-	lda	$_Sound_NesRegs+0x4
-	and	#0x20
-	bne $+Sound__DetectChanges_DecayDisabled1
-
-		lda $_Sound_NesRegs+0x7
-		beq $+Sound__DetectChanges_Plus1
-			sta	$_Sound_CopyRegs+0x7
-			stz	$_Sound_NesRegs+0x7
-
-			lda	#0x82
-			tsb	$_Sound_CopyRegs+0x16
-			bra $+Sound__DetectChanges_EndSquare1
-
-Sound__DetectChanges_Plus1:
-			lda	#0x82
-			trb	$_Sound_CopyRegs+0x16
-			bra $+Sound__DetectChanges_EndSquare1
-
-Sound__DetectChanges_DecayDisabled1:
-		lda	$_Sound_NesRegs+0x7
-		sta	$_Sound_CopyRegs+0x7
-
-Sound__DetectChanges_EndSquare1:
-
-	// Triangle wave
-	lda	$_Sound_NesRegs+0x8
-	bmi	$+Sound__DetectChanges_LinearTri
-
-		lda	$_Sound_NesRegs+0xb
-		beq	$+Sound__DetectChanges_Plus2
-
-			sta	$_Sound_CopyRegs+0xb
-			stz	$_Sound_NesRegs+0xb
-
-			lda	#0x04
-			tsb	$_Sound_CopyRegs+0x16
-			bra	$+Sound__DetectChanges_EndTri
-
-Sound__DetectChanges_Plus2:
-			lda	#0x04
-			trb	$_Sound_CopyRegs+0x16
-			bra	$+Sound__DetectChanges_EndTri
-
-Sound__DetectChanges_LinearTri:
-		lda	$_Sound_NesRegs+0xb
-		sta	$_Sound_CopyRegs+0xb
-
-Sound__DetectChanges_EndTri:
-	
-	lda	$_Sound_NesRegs+0xc
-	and	#0x20
-	bne	$+Sound__DetectChanges_Disabled2
-
-		lda	$_Sound_NesRegs+0xf
-		beq	$+Sound__DetectChanges_Plus3
-
-			sta	$_Sound_CopyRegs+0xf
-			stz	$_Sound_NesRegs+0xf
-
-			lda	#0x08
-			tsb	$_Sound_CopyRegs+0x16
-			bra	$+Sound__DetectChanges_EndNoise
-
-Sound__DetectChanges_Plus3:
-			lda	#0x08
-			trb	$_Sound_CopyRegs+0x16
-			bra	$+Sound__DetectChanges_EndNoise
-
-Sound__DetectChanges_Disabled2:
-		lda	$_Sound_NesRegs+0xf
-		sta	$_Sound_CopyRegs+0xf
-
-Sound__DetectChanges_EndNoise:
-
-	// Check freq for sweeps
-	lda	$_Sound_NesRegs+0x1
-	bpl	$+Sound__DetectChanges_Sqsw1
-
-		//lda	$_Sound_NesRegs+0x1
-		and	#0x07
-		beq	$+Sound__DetectChanges_Sqsw1x
-
-			lda	$_Sound_NesRegs+0x2
-			beq	$+Sound__DetectChanges_Sqsw1
-
-				sta	$_Sound_CopyRegs+0x2
-				stz	$_Sound_NesRegs+0x2
-
-				lda	#0x40
-				tsb	$_Sound_CopyRegs+0x16
-				bra	$+Sound__DetectChanges_Plus4
-
-Sound__DetectChanges_Sqsw1:
-				lda	$_Sound_NesRegs+0x2
-				sta	$_Sound_CopyRegs+0x2
-
-Sound__DetectChanges_Plus4:
-			bra $+Sound__DetectChanges_NextCheck
-
-Sound__DetectChanges_Sqsw1x:
-		lda	#0x40
-		trb	$_Sound_CopyRegs+0x16
-		bra	$-Sound__DetectChanges_Sqsw1
-
-Sound__DetectChanges_NextCheck:
-	
-	// Check freq for sweeps
-	lda	$_Sound_NesRegs+0x5
-	bpl	$+Sound__DetectChanges_Sqsw12
-		
-		//lda	$_Sound_NesRegs+0x5
-		and	#0x07
-		beq	$+Sound__DetectChanges_Sqsw1x2
-
-			lda	$_Sound_NesRegs+0x6
-			beq	$+Sound__DetectChanges_Sqsw12
-
-				sta	$_Sound_CopyRegs+0x6
-				stz	$_Sound_NesRegs+0x6
-
-				lda	#0x80
-				tsb	$_Sound_CopyRegs+0x16
-				bra	$+Sound__DetectChanges_Plus5
-
-Sound__DetectChanges_Sqsw12:
-				lda	$_Sound_NesRegs+0x6
-				sta	$_Sound_CopyRegs+0x6
-
-Sound__DetectChanges_Plus5:
-			bra $+Sound__DetectChanges_NextCheck2
-
-Sound__DetectChanges_Sqsw1x2:
-		lda	#0x80
-		trb	$_Sound_CopyRegs+0x16
-		bra	$-Sound__DetectChanges_Sqsw12
-
-Sound__DetectChanges_NextCheck2:
-
-	// Return
-	return
-
-	// ------------------------------------------------------------------------
-
-	.mx	0x30
-	.func	Sound__EmulateLengthCounter
-Sound__EmulateLengthCounter:
-	// Clear upper bits of A
-	//tdc
-	//xba
-
-	//stz	$_Sound_CopyRegs+0x15
-
-	// TODO: Finish moving code
-
-	// Square 0
-//	lda	$_Sound_CopyRegs+0x16
-//	and	#0x01
-//	beq $+Sound__EmulateLengthCounter_Sq0NotChanged
-//		ldx	$_Sound_CopyRegs+0x3
-//		lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-//		sta	$_Sound_square0_length
-//Sound__EmulateLengthCounter_Sq0NotChanged:
-
-	//lda	#0x01
-	//tsb	$_Sound_CopyRegs+0x15
-
-	//lda	$_Sound_NesRegs+0x0
-	//and	#0x20
-	lda	#0x01
-	bit	$.Sound_CopyRegs+0x15
-	beq	$+Sound__EmulateLengthCounter_sq0_counter_disabled
-
-		ldx	$.Sound_square0_length
-		beq	$+Sound__EmulateLengthCounter_blahsq
-			dec	$.Sound_square0_length
-			bra	$+Sound__EmulateLengthCounter_Plus0
-
-Sound__EmulateLengthCounter_blahsq:
-			//lda	#0x01
-			trb	$.Sound_CopyRegs+0x15
-			//lda	#0x40
-			//trb	$_Sound_CopyRegs+0x16
-
-Sound__EmulateLengthCounter_Plus0:
-Sound__EmulateLengthCounter_sq0_counter_disabled:
-
-	// Square 1
-//	lda	$_Sound_CopyRegs+0x16
-//	and	#0x02
-//	beq $+Sound__EmulateLengthCounter_sq1_not_changed
-//		ldx	$_Sound_CopyRegs+0x7
-//		lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-//		sta	$_Sound_square1_length
-//Sound__EmulateLengthCounter_sq1_not_changed:
-	
-	//lda	#0x02
-	//tsb	$_Sound_CopyRegs+0x15
-
-	//lda	$_Sound_NesRegs+0x4
-	//and	#0x20
-	lda	#0x02
-	bit	$.Sound_CopyRegs+0x15
-	beq	$+Sound__EmulateLengthCounter_sq1_counter_disabled
-
-		ldx	$.Sound_square1_length
-		beq	$+Sound__EmulateLengthCounter_sqblah
-			dec	$.Sound_square1_length
-			bra	$+Sound__EmulateLengthCounter_Plus1
-
-Sound__EmulateLengthCounter_sqblah:
-			//lda	#0x02
-			trb	$.Sound_CopyRegs+0x15
-			//lda	#0x80
-			//trb	$_Sound_CopyRegs+0x16
-
-Sound__EmulateLengthCounter_Plus1:
-Sound__EmulateLengthCounter_sq1_counter_disabled:
-
-//	lda	$_Sound_CopyRegs+0x16
-//	and	#0x04
-//	beq	$+Sound__EmulateLengthCounter_tri_not_changed
-//		//lda	$_Sound_NesRegs+0x8
-//		//bmi	$+Sound__EmulateLengthCounter_LinearTri
-//			ldx	$_Sound_CopyRegs+0xb
-//			lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-//			sta	$_Sound_triangle_length
-//			bra	$+Sound__EmulateLengthCounter_tri_not_changed
-//
-//Sound__EmulateLengthCounter_LinearTri:
-//			//stz	$_Sound_NesRegs+0x8
-//			lda	$_Sound_NesRegs+0x8
-//			and	#0x7f
-//			beq	$+Sound__EmulateLengthCounter_tri_not_changed
-//				adc	#0x01
-//				sta	$_Sound_triangle_length
-//				lda	#0x04
-//				trb	$_Sound_CopyRegs+0x16
-//Sound__EmulateLengthCounter_tri_not_changed:
-
-	lda	#0x04
-	tsb	$.Sound_CopyRegs+0x15
-
-	ldx	$.Sound_NesRegs+0x8
-	bpl	$+Sound__EmulateLengthCounter_tri_counter_disabled
-
-		ldx	$.Sound_triangle_length
-		beq	$+Sound__EmulateLengthCounter_blah
-			dec	$.Sound_triangle_length
-			bra	$+Sound__EmulateLengthCounter_Plus2
-Sound__EmulateLengthCounter_blah:
-			//lda	#0x04
-			trb	$.Sound_CopyRegs+0x15
-
-Sound__EmulateLengthCounter_Plus2:
-Sound__EmulateLengthCounter_tri_counter_disabled:
-
-	// Noise channel
-//	lda	$.Sound_CopyRegs+0x16
-//	and	#0x08
-//	beq	$+Sound__EmulateLengthCounter_unchanged
-//		ldx	$.Sound_CopyRegs+0xf
-//		lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-//		sta	$.Sound_noise_length
-//Sound__EmulateLengthCounter_unchanged:
-
-	//lda	#0x08
-	//tsb	$_Sound_CopyRegs+0x15
-
-	//lda	$_Sound_NesRegs+0xc
-	//and	#0x20
-	lda	#0x08
-	bit	$.Sound_CopyRegs+0x15
-	beq	$+Sound__EmulateLengthCounter_noise_counter_disabled
-
-		ldx	$.Sound_noise_length
-		beq	$+Sound__EmulateLengthCounter_pleh
-			dec	$.Sound_noise_length
-			bra	$+Sound__EmulateLengthCounter_Plus3
-
-Sound__EmulateLengthCounter_pleh:
-			//lda	#0x08
-			trb	$.Sound_CopyRegs+0x15
-
-Sound__EmulateLengthCounter_Plus3:
-Sound__EmulateLengthCounter_noise_counter_disabled:
-
-	//lda	$_Sound_CopyRegs+0x15
-	//and	$_Sound_NesRegs+0x15
-	//sta	$_Sound_CopyRegs+0x15
-
-	return
+	.macro	Sound__EmulateLengthCounter
+		// Square 0
+		lda	#0x01
+		bit	$.Sound_NesRegs+0x15
+		beq	$+b_1
+			ldx	$.Sound_square0_length
+			beq	$+b_else
+				dec	$.Sound_square0_length
+				bra	$+b_1
+b_else:
+				//lda	#0x01
+				trb	$.Sound_NesRegs+0x15
+b_1:
+
+		// Square 1
+		lda	#0x02
+		bit	$.Sound_NesRegs+0x15
+		beq	$+b_1
+			ldx	$.Sound_square1_length
+			beq	$+b_else
+				dec	$.Sound_square1_length
+				bra	$+b_1
+b_else:
+				//lda	#0x02
+				trb	$.Sound_NesRegs+0x15
+b_1:
+
+		// Triangle
+		lda	#0x04
+		tsb	$.Sound_NesRegs+0x15
+		ldx	$.Sound_NesRegs+0x8
+		bpl	$+b_1
+			ldx	$.Sound_triangle_length
+			beq	$+b_else
+				dec	$.Sound_triangle_length
+				bra	$+b_1
+b_else:
+				//lda	#0x04
+				trb	$.Sound_NesRegs+0x15
+b_1:
+
+		// Noise channel
+		lda	#0x08
+		bit	$.Sound_NesRegs+0x15
+		beq	$+b_1
+			ldx	$.Sound_noise_length
+			beq	$+b_else
+				dec	$.Sound_noise_length
+				bra	$+b_1
+b_else:
+				//lda	#0x08
+				trb	$.Sound_NesRegs+0x15
+b_1:
+	.endm
 
 //Sound__EmulateLengthCounter_length_d3_0:
 //	.data8 0x06,0x0B,0x15,0x29,0x51,0x1F,0x08,0x0F
@@ -565,130 +297,43 @@ Sound__EmulateLengthCounter_length_d3_mixed:
 	.fill	8, 0x0F
 	.fill	8, 0x11
 	.fill	8, 0x10
-	
-	// ------------------------------------------------------------------------
-
-	.mx	0x30
-	.func	Sound__BackupRegs
-Sound__BackupRegs:
-	lda $.Sound_NesRegs+0x0
-	sta $.Sound_CopyRegs+0x0
-	lda $.Sound_NesRegs+0x1
-	sta $.Sound_CopyRegs+0x1
-	
-	lda $.Sound_NesRegs+0x4
-	sta $.Sound_CopyRegs+0x4
-	lda $.Sound_NesRegs+0x5
-	sta $.Sound_CopyRegs+0x5
-	
-	lda $.Sound_NesRegs+0x8
-	sta $.Sound_CopyRegs+0x8
-	lda $.Sound_NesRegs+0x9
-	sta $.Sound_CopyRegs+0x9
-	lda $.Sound_NesRegs+0xa
-	sta $.Sound_CopyRegs+0xa
-	
-	lda $.Sound_NesRegs+0xc
-	sta $.Sound_CopyRegs+0xc
-	lda $.Sound_NesRegs+0xd
-	sta $.Sound_CopyRegs+0xd
-	lda $.Sound_NesRegs+0xe
-	sta $.Sound_CopyRegs+0xe
-	
-	lda $.Sound_NesRegs+0x11
-	sta $.Sound_CopyRegs+0x11
-
-	// DEBUG ONLY
-	lda	$0x002141
-	sta	$=Sound_DebugAPU+0
-	lda	$0x002142
-	sta	$=Sound_DebugAPU+1
-
-	return
 
 	// ------------------------------------------------------------------------
 
 	.mx	0x20
-	.func	Sound__UpdateDsp
-Sound__UpdateDsp:
-	rep	#0x10
 	.macro	Sound__UpdateDsp_Mac	Offset
-		lda	$.Sound_CopyRegs+{0}
+		lda	$.Sound_NesRegs+{0}
 		sta	$=Sound__Init_HdmaTable_Start+0x7e0000+{0}*2,x
 	.endm
-	//ldx	$.HDMA_Sound_Back
-	ldx	$.HDMA_Sound_Side
-	Sound__UpdateDsp_Mac	0x00
-	Sound__UpdateDsp_Mac	0x01
-	Sound__UpdateDsp_Mac	0x02
-	Sound__UpdateDsp_Mac	0x03
-	Sound__UpdateDsp_Mac	0x04
-	Sound__UpdateDsp_Mac	0x05
-	Sound__UpdateDsp_Mac	0x06
-	Sound__UpdateDsp_Mac	0x07
-	Sound__UpdateDsp_Mac	0x08
-	Sound__UpdateDsp_Mac	0x09
-	Sound__UpdateDsp_Mac	0x0a
-	Sound__UpdateDsp_Mac	0x0b
-	Sound__UpdateDsp_Mac	0x0c
-	Sound__UpdateDsp_Mac	0x0d
-	Sound__UpdateDsp_Mac	0x0e
-	Sound__UpdateDsp_Mac	0x0f
-	Sound__UpdateDsp_Mac	0x10
-	Sound__UpdateDsp_Mac	0x11
-	Sound__UpdateDsp_Mac	0x12
-	Sound__UpdateDsp_Mac	0x13
-	Sound__UpdateDsp_Mac	0x14
-	Sound__UpdateDsp_Mac	0x15
-	Sound__UpdateDsp_Mac	0x16
-
-	sep	#0x10
-	return
-
-	// OLD
-.false
-{
-	stz	$_Sound_TestCounter0
-	stz	$_Sound_TestCounter1
-
-	// Wait for SPC ready
-	lda	#0x7d
-Sound__UpdateDsp_Wait0:
-		inc	$_Sound_TestCounter0
-		cmp	$0x2140
-		bne	$-Sound__UpdateDsp_Wait0
-
-	// Tell SPC that CPU is ready
-	lda	#0xd7
-	sta	$0x2140
-
-Sound__UpdateDsp_Wait1:
-		inc	$_Sound_TestCounter1
-		// Wait for reply
-		cmp	$0x2140
-		bne	$-Sound__UpdateDsp_Wait1
-
-	// Clear port 0
-	ldx	#0x00
-Sound__UpdateDsp_Xfer:
-		// Send data to port 1
-		lda	$_Sound_CopyRegs,x
-		sta	$0x2141
-		stx	$0x2140
-
-Sound__UpdateDsp_Wait2:
-			// Wait for reply on port 0
-			cpx	$0x2140
-			bne	$-Sound__UpdateDsp_Wait2
-
-		inx
-		cpx	#0x17
-		bne	$-Sound__UpdateDsp_Xfer
-
-	return
-}
+	.macro	Sound__UpdateDsp
+		ldx	$.HDMA_Sound_Side
+		Sound__UpdateDsp_Mac	0x00
+		Sound__UpdateDsp_Mac	0x01
+		Sound__UpdateDsp_Mac	0x02
+		Sound__UpdateDsp_Mac	0x03
+		Sound__UpdateDsp_Mac	0x04
+		Sound__UpdateDsp_Mac	0x05
+		Sound__UpdateDsp_Mac	0x06
+		Sound__UpdateDsp_Mac	0x07
+		Sound__UpdateDsp_Mac	0x08
+		Sound__UpdateDsp_Mac	0x09
+		Sound__UpdateDsp_Mac	0x0a
+		Sound__UpdateDsp_Mac	0x0b
+		Sound__UpdateDsp_Mac	0x0c
+		Sound__UpdateDsp_Mac	0x0d
+		Sound__UpdateDsp_Mac	0x0e
+		Sound__UpdateDsp_Mac	0x0f
+		Sound__UpdateDsp_Mac	0x10
+		Sound__UpdateDsp_Mac	0x11
+		Sound__UpdateDsp_Mac	0x12
+		Sound__UpdateDsp_Mac	0x13
+		Sound__UpdateDsp_Mac	0x14
+		Sound__UpdateDsp_Mac	0x15
+		Sound__UpdateDsp_Mac	0x16
+	.endm
 
 	// ------------------------------------------------------------------------
+	// OBSOLETE DIRECT TRANSFER PLANS
 
 	// Port usage:
 	//  In_0  = Write request with bit 7 as a ready flip-flop
