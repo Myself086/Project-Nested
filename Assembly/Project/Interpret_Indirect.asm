@@ -16,6 +16,7 @@ b_ld_20e:
 
 	Segment
 b_1:
+		tax
 		ora	#0x1f
 		trap
 		Exception	"Indirect IO Access{}{}{}An indirect load was requested to page range 0x{x:X}-0x{a:X}."
@@ -84,6 +85,7 @@ b_st_60e:
 
 	Segment
 b_1:
+		tax
 		ora	#0x1f
 		trap
 		Exception	"Indirect IO Access{}{}{}An indirect store was requested to page range 0x{x:X}-0x{a:X}."
