@@ -366,15 +366,15 @@ Start__Irq_NesNmi_Return:
 	phk
 	plb
 
-	// Restore NES memory range related to register DB
+	// Restore necessary variables
 	lda	$_keepNesBank
 	sta	$_Memory_NesBank
 	lda	$_keepIOTemp
 	sta	$_IO_Temp
 	.mx	0x00
 	rep	#0x30
-	lda	$_IO_Temp16
-	sta	$_keepIOTemp16
+	lda	$_keepIOTemp16
+	sta	$_IO_Temp16
 
 	// Fix stack and go to proper return
 	lda	$_stack
@@ -387,15 +387,15 @@ Start__Irq_NesNmi_FakeReturn:
 	phk
 	plb
 
-	// Restore NES memory range related to register DB
+	// Restore necessary variables
 	lda	$_keepNesBank
 	sta	$_Memory_NesBank
 	lda	$_keepIOTemp
 	sta	$_IO_Temp
 	.mx	0x00
 	rep	#0x30
-	lda	$_IO_Temp16
-	sta	$_keepIOTemp16
+	lda	$_keepIOTemp16
+	sta	$_IO_Temp16
 
 	// Fix stack
 	lda	$_stack
