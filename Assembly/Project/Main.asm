@@ -305,6 +305,10 @@ b_loop:
 	rep	#0x30
 	.mx	0x00
 
+	// Prepare indirect JMP
+	lda	#_JMPiU_Start/0x100
+	sta	$_JMPiU_Action+1
+
 	// Prepare indirect load/store
 	lda	#_Interpret__LoadIndirect_Page/0x100
 	sta	$_LoadIndirect_Action+1

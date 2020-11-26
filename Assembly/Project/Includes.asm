@@ -101,20 +101,27 @@ ExceptionData:
 	.def	StaticRec_Origins		0xc10000
 
 	// ---------------------------------------------------------------------------
-	// Bank 82: Static recompiler call tables (no static data)
+	// Bank c2: Unrolled indirect JMP
 
 	.addr	0xc20000, 0xc2ffff
+JMPiU_Start:
+	.include	"Project/JMPiUnrolled.asm"
+
+	// ---------------------------------------------------------------------------
+	// Bank 82: Static recompiler call tables (no static data)
+
+	.addr	0xc30000, 0xc3ffff
 StaticRec_Tables:
 	// 256 arrays containing 16-bit address and 16-bit length
 	// Each sub array contains (same format as known calls in RAM):
 	// [0] 24-bit for the original address
 	// [3] 24-bit new call address
 	// [6] 16-bit recompiler flags
-	
+
 	// ---------------------------------------------------------------------------
 
 	// Final ROM size
-	.finalsize	0x020000
+	.finalsize	0x030000
 
 	// ---------------------------------------------------------------------------
 }

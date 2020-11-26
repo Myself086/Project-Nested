@@ -4,6 +4,8 @@ Dev build:
 - Added indirect JMP executed from WRAM
 - Minor performance improvement when indirect load/store changes bank
 - Minor performance improvement to CPU side of sound emulation
+- Large performance improvement to indirect JMP
+- Added page wrap support to indirect JMP
 
 v1.1
 - Fixed sprite pattern table swap made by mappers when sprites are 8x16 in size.

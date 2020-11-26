@@ -26,9 +26,9 @@
 	// 12 = NES palette (with some unused memory, reserved for 4bpp hacks?)
 	// 13 = Function pointer start index, used for the semi-sorted function list (only used while recompiling, could be moved later)
 	// 14 = "
-	// 15 = Function pointer lookup table for indirect JMP (these 2 pages only save 3 cycles per indirect JMP by being in LoROM range)
+	// 15 = Function pointer lookup table for indirect JMP
 	// 16 = "
-	// 17 = <Unused>
+	// 17 = "
 	// 18 = <Unused>
 	// 19 = <Unused>
 	// 1a = <Unused>
@@ -405,9 +405,9 @@ Sound_Ready:
 	.def	QuickFunction				0x1300
 
 	// ---------------------------------------------------------------------------
-	// Quick access to JMPi first node (only 3 cycles saved per indirect JMP by being in LoROM range)
+	// Quick access to JMPi first node
 
-	// 0x200 bytes
+	// 0x300 bytes
 	.def	JMPi_Start					0x1500
 
 	// ---------------------------------------------------------------------------
@@ -535,7 +535,7 @@ IRQ_VSTACK_START:
 	// Channel 2: x x x x x !-! ! x x x _ <- Unused HDMA channel
 	// Channel 3: x x x x x _ _ ! x x x _
 	// Channel 4: x x x x x _ _ _ x x x _
-	// Channel 5: x x x x x _ _ _ x x x _
+	// Channel 5: x x x x x !-!-! x x x _
 	// Channel 6: x x x x x !-!-! x x x _
 	// Channel 7: x x x x x !-!-! x x x _ <- Unused HDMA channel
 
@@ -557,6 +557,9 @@ IRQ_VSTACK_START:
 
 	// $2002's last value
 	.def	IO_2002						0x4337
+
+	// Indirect JMP first destination
+	.def	JMPiU_Action				0x4355
 
 	// Defines which memory range is represented by register DB, shares a byte with LoadIndirect_Action
 	.def	Memory_NesBank				0x4365
@@ -583,9 +586,6 @@ IRQ_VSTACK_START:
 	.def	JMPi_Bank					0xb10000
 	.def	JMPi_EmptyPointer			0xb17000
 	.def	JMPi_ArrayTop				0xb17fff
-
-	// Incremental step constant
-	.def	JMPi_Inc					0x0007
 
 	// Structure:
 	//	[0] = 16-bit comparison for the top 24-bit of the original address

@@ -1899,17 +1899,34 @@ b_1:
 		and	#0x07ff
 		pha
 b_InlineJmpI:
+		// What kind of indirect JMP is this?
+		ldy	#0
+		// Is it in ZP?
+		cmp	#0x0100
+		bcc	$+b_2
+			iny
+			iny
+			iny
+			iny
+b_2:
+		// Is it page wrapping?
+		ora	#0xff00
+		inc	a
+		bne	$+b_2
+			iny
+			iny
+b_2:
 
 		// Write inlined code
-		ldx	#_Inline__JmpI
-		lda	#_Inline__JmpI/0x10000
+		phy
+		ldx	$_Recompiler__Build_OpcodeType_JmpI_Table,y
+		lda	#_JMPiU_Inline_ZpNoWrap/0x10000
 		jsr	$_Recompiler__Build_InlineNoInc
-		tyx
 
-		// Write original address
+		// Change some parameters
+		plx
 		pla
-		ldy	#1
-		sta	[$.writeAddr],y
+		jsr	($_Recompiler__Build_OpcodeType_JmpI_Switch,x)
 
 		// Add to write address
 		txa
@@ -1936,6 +1953,64 @@ b_1:
 	adc	$.writeAddr
 	sta	$.writeAddr
 	rts
+
+Recompiler__Build_OpcodeType_JmpI_Table:
+	.data16	_JMPiU_Inline_ZpNoWrap, _JMPiU_Inline_ZpWrap
+	.data16	_JMPiU_Inline_AbsNoWrap, _JMPiU_Inline_AbsWrap
+
+	// Entry: A = Read address for indirect JMP, Y = Inline byte count
+	// Return: X = Inline byte count
+Recompiler__Build_OpcodeType_JmpI_Switch:
+	.data16	_Recompiler__Build_OpcodeType_JmpI_ZpNoWrap, _Recompiler__Build_OpcodeType_JmpI_ZpWrap
+	.data16	_Recompiler__Build_OpcodeType_JmpI_AbsNoWrap, _Recompiler__Build_OpcodeType_JmpI_AbsWrap
+
+		.mx	0x00
+Recompiler__Build_OpcodeType_JmpI_ZpNoWrap:
+		tyx
+		smx	#0x30
+		ldy	#.JMPiU_Inline_ZpNoWrap_Load-JMPiU_Inline_ZpNoWrap+1
+		sta	[$.writeAddr],y
+		inc	a
+		ldy	#.JMPiU_Inline_ZpNoWrap_LastLoad-JMPiU_Inline_ZpNoWrap+1
+		sta	[$.writeAddr],y
+		smx	#0x00
+		rts
+
+		.mx	0x00
+Recompiler__Build_OpcodeType_JmpI_ZpWrap:
+		tyx
+		smx	#0x30
+		ldy	#.JMPiU_Inline_ZpWrap_Load-JMPiU_Inline_ZpWrap+1
+		sta	[$.writeAddr],y
+		inc	a
+		ldy	#.JMPiU_Inline_ZpWrap_LastLoad-JMPiU_Inline_ZpWrap+1
+		sta	[$.writeAddr],y
+		smx	#0x00
+		rts
+
+		.mx	0x00
+Recompiler__Build_OpcodeType_JmpI_AbsNoWrap:
+		tyx
+		ldy	#_JMPiU_Inline_AbsNoWrap_Load-JMPiU_Inline_AbsNoWrap+1
+		sta	[$.writeAddr],y
+		inc	a
+		ldy	#_JMPiU_Inline_AbsNoWrap_LastLoad-JMPiU_Inline_AbsNoWrap+1
+		sta	[$.writeAddr],y
+		rts
+
+		.mx	0x00
+Recompiler__Build_OpcodeType_JmpI_AbsWrap:
+		tyx
+		ldy	#_JMPiU_Inline_AbsWrap_FirstLoad-JMPiU_Inline_AbsWrap+1
+		sta	[$.writeAddr],y
+		and	#0xff00
+		ldy	#_JMPiU_Inline_AbsWrap_SecondLoad-JMPiU_Inline_AbsWrap+1
+		sta	[$.writeAddr],y
+		ldy	#_JMPiU_Inline_AbsWrap_LastLoad-JMPiU_Inline_AbsWrap+1
+		sta	[$.writeAddr],y
+		rts
+
+	.mx	0x00
 
 
 Recompiler__Build_OpcodeType_Jsr:
@@ -2106,11 +2181,12 @@ Recompiler__Build_OpcodeType_RtsNes:
 Recompiler__Build_OpcodeType_RtsI:
 	// Call interpreter like this:
 	// jmp $=Interpret
-	lda	#_Interpret__BANK*0x100+0x5c
+	breakpoint
+	lda	#_JMPiU__FromStack/0x10000*0x100+0x5c
 	ldy	#0x0002
 	sta	[$.writeAddr]
 	sta	[$.writeAddr],y
-	lda	#_Interpret__RtsI
+	lda	#_JMPiU__FromStack
 	dey
 	sta	[$.writeAddr],y
 	

@@ -84,10 +84,19 @@ Interpreter__Execute_Switch:
 				lda	$.a
 				ldx	$.x
 				ldy	$.y
-				pea	$0x0000
-				pld
-				pea	$_addr
-				jmp	$=Interpret__JmpI
+				sta	$_IO_Temp
+				php
+				rep	#0x20
+				.mx	0x10
+				lda	$.addr
+				and	#0xe0ff
+				xba
+				sta	$_JMPiU_Action
+				lda	#0
+				tcd
+				lda	$_addr+1
+				jmp	[$_JMPiU_Action]
+				.mx	0x30
 b_else:
 				// Copy to PC
 				sta	$.pc+1
@@ -116,8 +125,17 @@ b_else:
 			lda	$.a
 			ldx	$.x
 			ldy	$.y
-			pea	$0x0000
-			pld
-			pea	$_temp
-			jmp	$=Interpret__JmpI
+			sta	$_IO_Temp
+			php
+			rep	#0x20
+			.mx	0x10
+			lda	$.temp
+			and	#0xe0ff
+			xba
+			sta	$_JMPiU_Action
+			lda	#0
+			tcd
+			lda	$_temp+1
+			jmp	[$_JMPiU_Action]
+			.mx	0x30
 

@@ -290,6 +290,7 @@ Start__Irq_NesNmi:
 	.local	.keepNesBank
 	.local	_keepIOTemp16
 	.local	.keepIOTemp
+	.local	_keepJMPiU
 
 	// Is NMI enabled?
 	bit	$_IO_2000-1
@@ -313,6 +314,8 @@ Start__Irq_NesNmi:
 	.mx	0x00
 	lda	$_IO_Temp16
 	sta	$_keepIOTemp16
+	lda	$_JMPiU_Action
+	sta	$_keepJMPiU
 
 	// Next frame
 	call	Interpret__Wait4Vblank
@@ -375,6 +378,8 @@ Start__Irq_NesNmi_Return:
 	rep	#0x30
 	lda	$_keepIOTemp16
 	sta	$_IO_Temp16
+	lda	$_keepJMPiU
+	sta	$_JMPiU_Action
 
 	// Fix stack and go to proper return
 	lda	$_stack
@@ -396,6 +401,8 @@ Start__Irq_NesNmi_FakeReturn:
 	rep	#0x30
 	lda	$_keepIOTemp16
 	sta	$_IO_Temp16
+	lda	$_keepJMPiU
+	sta	$_JMPiU_Action
 
 	// Fix stack
 	lda	$_stack
