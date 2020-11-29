@@ -59,14 +59,15 @@ Recompiler__Reset:
 	ldx	#_Recompiler_FunctionList
 	call	Array__Clear
 
-	// OLD
-//	ldx	#0x00fe
-//Recompiler__Reset_CopyMorphic:
-//	lda	$=Morphic_Start,x
-//	sta	$_Morphic_Page,x
-//	dex
-//	dex
-//	bpl	$-Recompiler__Reset_CopyMorphic
+	// Prepare recompile RAM range
+	lda	$=RomInfo_RecompilePrgRam-1
+	bpl	$+b_else
+		lda	#0x6000
+		bra	$+b_1
+b_else:
+		lda	#0x8000
+b_1:
+	sta	$_Recompile_PrgRamTopRange
 
 	return
 
@@ -114,10 +115,9 @@ Recompiler__Build:
 	// Set bank for readAddr
 	lda	$.romAddr
 	bmi	$+Recompiler__Build_RomRange
-		// TODO: Check recompile flag to allow code in 0x6000-0x7fff range
-		and	#0xe000
-		cmp	#0x6000
-		beq	$+b_1
+		// Is this within recompile range?
+		cmp	$_Recompile_PrgRamTopRange
+		bcs	$+b_1
 			lda	$.romAddr
 			unlock
 			trap
@@ -1766,8 +1766,17 @@ Recompiler__Build_OpcodeType_Jmp:
 	sta	[$.writeAddr],y
 
 	// Is destination in WRAM?
-	cmp	#0x6000
+	cmp	$_Recompile_PrgRamTopRange
 	bcs	$+b_1
+		// Is it in SRAM?
+		and	#0xe000
+		beq	$+b_2
+		bmi	$+b_2
+			lda	#_Inline_StoreDirectKnown_60/0x10000
+			ldx	#_Inline_StoreDirectKnown_60
+			jsr	$_Recompiler__Build_Inline2
+b_2:
+
 		// Call interpreter like this:
 		// pea $_originalValue
 		// jmp $=Interpreter__Execute
@@ -1785,8 +1794,9 @@ Recompiler__Build_OpcodeType_Jmp:
 		iny
 		sta	[$.writeAddr],y
 
-		// Add to write address, assume carry clear from BCS
+		// Add to write address
 		lda	#7
+		clc
 		adc	$.writeAddr
 		sta	$.writeAddr
 		rts
@@ -1885,9 +1895,9 @@ b_2:
 		sta	$.memoryPrefix
 		// Write prefix
 		tyx
-		lda	$=Inline_CmdDirect_LUT,x
+		lda	$=Inline_StoreDirect_LUT,x
 		tax
-		lda	#_Inline_CmdDirect_LUT/0x10000
+		lda	#_Inline_StoreDirect_LUT/0x10000
 		jsr	$_Recompiler__Build_Inline2
 
 		bra	$+b_InlineJmpI
@@ -2016,11 +2026,20 @@ Recompiler__Build_OpcodeType_JmpI_AbsWrap:
 Recompiler__Build_OpcodeType_Jsr:
 	stz	$.memoryPrefix
 
-	// Is destination in WRAM?
+	// Is destination in RAM?
 	ldy	#1
 	lda	[$.readAddr],y
-	cmp	#0x6000
+	cmp	$_Recompile_PrgRamTopRange
 	bcs	$+b_1
+		// Is it in SRAM?
+		and	#0xe000
+		beq	$+b_2
+		bmi	$+b_2
+			lda	#_Inline_StoreDirectKnown_60/0x10000
+			ldx	#_Inline_StoreDirectKnown_60
+			jsr	$_Recompiler__Build_Inline2
+b_2:
+
 		// Call interpreter like this:
 		// phk
 		// per $0x0006
@@ -2047,8 +2066,9 @@ Recompiler__Build_OpcodeType_Jsr:
 		iny
 		sta	[$.writeAddr],y
 
-		// Add to write address, assume carry clear from BCS
+		// Add to write address
 		lda	#11
+		clc
 		adc	$.writeAddr
 		sta	$.writeAddr
 		rts
@@ -2181,7 +2201,6 @@ Recompiler__Build_OpcodeType_RtsNes:
 Recompiler__Build_OpcodeType_RtsI:
 	// Call interpreter like this:
 	// jmp $=Interpret
-	breakpoint
 	lda	#_JMPiU__FromStack/0x10000*0x100+0x5c
 	ldy	#0x0002
 	sta	[$.writeAddr]

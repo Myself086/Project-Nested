@@ -123,7 +123,7 @@ IO_BG_MIRRORS:
 
 
 	.addr	0x0a27, 0x0a3f
-	// 12/25
+	// 14/25
 
 IO_PPUADDR:
 	.fill	2
@@ -157,6 +157,9 @@ IO_SCROLL_Y:
 PPU_SCROLL_X:
 	.fill	2
 PPU_SCROLL_Y:
+	.fill	2
+
+Recompile_PrgRamTopRange:
 	.fill	2
 
 

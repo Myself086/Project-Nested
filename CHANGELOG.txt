@@ -6,6 +6,7 @@ Dev build:
 - Minor performance improvement to CPU side of sound emulation
 - Large performance improvement to indirect JMP
 - Added page wrap support to indirect JMP
+- Added option to recompile code in PRG RAM
 
 v1.1
 - Fixed sprite pattern table swap made by mappers when sprites are 8x16 in size.

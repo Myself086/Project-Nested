@@ -100,6 +100,10 @@ RomInfo_StackEmulation:
 RomInfo_VramQBufferSize:
 	.data16	0x1000
 
+	// Negative when recompiling PRG RAM instead of interpreting
+RomInfo_RecompilePrgRam:
+	.data8	0x00
+
 	// ---------------------------------------------------------------------------
 
 	.align	0x100
@@ -203,6 +207,11 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Clears RAM upon reset, losing all data that would otherwise carry over."
 		RomInfo_SummaryMac	"Doesn't lose data from saved files."
 		RomInfo_DefineMac	"public bool MemoryEmulation.ZeroMemoryReset : Zero Memory upon reset", RomInfo_ZeroMemoryReset, 0x80
+
+	RomInfo_DefineMac	"public void Tab_Cpu : CPU related rules.", 0, 0
+
+		RomInfo_SummaryMac	"This option is for games that store static code into PRG RAM."
+		RomInfo_DefineMac	"public bool Cpu.RecompilePrgRam : Recompile PRG RAM", RomInfo_RecompilePrgRam, 0x80
 
 	RomInfo_DefineMac	"public void Tab_Stack : Stack related rules.", 0, 0
 
