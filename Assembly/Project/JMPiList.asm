@@ -5,6 +5,7 @@ JMPi__Listing:
 JMPi__Listing_Compare:
 		cmp	#0xffff
 		bne	$+b_1
+JMPi__Listing_Pull:
 			lda	$_IO_Temp
 			plp
 JMPi__Listing_Destination:
@@ -72,27 +73,49 @@ JMPi__Linker:
 	and	#0xff00
 	ora	$.a
 	xba
-	sta	$.Param_originalFunction
-	call
+	cmp	$_Recompile_PrgRamTopRange
+	bcc	$+b_else
+		sta	$.Param_originalFunction
+		call
 
-	// Add node for JMPi and change return address
-	.precall	JMPi__Add	=originalCall, =newAddr
-	lda	[$.Recompiler_FunctionList+3],y
-	sta	$3,s
-	sta	$.Param_newAddr+0
-	iny
-	lda	[$.Recompiler_FunctionList+3],y
-	sta	$4,s
-	sta	$.Param_newAddr+1
-	// Original address
-	dey
-	dey
-	dey
-	lda	[$.Recompiler_FunctionList+3],y
-	sta	$.Param_originalCall+1
-	dey
-	lda	[$.Recompiler_FunctionList+3],y
-	sta	$.Param_originalCall+0
+		// Add node for JMPi and change return address
+		.precall	JMPi__Add	=originalCall, =newAddr
+		lda	[$.Recompiler_FunctionList+3],y
+		sta	$3,s
+		sta	$.Param_newAddr+0
+		iny
+		lda	[$.Recompiler_FunctionList+3],y
+		sta	$4,s
+		sta	$.Param_newAddr+1
+		// Original address
+		dey
+		dey
+		dey
+		lda	[$.Recompiler_FunctionList+3],y
+		sta	$.Param_originalCall+1
+		dey
+		lda	[$.Recompiler_FunctionList+3],y
+		sta	$.Param_originalCall+0
+
+		bra	$+b_1
+b_else:
+		// Add interpreted destination
+		stz	$.Param_newAddr+0
+		stz	$.Param_newAddr+1
+		tay
+		xba
+		and	#0x00e0
+		tax
+		lda	$_Program_BankNum-1,x
+		sta	$.Param_originalCall+1
+		sty	$.Param_originalCall+0
+		sty	$_IO_Temp16
+
+		lda	#_JMPi__Interpreter_FirstIteration
+		sta	$3,s
+		lda	#_JMPi__Interpreter_FirstIteration/0x100
+		sta	$4,s
+b_1:
 	call
 
 	// Return
@@ -192,14 +215,59 @@ b_1:
 	ldy	#_JMPi__Listing_Compare-JMPi__Listing+1
 	sta	[$.nodeAddr],y
 
-	// Write destination
+	// Is destination interpreted?
 	lda	$.newAddr+0
-	ldy	#_JMPi__Listing_Destination-JMPi__Listing+1
-	sta	[$.nodeAddr],y
-	lda	$.newAddr+1
-	iny
-	sta	[$.nodeAddr],y
+	ora	$.newAddr+1
+	bne	$+b_else
+		// Call interpreter like this:
+		//  plp
+		//  pea	...
+		//  jmp Interpreter
+		lda	#0xf428
+		ldy	#_JMPi__Listing_Pull-JMPi__Listing
+		sta	[$.nodeAddr],y
+		lda	$.originalCall
+		iny
+		iny
+		sta	[$.nodeAddr],y
+
+		// Change destination
+		lda	#_JMPi__Interpreter
+		ldy	#_JMPi__Listing_Destination-JMPi__Listing+1
+		sta	[$.nodeAddr],y
+		lda	#_JMPi__Interpreter/0x100
+		iny
+		sta	[$.nodeAddr],y
+
+		//$_Recompile_PrgRamTopRange
+
+		bra	$+b_1
+b_else:
+		// Write destination
+		lda	$.newAddr+0
+		ldy	#_JMPi__Listing_Destination-JMPi__Listing+1
+		sta	[$.nodeAddr],y
+		lda	$.newAddr+1
+		iny
+		sta	[$.nodeAddr],y
+b_1:
 
 	return
+
+	// ---------------------------------------------------------------------------
+	
+JMPi__Interpreter:
+	lda	$_IO_Temp
+	jmp	$=Interpreter__Execute
+
+JMPi__Interpreter_FirstIteration:
+	phd
+	php
+	lda	$_IO_Temp16+1
+	sta	$3,s
+	lda	$_IO_Temp16+0
+	sta	$2,s
+	plp
+	jmp	$=Interpreter__Execute
 
 	// ---------------------------------------------------------------------------
