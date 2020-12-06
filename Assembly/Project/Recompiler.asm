@@ -292,8 +292,15 @@ b_tonext:
 					//bpl	$+Recompiler__Build_loop1_loop_next
 					lda	$.stackTrace
 					bne	$+Recompiler__Build_loop1_loop_next
-					lda	#_Opcode_F_PullReturn
-					tsb	$.recompileFlags
+
+					// Using legacy stack underflow detection?
+					lda	$=RomInfo_StackEmulation
+					and	#_RomInfo_StackEmu_StackUnderflow
+					beq	$+b_2
+						lda	#_Opcode_F_PullReturn
+						tsb	$.recompileFlags
+b_2:
+
 					jmp	$_Recompiler__Build_loop1_loop_next
 
 b_1:
@@ -305,15 +312,6 @@ b_loop:
 							iny
 							cmp	[$.readAddr],y
 							beq	$-b_loop
-
-						// Is it ending with RTS? (TODO: Replace this)
-//						lda	#0x6068
-//						cmp	[$.readAddr],y
-//						beq	$+b_2
-//							txy
-//							clc
-//							bra	$-b_tonext
-//b_2:
 
 						// Add to readAddr to point to the last PLA
 						clc

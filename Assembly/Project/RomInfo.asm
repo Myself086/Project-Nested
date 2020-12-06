@@ -95,7 +95,8 @@ RomInfo_DebugOverlay:
 	// 16 bits of "Stack emulation" flags
 RomInfo_StackEmulation:
 	.data16	0x000f
-	.def	RomInfo_StackEmu_LazyDoubleReturn	0x0001
+	.def	RomInfo_StackEmu_LazyDoubleReturn		0x0001
+	.def	RomInfo_StackEmu_StackUnderflow			0x0002
 
 RomInfo_VramQBufferSize:
 	.data16	0x1000
@@ -219,6 +220,11 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Has no effect on performance but may make or break games."
 		RomInfo_DefineMac	"public bool StackEmulation.LazyDoubleReturn : Stack emulation, Lazy double return", RomInfo_StackEmulation, RomInfo_StackEmu_LazyDoubleReturn
+
+		RomInfo_SummaryMac	"Detects when a return address is used as data pointer."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Has no effect on performance but may make or break games."
+		RomInfo_DefineMac	"public bool StackEmulation.StackUnderflow : Stack emulation, Stack underflow detection", RomInfo_StackEmulation, RomInfo_StackEmu_StackUnderflow
 
 	RomInfo_DefineMac	"public void Tab_Banks : Bank and range related rules.", 0, 0
 
