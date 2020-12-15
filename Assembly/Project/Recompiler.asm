@@ -82,13 +82,29 @@ Recompiler__Build:
 	.local	=destListReadP
 	.local	_startAddr, =readAddr
 	.local	_opcodeX2
-	.local	_recompileFlags, _stackTrace, _stackDepth
+	.local	_recompileFlags, _stackTrace, _stackTraceReset, _stackDepth
 	.local	=bankStart
 	// TODO: Replace stackTrace with stackDepth
 
 	// Change bank
 	phk
 	plb
+
+	// Prepare forced recompile flags
+	stz	$.recompileFlags
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturn
+	bne	$+b_else
+		lda	#_Opcode_F_PullReturn
+		tsb	$.recompileFlags
+		lda	#0x4000
+		sta	$.stackTrace
+		sta	$.stackTraceReset
+		bra	$+b_1
+b_else:
+		stz	$.stackTrace
+		stz	$.stackTraceReset
+b_1:
 
 	// Clear lists
 	ldx	#_Recompiler_BranchSrcList
@@ -143,8 +159,6 @@ Recompiler__Build_RomRange:
 Recompiler__Build_SkipRomRange:
 
 	// Loop through the list of destination
-	stz	$.recompileFlags
-	stz	$.stackTrace
 Recompiler__Build_loop1:
 		// Read next destination
 		lda	[$.destListReadP]
@@ -393,7 +407,8 @@ Recompiler__Build_loop1_exit:
 	stz	$.blockStart
 
 	// Reset stack trace
-	stz	$.stackTrace
+	lda	$.stackTraceReset
+	sta	$.stackTrace
 
 	// Prepare reading destination list
 	.local	=destRead, _destInc
@@ -479,7 +494,8 @@ Recompiler__Build_loop2_loop_skip1:
 				stz	$.memoryPrefix
 
 				// Clear stack trace (old version of stackDepth)
-				stz	$.stackTrace
+				lda	$.stackTraceReset
+				sta	$.stackTrace
 
 Recompiler__Build_loop2_loop_skip2:
 

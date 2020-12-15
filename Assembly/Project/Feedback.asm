@@ -127,6 +127,13 @@ Feedback__Init_Copy_Loop_Entry:
 	.func	Feedback__Add
 	// Entry: X = Address, Y = Bank number
 Feedback__Add:
+	// Is native return active?
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturn
+	bne	$+b_1
+		return
+b_1:
+
 	// Set up destination address for writing
 	.local	=pointer
 	lda	#_Feedback_EmptyPointer/0x100

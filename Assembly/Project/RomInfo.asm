@@ -97,6 +97,7 @@ RomInfo_StackEmulation:
 	.data16	0x000f
 	.def	RomInfo_StackEmu_LazyDoubleReturn		0x0001
 	.def	RomInfo_StackEmu_StackUnderflow			0x0002
+	.def	RomInfo_StackEmu_NativeReturn			0x0004
 
 RomInfo_VramQBufferSize:
 	.data16	0x1000
@@ -215,6 +216,13 @@ RomInfo_Description:
 		RomInfo_DefineMac	"public bool Cpu.RecompilePrgRam : Recompile PRG RAM", RomInfo_RecompilePrgRam, 0x80
 
 	RomInfo_DefineMac	"public void Tab_Stack : Stack related rules.", 0, 0
+
+		RomInfo_SummaryMac	"Use native return addresses instead of originals. Greatly improves performance."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Turn this option OFF to test whether the game has stack emulation issues."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Disabling this option disables SRM feedback as well as every other stack options."
+		RomInfo_DefineMac	"public bool StackEmulation.NativeReturn : Stack emulation, Native return address", RomInfo_StackEmulation, RomInfo_StackEmu_NativeReturn
 
 		RomInfo_SummaryMac	"Take a more lazy approach when solving double return."
 		RomInfo_SummaryMac	""
