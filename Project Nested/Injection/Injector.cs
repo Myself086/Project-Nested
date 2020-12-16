@@ -357,6 +357,9 @@ namespace Project_Nested.Injection
 
         private byte[] FinalChanges()
         {
+            // Clone data so it doesn't carry over to a future save
+            byte[] OutData = (byte[])this.OutData.Clone();
+
             // Copy start-up code to its proper location for ROMs using more than 4mb
             Array.Copy(OutData, 0x00ff00, OutData, 0x40ff00, 0x100);
 
