@@ -1393,6 +1393,7 @@ Recompiler__Build_OpcodeType_LdaConst:
 	lda	[$.readAddr],y
 	cmp	#0xa948
 	beq	$+Recompiler__Build_OpcodeType_LdaConst_PushReturn
+b_back:
 
 	// Is it LDA #0?
 	lda	[$.readAddr]
@@ -1406,6 +1407,11 @@ Recompiler__Build_OpcodeType_LdaConst:
 	rts
 
 Recompiler__Build_OpcodeType_LdaConst_PushReturn:
+	// Are we using native stack?
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturn
+	beq	$-b_back
+
 	// Expected sequence of code:
 	//  lda	#high
 	//  pha
