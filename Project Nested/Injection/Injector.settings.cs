@@ -77,6 +77,10 @@ namespace Project_Nested.Injection
                 if (item.Value.IsPublic && !item.Value.IsGlobal && item.Value.type != SettingType.Void)
                     sb.AppendLine(item.Value.ToString());
 
+            // Unknown settings
+            foreach (var item in unknownSettings)
+                sb.AppendLine(item);
+
             // Calls
             sb.AppendLine(ConvertCallsToString(this.calls));
 
@@ -163,18 +167,29 @@ namespace Project_Nested.Injection
                 // Setting
                 int equalSign = commandLine.IndexOf('=');
                 if (equalSign >= 0)
-                    SetSetting(commandLine.Substring(0, equalSign), commandLine.Substring(equalSign + 1));
+                    if (!SetSetting(commandLine.Substring(0, equalSign), commandLine.Substring(equalSign + 1)))
+                        unknownSettings.Add(commandLine);
             }
         }
 
-        public void SetSetting(string name, string value)
+        public bool SetSetting(string name, string value)
         {
-            settings[name.Trim()].SetValue(value);
+            name = name.Trim();
+
+            bool rtn;
+            if (rtn = settings.ContainsKey(name))
+                settings[name].SetValue(value);
+            return rtn;
         }
 
-        public void SetSetting(string name, int index, string value)
+        public bool SetSetting(string name, int index, string value)
         {
-            settings[name.Trim()][index] = value;
+            name = name.Trim();
+
+            bool rtn;
+            if (rtn = settings.ContainsKey(name))
+                settings[name][index] = value;
+            return rtn;
         }
 
         #endregion

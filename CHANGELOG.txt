@@ -9,6 +9,7 @@ Dev build:
 - Added option to recompile code in PRG RAM
 - Fixed indirect JMP into interpreted RAM
 - Added some options to disable stack optimizations
+- Fixed loading/saving unknown settings in a profile
 
 v1.1
 - Fixed sprite pattern table swap made by mappers when sprites are 8x16 in size.

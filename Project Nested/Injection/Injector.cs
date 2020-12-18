@@ -35,6 +35,7 @@ namespace Project_Nested.Injection
         bool settingsLoaded;
         Dictionary<string, Setting> settings { get { if (!settingsLoaded) { LoadSettings(); settingsLoaded = true; } return _settings; } }
         Dictionary<string, Setting> _settings = new Dictionary<string, Setting>();
+        List<string> unknownSettings = new List<string>();
 
         SettingWrapper<short> Mapper => new SettingWrapper<short>(settings, "MapperNum");
         SettingWrapper<byte> StartBankPrg => new SettingWrapper<byte>(settings, "StartBankPRG");
