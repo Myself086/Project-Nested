@@ -131,11 +131,11 @@ RomInfo_ChrBankLut_hi:
 	// ---------------------------------------------------------------------------
 
 	// Version number
-	[80ffdB] = 0x01
+	[80ffdB] = 0x02
 RomInfo_Title:
 	.string0	"Project Nested"
 RomInfo_Version:
-	.string0	"1.1"
+	.string0	"1.2"
 
 	// ---------------------------------------------------------------------------
 
@@ -154,7 +154,7 @@ RomInfo_Version:
 	// Pointer used in Header.asm
 RomInfo_Description:
 
-	RomInfo_DefineMac	"public void Tab_Version : smc version 1.1 (beta)", 0, 0
+	RomInfo_DefineMac	"public void Tab_Version : smc version 1.2", 0, 0
 
 	RomInfo_DefineMac	"private void Tab_Warning : Settings in RED are for debugging purposes ONLY.", 0, 0
 

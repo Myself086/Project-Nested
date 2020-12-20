@@ -1,5 +1,7 @@
 
 Dev build:
+
+v1.2
 - Fixed JMP to WRAM
 - Added indirect JMP executed from WRAM
 - Minor performance improvement when indirect load/store changes bank
