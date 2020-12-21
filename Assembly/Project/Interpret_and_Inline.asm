@@ -519,6 +519,20 @@ b_1:
 
 	// ---------------------------------------------------------------------------
 
+Inline__RmwToIO:
+	php
+	pha
+Inline__RmwToIO_Load:
+	lda	$0x50da
+Inline__RmwToIO_Call:
+	jsr	$0xc0ffee
+	pla
+	plp
+
+	.data8	0
+
+	// ---------------------------------------------------------------------------
+
 	.mx	0x30
 
 Inline__PushConstantReturn:

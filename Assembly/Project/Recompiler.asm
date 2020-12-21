@@ -819,6 +819,8 @@ Recompiler__Build_OpcodeType:
 	.data16	_Recompiler__Build_OpcodeType_Brw
 	.data16	_Recompiler__Build_OpcodeType_RtsNes
 	.data16	_Recompiler__Build_OpcodeType_Jsl
+	.data16	_Recompiler__Build_OpcodeType_Rmw
+	.data16	_Recompiler__Build_OpcodeType_RmwX
 
 	// Entry: A = Opcode * 2, X = Free, Y = Free
 	// Allowed to return any mode
@@ -875,7 +877,12 @@ Recompiler__Build_OpcodeType_StxA:
 Recompiler__Build_OpcodeType_StyA:
 	ldx	#_iIOPort_sty*2
 	bra	$+Recompiler__Build_OpcodeType_AbsIO
-	
+Recompiler__Build_OpcodeType_RmwX:
+	// TODO: Support RMW Abs,X
+Recompiler__Build_OpcodeType_Rmw:
+	ldx	#_iIOPort_rmw*2
+	bra	$+Recompiler__Build_OpcodeType_AbsIO
+
 Recompiler__Build_OpcodeType_Abs:
 	ldx	#0x0000
 Recompiler__Build_OpcodeType_AbsIO:
@@ -890,7 +897,7 @@ Recompiler__Build_OpcodeType_AbsIO:
 		// Is it a store opcode?
 		cpx	#_iIOPort_store*2
 		bcs	$+Recompiler__Build_OpcodeType_Abs_IO
-		jmp	$_Recompiler__Build_OpcodeType_Abs_Pass
+		jmp	$_Recompiler__Build_OpcodeType_Abs_HighRange
 Recompiler__Build_OpcodeType_Abs_SkipStoreCondition:
 	// Are we in SRAM range?
 	cmp	#0x6000
@@ -908,7 +915,7 @@ Recompiler__Build_OpcodeType_Abs_SkipSramRange:
 	// Are we reading gamepad inputs?
 	and	#0xfffe
 	cmp	#0x4016
-	beq	$+Recompiler__Build_OpcodeType_Abs_Pass
+	jeq	$_Recompiler__Build_OpcodeType_Abs_HighRange
 	// Are we in I/O range?
 	lda	[$.readAddr],y
 	bit	#0x6000
@@ -918,7 +925,9 @@ Recompiler__Build_OpcodeType_Abs_IO:
 		ldy	#0xffff
 		sty	$.blockFlags
 
-		// Get IO access call pointer
+		// Get IO access call pointer (TODO: Fix iIOPort_rmw)
+		cpx	#_iIOPort_rmw*2
+		beq	$+Recompiler__Build_OpcodeType_Abs_PassRmw
 		phx
 		txy
 		tax
@@ -985,8 +994,79 @@ Recompiler__Build_OpcodeType_Abs_Pass2:
 	sta	$.writeAddr
 	rts
 
-Recompiler__Build_OpcodeType_Abs_Pass:
-	jmp	$_Recompiler__Build_OpcodeType_Abs_HighRange
+Recompiler__Build_OpcodeType_Abs_PassRmw:
+	ldy	#_iIOPort_sta*2
+	tax
+	call	Recompiler__GetIOAccess
+	pha
+
+	// Prepare memory emulation prefix
+	ldy	#1
+	lda	[$.readAddr],y
+	cmp	#0x6000
+	bcc	$+b_1
+		// ROM and SRAM range
+		pha
+		xba
+		and	#0x00e0
+		tay
+		// Is memory prefix known?
+		ldx	$.memoryPrefix
+		beq	$+b_2
+			// Is it the same memory prefix?
+			cpy	$.memoryPrefix
+			bne	$+b_diff
+				// Same
+				pla
+				bra	$+b_noPrefix
+b_diff:
+				// Different
+				ora	#0x0100
+				tay
+				and	#0x00ff
+b_2:
+		sta	$.memoryPrefix
+		// Write prefix
+		lda	[$.writeAddr]
+		pha
+		tyx
+		lda	$=Inline_StoreDirect_LUT,x
+		tax
+		lda	#_Inline_StoreDirect_LUT/0x10000
+		jsr	$_Recompiler__Build_Inline2
+		// Write original code
+		ldy	#0x0001
+		pla
+		sta	[$.writeAddr]
+		pla
+		sta	[$.writeAddr],y
+b_1:
+b_noPrefix:
+
+	// Write inlined code
+	ldx	#_Inline__RmwToIO
+	lda	#_Inline__RmwToIO/0x10000
+	jsr	$_Recompiler__Build_InlineNoInc
+	tyx
+	// Change load address
+	ldy	#1
+	lda	[$.readAddr],y
+	ldy	#_Inline__RmwToIO_Load-Inline__RmwToIO+1
+	sta	[$.writeAddr],y
+	// Change call
+	lda	$.DP_ZeroBank-1
+	ldy	#_Inline__RmwToIO_Call-Inline__RmwToIO+2
+	sta	[$.writeAddr],y
+	pla
+	dey
+	sta	[$.writeAddr],y
+
+	// Add to write address
+	txa
+	clc
+	adc	$.writeAddr
+	sta	$.writeAddr
+	rts
 
 
 Recompiler__Build_OpcodeType_AbsX:

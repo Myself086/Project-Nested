@@ -1,5 +1,6 @@
 
 Dev build:
+- Added support for read-modify-write to IO ports
 
 v1.2
 - Fixed JMP to WRAM
