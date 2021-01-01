@@ -34,6 +34,7 @@ IO__w2000_y:
 IO__w2000_a:
 	sta	$_IO_2000
 IO__w2000_in:
+	lock
 	php
 	xba
 
@@ -48,7 +49,6 @@ IO__w2000_in:
 
 		// Inc 1
 		lda	#.VramQ_PpuAddrInc
-		lock
 		sta	$0x2180
 		lda	#0x01
 		sta	$0x2180
@@ -56,6 +56,7 @@ IO__w2000_in:
 
 		xba
 		plp
+		unlock
 		rtl
 
 IO__w2000_a_inc32:
@@ -67,7 +68,6 @@ IO__w2000_a_inc32:
 
 		// Inc 32
 		lda	#.VramQ_PpuAddrInc
-		lock
 		sta	$0x2180
 		lda	#0x20
 		sta	$0x2180
@@ -75,6 +75,7 @@ IO__w2000_a_inc32:
 
 		xba
 		plp
+		unlock
 		rtl
 
 

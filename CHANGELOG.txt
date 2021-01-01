@@ -1,6 +1,7 @@
 
 Dev build:
 - Added support for read-modify-write to IO ports
+- Port $2000 is now thread safe, fixes Final Fantasy I random crashes
 
 v1.2
 - Fixed JMP to WRAM
