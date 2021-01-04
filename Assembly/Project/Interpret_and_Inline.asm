@@ -551,9 +551,11 @@ Inline__PushConstantReturn_OriginalValue:
 
 Inline__PushConstantReturnAOT:
 	lda	#0x85
-Inline__PushConstantReturnAOT_Call:
-	jsr	$0xc0ffee
-		jsr	$=Interpret__Jsr
+	phk
+	per	$0xff01
+	bra	$+Inline__PushConstantReturnAOT_End
+Inline__PushConstantReturnAOT_JmpToRam:
+		jsr	$0x7f01d5
 		nop
 		rtl
 Inline__PushConstantReturnAOT_End:

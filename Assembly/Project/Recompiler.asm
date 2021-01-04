@@ -1590,23 +1590,14 @@ b_1:
 		// Write code
 		ldx	#_Inline__PushConstantReturnAOT
 		lda	#_Inline__PushConstantReturnAOT/0x10000
-		jsr	$_Recompiler__Build_InlineNoInc
+		ldy	#0
+		jsr	$_Recompiler__Build_Inline2NoInc
 		tyx
 
 		// Copy last LDA
 		ldy	#3
 		lda	[$.readAddr],y
 		sta	[$.writeAddr]
-
-		// Write call
-		ldy	#_Inline__PushConstantReturnAOT_Call-Inline__PushConstantReturnAOT+2
-		lda	$.writeAddr+1
-		sta	[$.writeAddr],y
-		dey
-		txa
-		clc
-		adc	$.writeAddr
-		sta	[$.writeAddr],y
 
 		// Write original return
 		lda	$=StaticRec_OriginCount
@@ -1621,9 +1612,20 @@ b_1:
 		// Write original value
 		sta	$=StaticRec_Origins+2,x
 
+		// Write and increment origin count, assume carry clear from previous adc
+		txa
+		ldy	#_Inline__PushConstantReturnAOT_JmpToRam-Inline__PushConstantReturnAOT+1
+		sta	[$.writeAddr],y
+		adc	#4
+		sta	$=StaticRec_OriginCount
+
+		// Add to read address to skip the sequence, 2 is added after RTS
+		lda	#4
+		adc	$.readAddr
+		sta	$.readAddr
+
 		// Add to write address
 		lda	#_Inline__PushConstantReturnAOT_End-Inline__PushConstantReturnAOT
-		clc
 		adc	$.writeAddr
 		sta	$.writeAddr
 		rts
@@ -1953,7 +1955,6 @@ Recompiler__Build_OpcodeType_Jmp_OutOfRange:
 	lda	#0x6bea
 	sta	[$.writeAddr]
 	inc	$.writeAddr
-	//jmp	$_Recompiler__Build_OpcodeType_Rts
 	inc	$.writeAddr
 	rts
 
@@ -2611,6 +2612,7 @@ Recompiler__Build_OpcodeType_None:
 	lsr	a
 	tay
 	bra	$-Recompiler__Build_OpcodeType_None
+
 	
 Recompiler__Build_Inline:
 	// Entry: X = source address, A = source bank
@@ -2646,6 +2648,7 @@ Recompiler__Build_Inline_LoopEnd:
 	rts
 	.unlocal	=inline
 
+
 Recompiler__Build_InlineNoInc:
 	// Entry: X = source address, A = source bank
 	// Return: Y = number of bytes added
@@ -2675,6 +2678,7 @@ b_LoopEnd:
 
 	rts
 	.unlocal	=inline
+
 
 Recompiler__Build_Inline2:
 	// Entry: X = source address, A = source bank, Y = Replacement for 0xff
@@ -2711,6 +2715,41 @@ Recompiler__Build_Inline2_LoopEnd:
 	tya
 	adc	$.writeAddr
 	sta	$.writeAddr
+
+	rts
+	.unlocal	=inline, .inlineValue
+
+
+Recompiler__Build_Inline2NoInc:
+	// Entry: X = source address, A = source bank, Y = Replacement for 0xff
+	.local	=inline, .inlineValue
+
+	// Change mode
+	sep	#0x20
+	.mx	0x20
+
+	stx	$.inline
+	sta	$.inline+2
+	sty	$.inlineValue
+
+	ldy	#0x0000
+	lda	[$.inline],y
+	beq	$+b_LoopEnd
+b_loop:
+		cmp	#0xff
+		bne	$+b_1
+			lda	$.inlineValue
+b_1:
+		sta	[$.writeAddr],y
+		iny
+b_LoopStart:
+		lda	[$.inline],y
+		bne	$-b_loop
+b_LoopEnd:
+
+	// Change mode back
+	rep	#0x31
+	.mx	0x00
 
 	rts
 	.unlocal	=inline, .inlineValue
