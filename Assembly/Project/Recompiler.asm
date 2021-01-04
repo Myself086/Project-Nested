@@ -52,12 +52,15 @@ Recompiler__Reset:
 	rep	#0x30
 	.mx	0x00
 
-	// Tell EmulSNES where the known calls are
-	ldx	#_KnownCalls_Start
-	WDM_ExportCallList_x
-
+	// Reset known calls
 	ldx	#_Recompiler_FunctionList
 	call	Array__Clear
+
+	// Tell EmulSNES where the known calls are
+	lda	#_RomInfo_BankLut/0x100
+	ldx	#_Recompiler_FunctionList
+	ldy	#_StaticRec_Tables/0x100
+	WDM_ExportCallList
 
 	// Prepare recompile RAM range
 	lda	$=RomInfo_RecompilePrgRam-1
