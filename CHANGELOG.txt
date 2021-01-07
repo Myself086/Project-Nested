@@ -3,6 +3,7 @@ Dev build:
 - Added support for read-modify-write to IO ports
 - Port $2000 is now thread safe, fixes Final Fantasy I random crashes
 - Fixed AOT JMP across banks
+- Fixed branch destinations to $7f0000, commonly used by AOT and once by JIT
 
 v1.2
 - Fixed JMP to WRAM

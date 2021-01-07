@@ -1771,6 +1771,7 @@ b_1:
 		lda	[$.Recompiler_BranchDestList+3],y
 		beq	$+b_1
 			sbc	#1
+			sec								// Fix bug when destination is 0x0000
 			sbc	$.writeAddr
 			cmp	#0xff80
 			bcc	$+b_1
