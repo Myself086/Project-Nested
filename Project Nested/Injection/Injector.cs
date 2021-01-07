@@ -364,6 +364,10 @@ namespace Project_Nested.Injection
             // Copy start-up code to its proper location for ROMs using more than 4mb
             Array.Copy(OutData, 0x00ff00, OutData, 0x40ff00, 0x100);
 
+            // Rom makeup, HiROM vs ExHiROM (required for SD2SNES ExHiROM)
+            OutData[0x00ffd5] = 0x31;
+            OutData[0x40ffd5] = 0x35;
+
             // Compile known calls
             {
                 // Bank range
