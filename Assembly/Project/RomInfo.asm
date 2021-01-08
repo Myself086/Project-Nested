@@ -9,6 +9,11 @@ RomInfo_StartBankPRG:
 RomInfo_StartBankCHR:
 	.data8	0xc5
 
+	// Cartridge flags
+RomInfo_CartFlags:
+	.data16	0x0000
+	.def	RomInfo_CartFlags_TruncateRom		0x0001
+
 	// 16 bits of "Memory emulation" flags
 RomInfo_MemoryEmulation:
 	.data16	0x000f
@@ -135,7 +140,7 @@ RomInfo_ChrBankLut_hi:
 RomInfo_Title:
 	.string0	"Project Nested"
 RomInfo_Version:
-	.string0	"1.2"
+	.string0	"1.2.1 (indev)"
 
 	// ---------------------------------------------------------------------------
 
@@ -154,7 +159,7 @@ RomInfo_Version:
 	// Pointer used in Header.asm
 RomInfo_Description:
 
-	RomInfo_DefineMac	"public void Tab_Version : smc version 1.2", 0, 0
+	RomInfo_DefineMac	"public void Tab_Version : smc version 1.2.1 (indev)", 0, 0
 
 	RomInfo_DefineMac	"private void Tab_Warning : Settings in RED are for debugging purposes ONLY.", 0, 0
 
@@ -209,6 +214,13 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Clears RAM upon reset, losing all data that would otherwise carry over."
 		RomInfo_SummaryMac	"Doesn't lose data from saved files."
 		RomInfo_DefineMac	"public bool MemoryEmulation.ZeroMemoryReset : Zero Memory upon reset", RomInfo_ZeroMemoryReset, 0x80
+
+	RomInfo_DefineMac	"public void Tab_Cartridge : Cartridge settings.", 0, 0
+
+		RomInfo_SummaryMac	"Truncates the ROM size to the size that it's supposed to be instead of a power of 2"
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Intended for devices that are unable to load 8mb."
+		RomInfo_DefineMac	"public bool Cartridge.TruncateRom : Truncate ROM", RomInfo_CartFlags, RomInfo_CartFlags_TruncateRom
 
 	RomInfo_DefineMac	"public void Tab_Cpu : CPU related rules.", 0, 0
 

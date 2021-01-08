@@ -65,6 +65,7 @@
     <Compile Include="Injection\Injector.settings.cs" />
     <Compile Include="Injection\Patch.cs" />
     <Compile Include="Injection\Setting.cs" />
+    <Compile Include="IntExtension.cs" />
     <Compile Include="SrmFeedbackReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

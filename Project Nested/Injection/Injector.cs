@@ -54,6 +54,8 @@ namespace Project_Nested.Injection
             AbsolutePrgBankCross = 0x0008,
         }
 
+        SettingWrapper<bool> TruncateRom => new SettingWrapper<bool>(settings, "Cartridge.TruncateRom");
+
         SettingWrapper<byte> PrgBankNumbers => new SettingWrapper<byte>(settings, "PrgBanks");
 
         SettingWrapper<int> PrgBankingMask => new SettingWrapper<int>(settings, "PrgBankMask");
@@ -416,14 +418,8 @@ namespace Project_Nested.Injection
             finalRomSize = BankToFileAddress(NewLoRomBank) > BankToFileAddress(NewHiRomBank) ?
                            BankToFileAddress(NewLoRomBank) : BankToFileAddress(NewHiRomBank);
 
-            // Round up to a power of 2 (not necessary but the checksum would get tricky)
-            finalRomSize--;
-            finalRomSize |= finalRomSize >> 1;
-            finalRomSize |= finalRomSize >> 2;
-            finalRomSize |= finalRomSize >> 4;
-            finalRomSize |= finalRomSize >> 8;
-            finalRomSize |= finalRomSize >> 16;
-            finalRomSize++;
+            if (!TruncateRom.Value)
+                finalRomSize = finalRomSize.RoundToPowerOf2();
 
             // Resize ROM
             byte[] finalData = OutData;
@@ -444,20 +440,50 @@ namespace Project_Nested.Injection
 
             // Calculate checksum
             {
+                Int32 checksumAddress = finalData.Length < 0x400000 ? 0x00ffdc : 0x40ffdc;
+
                 // Erase checksum
-                finalData.Write32(0xffdc, 0x0000ffff);
+                finalData.Write32(checksumAddress, 0x0000ffff);
 
                 // Do checksum
-                Int32 sum = 0;
-                for (int i = 0; i < finalRomSize; i++)
-                    sum += finalData[i];
+                Int32 sum = CalculateChecksum(finalData);
 
                 // Write checksum
-                finalData.Write16(0xffdc + 0, ~sum);
-                finalData.Write16(0xffdc + 2, sum);
+                finalData.Write16(checksumAddress + 0, ~sum);
+                finalData.Write16(checksumAddress + 2, sum);
             }
 
             return finalData;
+        }
+
+        private int CalculateChecksum(byte[] data)
+        {
+            Int32 fileSize = data.Length;
+            Int32 mirroredSize = fileSize.RoundToPowerOf2();
+
+            int sum = 0;
+            for (int i = 0; i < mirroredSize;)
+            {
+                // Get highest cleared bit compared to fileSize
+                Int32 highBit = ~i & fileSize;
+                while ((highBit & (highBit - 1)) != 0)
+                    highBit &= highBit - 1;
+                if (highBit == 0)
+                    highBit = fileSize & ~(fileSize - 1);
+
+                // Get mirror offsets
+                Int32 topOffset = ~(highBit - 1) & fileSize;
+                Int32 bottomOffset = topOffset & ~highBit;
+
+                // Count bytes
+                for (int u = bottomOffset; u < topOffset; u++)
+                    sum += data[u];
+
+                // Next
+                i += topOffset - bottomOffset;
+            }
+
+            return sum;
         }
 
         #endregion

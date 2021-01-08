@@ -5,6 +5,7 @@ Dev build:
 - Fixed AOT JMP across banks
 - Fixed branch destinations to $7f0000, commonly used by AOT and once by JIT
 - Fixed ExHiROM for SD2SNES
+- Added option to truncate ROM size instead of a power of 2
 
 v1.2
 - Fixed JMP to WRAM
