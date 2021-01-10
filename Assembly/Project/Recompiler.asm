@@ -2512,7 +2512,7 @@ b_1:
 	dec	$.stackTrace
 	lsr	$.stackDepth
 
-false
+.false
 {
 	// Is this function pulling return?
 	lda	$.recompileFlags
