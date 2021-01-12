@@ -474,6 +474,9 @@ Gui__CalcRamPercent:
 	and	#0xfffc
 	adc	$.low+1
 	sta	$.low+1
+	bcc	$+b_1
+		inc	$.high+1
+b_1:
 
 	// -bit 4
 	txa
@@ -530,6 +533,9 @@ Gui__CalcCpuPercent:
 	and	#0xfffc
 	adc	$.low+1
 	sta	$.low+1
+	bcc	$+b_1
+		inc	$.high+1
+b_1:
 
 	// +Bit 7
 	txa
@@ -542,9 +548,9 @@ Gui__CalcCpuPercent:
 	tya
 	adc	$.low+1
 	sta	$.low+1
-	bcc	$+b_mac1
+	bcc	$+b_1
 		inc	$.high+1
-b_mac1:
+b_1:
 
 	// -bit 4
 	txa
