@@ -7,6 +7,7 @@ Dev build:
 - Fixed ExHiROM for SD2SNES
 - Added option to truncate ROM size instead of a power of 2
 - Fixed minor math error on the performance display
+- Added indirect IO access
 
 v1.2
 - Fixed JMP to WRAM

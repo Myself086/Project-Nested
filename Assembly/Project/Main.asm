@@ -301,6 +301,24 @@ b_loop:
 	lda	#0x04
 	sta	$0x212C
 
+	// Prepare indirect IO JMP
+	lda	#0x5c
+	sta	$_InterpretIO_Action_JMP
+
+	// Prepare indirect load/store
+	.macro	Main_SetIndirectOpcode		OpcodeName
+		lda	#.Interpret__{0}Indirect_Page/0x100
+		sta	$_Indirect_{0}_Action+1
+	.endm
+	Main_SetIndirectOpcode	Ora
+	Main_SetIndirectOpcode	And
+	Main_SetIndirectOpcode	Eor
+	Main_SetIndirectOpcode	Adc
+	Main_SetIndirectOpcode	Sta
+	Main_SetIndirectOpcode	Lda
+	Main_SetIndirectOpcode	Cmp
+	Main_SetIndirectOpcode	Sbc
+
 	// Change mode
 	rep	#0x30
 	.mx	0x00
@@ -308,12 +326,6 @@ b_loop:
 	// Prepare indirect JMP
 	lda	#_JMPiU_Start/0x100
 	sta	$_JMPiU_Action+1
-
-	// Prepare indirect load/store
-	lda	#_Interpret__LoadIndirect_Page/0x100
-	sta	$_LoadIndirect_Action+1
-	lda	#_Interpret__StoreIndirect_Page/0x100
-	sta	$_StoreIndirect_Action+1
 
 	// Recompile from reset vector's address at 0xFFFC
 	.precall	Recompiler__Build		_romAddr, _compileType

@@ -23,6 +23,13 @@
 		dec	a
 	.endm
 
+	.macro	inc16dp
+		inc	$.Zero+{0}
+		bne	$+b_inc16__
+			inc	$.Zero+{0}+1
+b_inc16__:
+	.endm
+
 	// ---------------------------------------------------------------------------
 	// Stack related macros
 

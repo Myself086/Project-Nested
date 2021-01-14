@@ -201,10 +201,31 @@ IRQ_SnesPointer:
 
 
 	.addr	0x0a87, 0x0a9f
-	// 2/25
+	// 18/25
 
 	// Data copied from APU's memory
 Sound_DebugAPU:
+	.fill	2
+
+	// Long jump for the following 24-bit pointer
+InterpretIO_Action_JMP:
+	.fill	1
+	// 24-bit code pointer for indirect IO access (TODO: Thread safety)
+InterpretIO_Action:
+	.fill	3
+
+	// Indirect memory access meant for indirect IO but every indirect opcode needs its own action pointer
+Indirect_Ora_Action:
+	.fill	2
+Indirect_And_Action:
+	.fill	2
+Indirect_Eor_Action:
+	.fill	2
+Indirect_Adc_Action:
+	.fill	2
+Indirect_Cmp_Action:
+	.fill	2
+Indirect_Sbc_Action:
 	.fill	2
 
 
@@ -539,8 +560,8 @@ IRQ_VSTACK_START:
 	// Channel 3: x x x x x _ _ ! x x x _
 	// Channel 4: x x x x x _ _ _ x x x _
 	// Channel 5: x x x x x !-!-! x x x _
-	// Channel 6: x x x x x !-!-! x x x _
-	// Channel 7: x x x x x !-!-! x x x _ <- Unused HDMA channel
+	// Channel 6: x x x x x !-! _ x x x _
+	// Channel 7: x x x x x !-! _ x x x _ <- Unused HDMA channel
 
 	// 16-bit Used to store temporary read/write value for IO ports (directly before zero)
 	.def	IO_Temp16					0x4307
@@ -564,11 +585,11 @@ IRQ_VSTACK_START:
 	// Indirect JMP first destination
 	.def	JMPiU_Action				0x4355
 
-	// Defines which memory range is represented by register DB, shares a byte with LoadIndirect_Action
+	// Defines which memory range is represented by register DB, shares a byte with Indirect_Lda_Action
 	.def	Memory_NesBank				0x4365
-	// Indirect load/store, indirect 24-bit JMP destinations
-	.def	LoadIndirect_Action			0x4365
-	.def	StoreIndirect_Action		0x4375
+	// Indirect load/store, indirect 16-bit JMP destinations
+	.def	Indirect_Lda_Action			0x4365
+	.def	Indirect_Sta_Action			0x4375
 
 	// ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------

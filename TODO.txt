@@ -2,7 +2,6 @@
 ----------------------------------------------------------------
 	CPU
 
-- Use a more optimized memory emulation for AND (ZP),Y
 - Add register&flag assumption for JIT to ignore non conditional branches
 - Fix original interrupt flag for PHP and PLP
 - Fix branches pointing inside another opcode's operand within the same function
@@ -11,11 +10,11 @@
 - Optimize branch detection when disassembling
 - Allow NMI to happen during NMI execution
 - Fix stack tracing for cross-bank JMP and indirect JMP
+- Fix memory emulation for STA (ZP,X) when writing to ROM
 
 ----------------------------------------------------------------
 	IO ports
 
-- Support indirect access to IO ports
 - Add ports $2003 and $2004
 - Optimize $2007
 - Add inline capability
@@ -28,6 +27,7 @@
 - Fix disabling background, seems to not work when left column is disabled
 - Randomize VRAM allocation for CHR when 2 or more CHR buffers are found to have the same amount of different bytes
 - Fix 8 sprites per scanline sometimes showing 9 for 8x8 and 8x16 sprite size.
+- Palette option
 
 ----------------------------------------------------------------
 	APU

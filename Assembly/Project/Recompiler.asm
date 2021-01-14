@@ -1422,7 +1422,26 @@ Recompiler__Build_OpcodeType_IndY:
 		iny
 		ldx	#_Inline_CmdIndirect
 		lda	#_Inline_CmdIndirect/0x10000
-		jsr	$_Recompiler__Build_Inline2
+		jsr	$_Recompiler__Build_Inline2NoInc
+		phy
+
+		// Fix call page
+		lda	[$.readAddr]
+		and	#0x00e0
+		lsr	a
+		lsr	a
+		lsr	a
+		lsr	a
+		tax
+		lda	$=Interpret__IndirectIO_PageTable,x
+		ldy	#_Inline_CmdIndirect_Call-Inline_CmdIndirect+1
+		sta	[$.writeAddr],y
+
+		// Add to write address, assume carry clear from LSR
+		pla
+		adc	$.writeAddr
+		sta	$.writeAddr
+
 		bra	$+Recompiler__Build_OpcodeType_Zpg
 
 Recompiler__Build_OpcodeType_LdaIndY:
@@ -2723,6 +2742,7 @@ Recompiler__Build_Inline2_LoopEnd:
 
 Recompiler__Build_Inline2NoInc:
 	// Entry: X = source address, A = source bank, Y = Replacement for 0xff
+	// Return: Y = number of bytes added
 	.local	=inline, .inlineValue
 
 	// Change mode
@@ -2991,9 +3011,11 @@ Recompiler__GetIOAccess_Default:
 	return
 
 Recompiler__GetIOAccess_Return:
-	.local	_temp
+	.local	=temp
+	lda	#_Recompiler__GetIOAccess_Return/0x100
+	sta	$.temp+1
 	stx	$.temp
-	lda	($.temp),y
+	lda	[$.temp],y
 	return
 
 Recompiler__GetIOAccess_ReturnMapper:
