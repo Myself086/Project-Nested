@@ -9,6 +9,7 @@ Dev build:
 - Fixed minor math error on the performance display
 - Added indirect IO access
 - Fixed a crash that sometimes happened after exiting a NES IRQ
+- Fixed memory emulation assumptions after executing an idle loop
 
 v1.2
 - Fixed JMP to WRAM

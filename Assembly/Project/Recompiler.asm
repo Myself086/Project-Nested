@@ -1742,6 +1742,9 @@ Recompiler__Build_OpcodeType_Brw_in:
 	lda	$=RomInfo_NmiMode
 	and	#_RomInfo_NmiMode_DetectIdling
 	beq	$+b_1
+		// Reset memory prefix
+		stz	$.memoryPrefix
+
 		// Keep current branch
 		inc	$.writeAddr
 
@@ -1856,10 +1859,12 @@ b_1:
 
 Recompiler__Build_OpcodeType_Br_Idle_Default:
 		// b.. $+7
-		// jsl $=Interpret__Idle
+		//  jsl $=Interpret__Idle
+		//  stz $_Memory_NesBank
 		// jmp $_destination
-		.data8	0x07
+		.data8	10
 		jsr	$=Interpret__Idle
+		stz	$_Memory_NesBank
 		.data8	0x4c, 0x00
 
 Recompiler__Build_OpcodeType_Br_Idle_Infinite:
@@ -1871,13 +1876,15 @@ b_back:
 		.data8	0x00
 
 Recompiler__Build_OpcodeType_Br_Idle_BitShift:
-		// b.. $+9
-		// beq $+4
-		// jsl $=Interpret__Idle
+		// b.. $+12
+		// beq +
+		//  jsl $=Interpret__Idle
+		//  stz $_Memory_NesBank
 		// jmp $_destination
-		.data8	0x09
+		.data8	12
 		beq	$+b_1
 			jsr	$=Interpret__Idle
+			stz	$_Memory_NesBank
 b_1:
 		.data8	0x4c, 0x00
 
