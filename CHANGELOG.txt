@@ -10,6 +10,7 @@ Dev build:
 - Added indirect IO access
 - Fixed a crash that sometimes happened after exiting a NES IRQ
 - Fixed memory emulation assumptions after executing an idle loop
+- Fixed some errors during the final stage of generating a SNES file
 
 v1.2
 - Fixed JMP to WRAM

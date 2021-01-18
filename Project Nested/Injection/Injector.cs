@@ -360,9 +360,6 @@ namespace Project_Nested.Injection
 
         private byte[] FinalChanges()
         {
-            // Clone data so it doesn't carry over to a future save
-            byte[] OutData = (byte[])this.OutData.Clone();
-
             // Copy start-up code to its proper location for ROMs using more than 4mb
             Array.Copy(OutData, 0x00ff00, OutData, 0x40ff00, 0x100);
 
@@ -371,6 +368,7 @@ namespace Project_Nested.Injection
             OutData[0x40ffd5] = 0x35;
 
             // Compile known calls
+            byte[] finalData = null;
             {
                 // Bank range
                 this.AotCompileBanks.SetValueAt(0, (byte)(NewHiRomBank + 1));
@@ -393,14 +391,13 @@ namespace Project_Nested.Injection
                     for (int i = 0; i < calls.Count; i++)
                         sram.Write24(callsPointer + i * 3 + 2, calls[i]);
                 }
+
                 // Call compiler
                 c65816 emu = new c65816(OutData, sram);
                 emu.InterruptUnusedReset();
-                if (emu.Execute())
-                {
-                    // Get data back
-                    OutData.WriteArray(0, emu.memory.ReadROM(), OutData.Length);
-                }
+                emu.Execute();
+                // Get data back and using 'finalData' instead of 'OutData' from now
+                finalData = emu.memory.ReadROM();
             }
 
             if (NewHiRomBank > 0x80)
@@ -408,7 +405,7 @@ namespace Project_Nested.Injection
                 // Find last used HiROM bank
                 for (; NewHiRomBank < 0xfe; NewHiRomBank++)
                 {
-                    if (OutData.Read16(BankToFileAddress(NewHiRomBank) + 0x7ffe) == 0)
+                    if (finalData.Read16(BankToFileAddress(NewHiRomBank) + 0x7ffe) == 0)
                         break;
                 }
             }
@@ -422,7 +419,6 @@ namespace Project_Nested.Injection
                 finalRomSize = finalRomSize.RoundToPowerOf2();
 
             // Resize ROM
-            byte[] finalData = OutData;
             if (finalRomSize < finalData.Length)
                 Array.Resize(ref finalData, finalRomSize);
 
@@ -440,7 +436,7 @@ namespace Project_Nested.Injection
 
             // Calculate checksum
             {
-                Int32 checksumAddress = finalData.Length < 0x400000 ? 0x00ffdc : 0x40ffdc;
+                Int32 checksumAddress = finalData.Length <= 0x400000 ? 0x00ffdc : 0x40ffdc;
 
                 // Erase checksum
                 finalData.Write32(checksumAddress, 0x0000ffff);
