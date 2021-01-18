@@ -126,6 +126,7 @@ Hdma__UpdateScrolling_ReturnFromIRQ:
 	sta	$.Scanline
 	bne	$+b_SkipNewFrame
 		stz	$.Scanline_Busy
+		plb
 		pld
 b_exit:
 		return
