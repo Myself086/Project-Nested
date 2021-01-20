@@ -168,7 +168,7 @@ Recompiler__Build_loop1:
 		sta	$.readAddr
 		sta	$.startAddr
 		ldy	#0x0006
-		lda	[$.Recompiler_BranchDestList],y
+		lda	[$.destListReadP],y
 		sta	$.stackDepth
 
 Recompiler__Build_loop1_loop:
@@ -216,8 +216,8 @@ Recompiler__Build_loop1_loop_switch_Branch:
 					adc	#6
 					tay
 					lda	$.stackDepth
-					ora	[$.Recompiler_BranchDestList],y
-					sta	[$.Recompiler_BranchDestList],y
+					ora	[$.Recompiler_BranchDestList+3],y
+					sta	[$.Recompiler_BranchDestList+3],y
 
 					// Are at least 2 bits set? If so, flag a stack depth error
 					dec	a
@@ -264,15 +264,13 @@ Recompiler__Build_loop1_loop_switch_Jmp_NoRangeTest:
 					ldy	#0x0002
 					call	Array__InsertIfDifferent
 
-b_MergeStackDepth:
 					// Merge stack depth
-					tya
 					clc
 					adc	#6
 					tay
 					lda	$.stackDepth
-					ora	[$.Recompiler_BranchDestList],y
-					sta	[$.Recompiler_BranchDestList],y
+					ora	[$.Recompiler_BranchDestList+3],y
+					sta	[$.Recompiler_BranchDestList+3],y
 
 					// Are at least 2 bits set? If so, flag a stack depth error
 					dec	a
