@@ -93,6 +93,10 @@ Recompiler__Build:
 	phk
 	plb
 
+	// 
+	lda	$.Nmi_Count
+	cmp	#_Nmi_Count_TOP
+
 	// Prepare forced recompile flags
 	stz	$.recompileFlags
 	lda	$=RomInfo_StackEmulation
@@ -2013,8 +2017,8 @@ Recompiler__Build_OpcodeType_JmpI:
 			cpy	$.memoryPrefix
 			bne	$+b_diff
 				// Same
-				pla
-				bra	$+b_noPrefix
+				lda	$1,s
+				bra	$+b_InlineJmpI
 b_diff:
 				// Different
 				ora	#0x0100
@@ -2029,6 +2033,7 @@ b_2:
 		lda	#_Inline_StoreDirect_LUT/0x10000
 		jsr	$_Recompiler__Build_Inline2
 
+		lda	$1,s
 		bra	$+b_InlineJmpI
 b_1:
 
