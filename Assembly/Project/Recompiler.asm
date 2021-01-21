@@ -93,10 +93,6 @@ Recompiler__Build:
 	phk
 	plb
 
-	// 
-	lda	$.Nmi_Count
-	cmp	#_Nmi_Count_TOP
-
 	// Prepare forced recompile flags
 	stz	$.recompileFlags
 	lda	$=RomInfo_StackEmulation
