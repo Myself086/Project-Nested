@@ -12,6 +12,7 @@ Dev build:
 - Fixed memory emulation assumptions after executing an idle loop
 - Fixed some errors during the final stage of generating a SNES file
 - Fixed stack depth assumption when disassembling
+- Added load/compare absolute for idle loop detection
 
 v1.2
 - Fixed JMP to WRAM

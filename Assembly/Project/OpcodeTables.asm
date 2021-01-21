@@ -415,12 +415,15 @@ Opcode__BlockFlag:
 	Opcode__BlockFlag_ValidateMac	0xa5, "lda dp"
 	Opcode__BlockFlag_ValidateMac	0xa6, "ldx dp"
 	Opcode__BlockFlag_ValidateMac	0xa4, "ldy dp"
-	Opcode__BlockFlag_ValidateMac	0xa5, "lda addr"
-	Opcode__BlockFlag_ValidateMac	0xa6, "ldx addr"
-	Opcode__BlockFlag_ValidateMac	0xa4, "ldy addr"
+	Opcode__BlockFlag_ValidateMac	0xad, "lda addr"
+	Opcode__BlockFlag_ValidateMac	0xae, "ldx addr"
+	Opcode__BlockFlag_ValidateMac	0xac, "ldy addr"
 	Opcode__BlockFlag_ValidateMac	0xc5, "cmp dp"
 	Opcode__BlockFlag_ValidateMac	0xe4, "cpx dp"
 	Opcode__BlockFlag_ValidateMac	0xc4, "cpy dp"
+	Opcode__BlockFlag_ValidateMac	0xcd, "cmp addr"
+	Opcode__BlockFlag_ValidateMac	0xec, "cpx addr"
+	Opcode__BlockFlag_ValidateMac	0xcc, "cpy addr"
 
 	// Bit shift wait loop exception
 	Opcode__BlockFlag_SetMac		0x06, Opcode__BlockFlag_BitShift, "asl dp"
