@@ -149,9 +149,9 @@ Mapper1__w8000_DoStuff:
 	rtl
 
 Mapper1__w8000_BGmirrorsLUT:
-	.data8	0x24
-	.fill	7
 	.data8	0x20
+	.fill	7
+	.data8	0x24
 	.fill	7
 	.data8	0x21
 	.fill	7

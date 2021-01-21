@@ -13,6 +13,7 @@ Dev build:
 - Fixed some errors during the final stage of generating a SNES file
 - Fixed stack depth assumption when disassembling
 - Added load/compare absolute for idle loop detection
+- Fixed mapper 1 single screen lower bank (upper bank untested)
 
 v1.2
 - Fixed JMP to WRAM
