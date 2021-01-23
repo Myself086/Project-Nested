@@ -15,6 +15,7 @@ Dev build:
 - Added load/compare absolute for idle loop detection
 - Fixed mapper 1 single screen lower bank (upper bank untested)
 - Fixed memory emulation for indirect JMP in range $6000-$ffff
+- Removed unfinished IRQ mask emulation
 
 v1.2
 - Fixed JMP to WRAM

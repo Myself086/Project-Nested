@@ -158,7 +158,7 @@ Hdma__UpdateScrolling:
 b_SkipNewFrame:
 	// Is IRQ active?
 	lda	$.Scanline_IRQ
-	and	$_InterruptFlag_6502
+	//and	$_InterruptFlag_6502
 	beq	$+b_1
 		// Are we crossing IRQ?
 		cmp	$.Scanline_HDMA
