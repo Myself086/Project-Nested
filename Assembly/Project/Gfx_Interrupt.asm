@@ -230,11 +230,11 @@ b_1:
 
 	// Increment NMI count, up to 3
 	lda	$.Nmi_Count
-	cmp	#0x0003
+	cmp	#_Nmi_Count_TOP
 	bcs	$+b_else
 		inc	a
 		sta	$.Nmi_Count
-		cmp	#0x0003
+		cmp	#_Nmi_Count_TOP
 		bcc	$+b_1
 b_else:
 		// Is Vblank loop busy?

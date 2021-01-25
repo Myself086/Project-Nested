@@ -460,6 +460,7 @@ IRQ_InterruptInProcess:
 
 Nmi_Count:
 	.fill	2
+	.def	Nmi_Count_TOP		0x0003
 
 Vblank_Busy:
 	.fill	2
