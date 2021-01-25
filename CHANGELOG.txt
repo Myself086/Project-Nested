@@ -16,6 +16,7 @@ Dev build:
 - Fixed mapper 1 single screen lower bank (upper bank untested)
 - Fixed memory emulation for indirect JMP in range $6000-$ffff
 - Removed unfinished IRQ mask emulation
+- Removed old interpreted RTS
 
 v1.2
 - Fixed JMP to WRAM

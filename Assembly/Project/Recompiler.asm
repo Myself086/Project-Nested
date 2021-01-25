@@ -2320,22 +2320,6 @@ b_1:
 	bmi	$-b_2
 
 Recompiler__Build_OpcodeType_RtsNes:
-	// Call interpreter like this:
-	// jmp $=Interpret
-	lda	#_Interpret__BANK*0x100+0x5c
-	ldy	#0x0002
-	sta	[$.writeAddr]
-	sta	[$.writeAddr],y
-	lda	#_Interpret__Rts
-	dey
-	sta	[$.writeAddr],y
-	
-	// Add to write address
-	lda	#0x0004
-	adc	$.writeAddr
-	sta	$.writeAddr
-	rts
-
 Recompiler__Build_OpcodeType_RtsI:
 	// Call interpreter like this:
 	// jmp $=Interpret
