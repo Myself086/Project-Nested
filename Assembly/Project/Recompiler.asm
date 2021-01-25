@@ -194,6 +194,7 @@ Recompiler__Build_loop1_loop_switch:
 				.data16	_Recompiler__Build_loop1_loop_switch_Pull
 				.data16	_Recompiler__Build_loop1_loop_switch_Tsx
 				.data16	_Recompiler__Build_loop1_loop_switch_Branch
+				.data16	_Recompiler__Build_loop1_loop_switch_NesReturn
 
 Recompiler__Build_loop1_loop_switch_Branch:
 					// Add destination
@@ -343,6 +344,13 @@ Recompiler__Build_loop1_loop_switch_Tsx:
 					lda	#_Opcode_F_PullReturn
 					tsb	$.recompileFlags
 					jmp	$_Recompiler__Build_loop1_loop_next
+
+
+Recompiler__Build_loop1_loop_switch_NesReturn:
+					// Set "pull return" flag to change caller's code
+					lda	#_Opcode_F_PullReturn
+					tsb	$.recompileFlags
+					jmp	$_Recompiler__Build_loop1_next
 
 
 Recompiler__Build_loop1_loop_switch_Brk:
