@@ -586,8 +586,11 @@ Recompiler__Build_loop3:
 		// Change jump address in the new code
 		clc
 		adc	#0x0004
-		trapcs
-		Exception	"Compiler Error - Bad Branch{}{}{}Branch source not found."
+		bcc	$+b_1
+			unlock
+			trap
+			Exception	"Compiler Error - Bad Branch{}{}{}Branch source not found."
+b_1:
 		tay
 		lda	[$.Recompiler_BranchDestList+3],y
 		sta	[$.srcBank]
