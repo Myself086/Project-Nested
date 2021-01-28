@@ -205,7 +205,13 @@ namespace Project_Nested.Injection
 
             public T this[int index]
             {
-                get => (T)Convert.ChangeType(varObj[index], typeof(T));
+                get
+                {
+                    var value = varObj[index];
+                    if (varObj.IsHex)
+                        return (T)Convert.ChangeType(value.ReadInt(), typeof(T));
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
                 set => varObj[index] = value.ToString();
             }
 
