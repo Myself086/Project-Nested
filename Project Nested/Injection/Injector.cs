@@ -81,6 +81,11 @@ namespace Project_Nested.Injection
         SettingWrapper<byte> ChrBankLut_low => new SettingWrapper<byte>(settings, "ChrBankLut_lo", true);
         SettingWrapper<byte> ChrBankLut_high => new SettingWrapper<byte>(settings, "ChrBankLut_hi", true);
 
+        SettingWrapper<bool> StaticRange_80 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_80");
+        SettingWrapper<bool> StaticRange_a0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_a0");
+        SettingWrapper<bool> StaticRange_c0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_c0");
+        SettingWrapper<bool> StaticRange_e0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_e0");
+
         enum PrgBankMirrorMode
         {
             None,               // NROM
@@ -103,14 +108,14 @@ namespace Project_Nested.Injection
             this.SrcDataCopy = data;
 
             // Dummy preparation because I'm too lazy to decouple the "switch (mapper)" part
-            WriteNesRom();
+            WriteNesRom(true);
         }
 
         #endregion
         // --------------------------------------------------------------------
         #region Apply patch
 
-        private byte[] WriteNesRom()
+        private byte[] WriteNesRom(bool initialChanges)
         {
             this.SrcData = (byte[])SrcDataCopy.Clone();
 
@@ -144,12 +149,27 @@ namespace Project_Nested.Injection
                 this.PrgBankNumbers.SetArray(startingBanks);
             }
 
+            void SetInitialBooleans(params SettingWrapper<bool>[] bools)
+            {
+                if (initialChanges)
+                    foreach (var item in bools)
+                        item.SetValue(true);
+            }
+
+            void ClearInitialBooleans(params SettingWrapper<bool>[] bools)
+            {
+                if (initialChanges)
+                    foreach (var item in bools)
+                        item.SetValue(false);
+            }
+
             // Mapper specific settings
             mapperSupported = true;
             switch (mapper)
             {
                 case 0:
                     WriteBanks(0x4000, 0x2000, PrgBankMirrorMode.None, new byte[] { 0, 0, 0, 0 });
+                    SetInitialBooleans(StaticRange_80, StaticRange_a0, StaticRange_c0, StaticRange_e0);
                     break;
                 case 1:
                     WriteBanks(0x4000, 0x1000, PrgBankMirrorMode.DirectMirror, new byte[] { 0, 0, 0xff, 0xff });
@@ -158,10 +178,12 @@ namespace Project_Nested.Injection
                 case 2:
                     WriteBanks(0x4000, 0x2000, PrgBankMirrorMode.DirectMirror, new byte[] { 0, 0, 0xff, 0xff });
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
+                    SetInitialBooleans(StaticRange_c0, StaticRange_e0);
                     break;
                 case 4:
                     WriteBanks(0x2000, 0x400, PrgBankMirrorMode.Cascade, new byte[] { 0, 1, 0xfe, 0xff });
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
+                    SetInitialBooleans(StaticRange_e0);
                     break;
                 default:
                     mapperSupported = false;
@@ -185,10 +207,42 @@ namespace Project_Nested.Injection
             Apply(MemoryEmulationAbsCrossBank, ForcedFlagEnum.AbsolutePrgBankCross);
         }
 
+        private void CopyStaticData()
+        {
+            byte[] GetBankData(int bankNum, int rangeStart)
+            {
+                // Convert bank number to file address
+                int fileAddress = ConvertSnesBankToFileAddress(bankNum) * 0x10000 + rangeStart;
+
+                return OutData.ReadArray(fileAddress, 0x2000);
+            }
+
+            // Prepare all of our static data, or null if non-static
+            byte[][] StaticRangeData = new byte[4][];
+            if (StaticRange_80.Value) StaticRangeData[0] = GetBankData(PrgBankLut_80[PrgBankNumbers[0]], 0x8000);
+            if (StaticRange_a0.Value) StaticRangeData[1] = GetBankData(PrgBankLut_a0[PrgBankNumbers[1]], 0xa000);
+            if (StaticRange_c0.Value) StaticRangeData[2] = GetBankData(PrgBankLut_c0[PrgBankNumbers[2]], 0xc000);
+            if (StaticRange_e0.Value) StaticRangeData[3] = GetBankData(PrgBankLut_e0[PrgBankNumbers[3]], 0xe000);
+
+            // Copy static data to every bank
+            foreach (var bank in PrgBanks)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    if (StaticRangeData[i] != null)
+                    {
+                        int fileAddress = ConvertSnesBankToFileAddress(bank) * 0x10000 + 0x8000 + i * 0x2000;
+
+                        OutData.WriteArray(fileAddress, StaticRangeData[i], 0x2000);
+                    }
+                }
+            }
+        }
+
         public byte[] ApplyPostChanges()
         {
             // Write NES ROM
-            WriteNesRom();
+            WriteNesRom(false);
 
             // Force some flags to be set
             ApplyForcedFlags();
@@ -198,6 +252,9 @@ namespace Project_Nested.Injection
 
             // Write CHR bank tables
             WriteChrBankTable();
+
+            // Copy static ROM ranges to every bank
+            CopyStaticData();
 
             // Finish writing the ROM
             return FinalChanges();
@@ -265,7 +322,7 @@ namespace Project_Nested.Injection
             AddPrgBank(SrcData.ReadArray(start, mirroredSize));
         }
 
-        private void AddPrgBank(params byte[] data)
+        private void AddPrgBank(byte[] data)
         {
             // Check for boundaries
             switch (NewLoRomBank)
@@ -480,6 +537,12 @@ namespace Project_Nested.Injection
             }
 
             return sum;
+        }
+
+        int ConvertSnesBankToFileAddress(int bankNum)
+        {
+            return (((bankNum ^ 0x80) & 0x80) >> 1) |
+                    (bankNum & 0x3f);
         }
 
         #endregion

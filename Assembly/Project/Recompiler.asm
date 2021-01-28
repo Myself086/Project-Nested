@@ -244,7 +244,12 @@ Recompiler__Build_loop1_loop_switch_Jmp:
 					lda	$.readAddr
 					eor	[$.readAddr],y
 					and	$=RomInfo_PrgBankingMask
-					jne	$_Recompiler__Build_loop1_next
+					beq	$+b_1
+						// Is target range considered static?
+						lda	[$.readAddr],y
+						jsr	$_Recompiler__Build_IsRangeStatic
+						jcc	$_Recompiler__Build_loop1_next
+b_1:
 
 					// Is this jump going out of range?
 					lda	$=RomInfo_JmpRange
@@ -1957,7 +1962,12 @@ Recompiler__Build_OpcodeType_Jmp_SkipInfinite:
 	//lda	[$.readAddr],y
 	eor	$.readAddr
 	and	$=RomInfo_PrgBankingMask
-	bne	$+Recompiler__Build_OpcodeType_Jmp_OutOfRange
+	beq	$+b_1
+		// Is target range considered static?
+		lda	[$.readAddr],y
+		jsr	$_Recompiler__Build_IsRangeStatic
+		bcc	$+Recompiler__Build_OpcodeType_Jmp_OutOfRange
+b_1:
 
 	// Is destination out of range?
 	lda	$=RomInfo_JmpRange
@@ -2775,6 +2785,54 @@ b_LoopEnd:
 
 	rts
 	.unlocal	=inline, .inlineValue
+
+
+Recompiler__Build_IsRangeStatic:
+	// Entry: A = Destination address
+	// Return: Carry = true when static, X & Y = Unchanged
+
+	.local	_temp
+	sta	$.temp
+
+	// Is read address in ROM range?
+	bit	$.readAddr
+	bmi	$+b_1
+		// Invalid source range
+		clc
+		rts
+b_1:
+
+	lda	$=RomInfo_StaticRanges
+
+	// Test bit 15 (must be set)
+	asl	$.temp
+	bcs	$+b_else
+		// Invalid destination range
+		clc
+		rts
+b_else:
+		lsr	a
+		lsr	a
+		lsr	a
+		lsr	a
+b_1:
+
+	// Test bit 14
+	asl	$.temp
+	bcc	$+b_1
+		lsr	a
+		lsr	a
+b_1:
+
+	// Test bit 13
+	asl	$.temp
+	bcc	$+b_1
+		lsr	a
+b_1:
+
+	// Return whether target range is considered static
+	lsr	a
+	rts
 
 	// ---------------------------------------------------------------------------
 

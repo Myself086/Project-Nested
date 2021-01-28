@@ -17,6 +17,7 @@ Dev build:
 - Fixed memory emulation for indirect JMP in range $6000-$ffff
 - Removed unfinished IRQ mask emulation
 - Removed old interpreted RTS
+- Added options to define ROM ranges as being static
 
 v1.2
 - Fixed JMP to WRAM
