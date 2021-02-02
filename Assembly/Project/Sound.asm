@@ -206,26 +206,34 @@ b_1:
 		lda	#0x01
 		bit	$.Sound_NesRegs+0x15
 		beq	$+b_1
-			ldx	$.Sound_square0_length
-			beq	$+b_else
-				dec	$.Sound_square0_length
-				bra	$+b_1
+			// Test Halt bit
+			lda	$.Sound_NesRegs+0x00
+			and	#0x20
+			bne	$+b_1
+				ldx	$.Sound_square0_length
+				beq	$+b_else
+					dec	$.Sound_square0_length
+					bra	$+b_1
 b_else:
-				//lda	#0x01
-				trb	$.Sound_NesRegs+0x15
+					//lda	#0x01
+					trb	$.Sound_NesRegs+0x15
 b_1:
 
 		// Square 1
 		lda	#0x02
 		bit	$.Sound_NesRegs+0x15
 		beq	$+b_1
-			ldx	$.Sound_square1_length
-			beq	$+b_else
-				dec	$.Sound_square1_length
-				bra	$+b_1
+			// Test Halt bit
+			lda	$.Sound_NesRegs+0x04
+			and	#0x20
+			bne	$+b_1
+				ldx	$.Sound_square1_length
+				beq	$+b_else
+					dec	$.Sound_square1_length
+					bra	$+b_1
 b_else:
-				//lda	#0x02
-				trb	$.Sound_NesRegs+0x15
+					//lda	#0x02
+					trb	$.Sound_NesRegs+0x15
 b_1:
 
 		// Triangle
@@ -246,13 +254,17 @@ b_1:
 		lda	#0x08
 		bit	$.Sound_NesRegs+0x15
 		beq	$+b_1
-			ldx	$.Sound_noise_length
-			beq	$+b_else
-				dec	$.Sound_noise_length
-				bra	$+b_1
+			// Test Halt bit
+			lda	$.Sound_NesRegs+0x0c
+			and	#0x20
+			bne	$+b_1
+				ldx	$.Sound_noise_length
+				beq	$+b_else
+					dec	$.Sound_noise_length
+					bra	$+b_1
 b_else:
-				//lda	#0x08
-				trb	$.Sound_NesRegs+0x15
+					//lda	#0x08
+					trb	$.Sound_NesRegs+0x15
 b_1:
 	.endm
 

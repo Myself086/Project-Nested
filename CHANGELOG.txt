@@ -18,6 +18,7 @@ Dev build:
 - Removed unfinished IRQ mask emulation
 - Removed old interpreted RTS
 - Added options to define ROM ranges as being static
+- Fixed pulse and noise halt bit
 
 v1.2
 - Fixed JMP to WRAM
