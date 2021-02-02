@@ -154,7 +154,7 @@ wait2:
         bne wait
         mov 0xF4,a               // reply to CPU with 0xD7 (begin transfer)
 
-		// 63.613 cycles per frame
+		// 63.613 cycles per scanline
 		// Transfer via HDMA must take no more than 66 cycles per byte
 		// Cycles used during transfer: 25 = 3+2 + 3+5+4 + 2+2+4
 
