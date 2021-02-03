@@ -212,6 +212,7 @@ Opcode__AffectReqTable65816:
 	.def	Opcode__A_Jsl			0x5a
 	.def	Opcode__A_Rmw			0x5c
 	.def	Opcode__A_RmwX			0x5e
+	.def	Opcode__A_RtlSnes		0x60
 
 Opcode__AddrMode:
 	//      0                 1                   2                  3                4                5                6                7                8                9                    a                b                c                 d                   e                f
@@ -219,7 +220,7 @@ Opcode__AddrMode:
 	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
 	.data16	_Opcode__A_Jsr,   _Opcode__A_XInd,    _Opcode__A_Jsl,    _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Plp,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_Abs,   _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
 	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
-	.data16	_Opcode__A_Rti,   _Opcode__A_XInd,    _Opcode__A_None,   _Opcode__A_None, _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Pha,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_Jmp,   _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
+	.data16	_Opcode__A_Rti,   _Opcode__A_XInd,    _Opcode__A_RtlSnes,_Opcode__A_None, _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Pha,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_Jmp,   _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
 	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Cli,  _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
 	.data16	_Opcode__A_Rts,   _Opcode__A_XInd,    _Opcode__A_RtsNes, _Opcode__A_None, _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Pla,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_JmpI,  _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
 	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Sei,  _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
@@ -321,6 +322,7 @@ Opcode__Instruction:
 	// 16 = Tsx
 	// 18 = Brw
 	// 1a = NES Return
+	// 1c = SNES Return
 
 Opcode__RecompileType:
 	//      0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f
@@ -328,7 +330,7 @@ Opcode__RecompileType:
 	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
 	.data16	0x0a, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x14, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
 	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
-	.data16	0x0e, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00, 0x12, 0x02, 0x02, 0x00, 0x06, 0x02, 0x02, 0x00
+	.data16	0x0e, 0x02, 0x1c, 0x00, 0x00, 0x02, 0x02, 0x00, 0x12, 0x02, 0x02, 0x00, 0x06, 0x02, 0x02, 0x00
 	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
 	.data16	0x0e, 0x02, 0x1a, 0x00, 0x00, 0x02, 0x02, 0x00, 0x14, 0x02, 0x02, 0x00, 0x08, 0x02, 0x02, 0x00
 	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00

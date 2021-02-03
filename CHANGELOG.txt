@@ -19,6 +19,7 @@ Dev build:
 - Removed old interpreted RTS
 - Added options to define ROM ranges as being static
 - Fixed pulse and noise halt bit
+- Added opcode $42 to patch forcing native return
 
 v1.2
 - Fixed JMP to WRAM

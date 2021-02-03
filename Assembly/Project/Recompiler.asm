@@ -195,6 +195,7 @@ Recompiler__Build_loop1_loop_switch:
 				.data16	_Recompiler__Build_loop1_loop_switch_Tsx
 				.data16	_Recompiler__Build_loop1_loop_switch_Branch
 				.data16	_Recompiler__Build_loop1_loop_switch_NesReturn
+				.data16	_Recompiler__Build_loop1_loop_switch_SnesReturn
 
 Recompiler__Build_loop1_loop_switch_Branch:
 					// Add destination
@@ -360,6 +361,7 @@ Recompiler__Build_loop1_loop_switch_NesReturn:
 
 Recompiler__Build_loop1_loop_switch_Brk:
 					// Nothing special here yet?
+Recompiler__Build_loop1_loop_switch_SnesReturn:
 Recompiler__Build_loop1_loop_switch_JmpIndexed:
 Recompiler__Build_loop1_loop_switch_Error:
 Recompiler__Build_loop1_loop_switch_Return:
@@ -838,6 +840,7 @@ Recompiler__Build_OpcodeType:
 	.data16	_Recompiler__Build_OpcodeType_Jsl
 	.data16	_Recompiler__Build_OpcodeType_Rmw
 	.data16	_Recompiler__Build_OpcodeType_RmwX
+	.data16	_Recompiler__Build_OpcodeType_RtlSnes
 
 	// Entry: A = Opcode * 2, X = Free, Y = Free
 	// Allowed to return any mode
@@ -2319,18 +2322,11 @@ b_3:
 	// Is this function pulling return?
 	lda	$.recompileFlags
 	and	#_Opcode_F_PullReturn
-	bne	$+b_1
-b_2:
-		// Regular return
-		lda	#0x006b
-		sta	[$.writeAddr]
-		inc	$.writeAddr
-		rts
-b_1:
+	beq	$+Recompiler__Build_OpcodeType_RtlSnes_JumpIn
 
 	// (Old condition, may have no effect?) is stack pointer below the original return address?
 	lda	$.stackTrace
-	bmi	$-b_2
+	bmi	$+Recompiler__Build_OpcodeType_RtlSnes_JumpIn
 
 Recompiler__Build_OpcodeType_RtsNes:
 Recompiler__Build_OpcodeType_RtsI:
@@ -2348,6 +2344,24 @@ Recompiler__Build_OpcodeType_RtsI:
 	lda	#0x0004
 	adc	$.writeAddr
 	sta	$.writeAddr
+	rts
+
+
+Recompiler__Build_OpcodeType_RtlSnes:
+	// Flag this function as having a return
+	lda	#_Opcode_F_HasReturn
+	tsb	$.recompileFlags
+
+	// Are we using native returns?
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturn
+	beq	$-Recompiler__Build_OpcodeType_RtsNes
+
+Recompiler__Build_OpcodeType_RtlSnes_JumpIn:
+	// Regular return
+	lda	#0x006b
+	sta	[$.writeAddr]
+	inc	$.writeAddr
 	rts
 
 
