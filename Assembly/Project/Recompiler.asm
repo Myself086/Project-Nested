@@ -867,6 +867,7 @@ Recompiler__Build_OpcodeType_Cli:
 
 Recompiler__Build_OpcodeType_Php:
 	asl	$.stackDepth
+	inc	$.stackTrace
 	jmp	$_Recompiler__Build_OpcodeType_Impl
 
 
