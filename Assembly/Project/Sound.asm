@@ -215,7 +215,7 @@ b_1:
 					dec	$.Sound_square0_length
 					bra	$+b_1
 b_else:
-					//lda	#0x01
+					lda	#0x01
 					trb	$.Sound_NesRegs+0x15
 b_1:
 
@@ -232,7 +232,7 @@ b_1:
 					dec	$.Sound_square1_length
 					bra	$+b_1
 b_else:
-					//lda	#0x02
+					lda	#0x02
 					trb	$.Sound_NesRegs+0x15
 b_1:
 
@@ -263,7 +263,7 @@ b_1:
 					dec	$.Sound_noise_length
 					bra	$+b_1
 b_else:
-					//lda	#0x08
+					lda	#0x08
 					trb	$.Sound_NesRegs+0x15
 b_1:
 	.endm
