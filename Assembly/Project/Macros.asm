@@ -297,7 +297,7 @@ This__:
 	// Mapper related macros
 
 	.macro	iIOPort_InterfaceSwitch		defaultDestination
-		switch	11, {0}, DP_Zero
+		switch	13, {0}, DP_Zero
 	.endm
 
 	// Load instructions
@@ -308,16 +308,18 @@ This__:
 	.def	iIOPort_loadindexed		3
 	.def	iIOPort_ldax	3
 	.def	iIOPort_lday	4
+	.def	iIOPort_ldai	5
 	// Store instructions
-	.def	iIOPort_store			5
-	.def	iIOPort_sta		5
-	.def	iIOPort_stx		6
-	.def	iIOPort_sty		7
-	.def	iIOPort_stax	8
-	.def	iIOPort_stay	9
+	.def	iIOPort_store			6
+	.def	iIOPort_sta		6
+	.def	iIOPort_stx		7
+	.def	iIOPort_sty		8
+	.def	iIOPort_stax	9
+	.def	iIOPort_stay	10
+	.def	iIOPort_stai	11
 	// RMW instructions
-	.def	iIOPort_readwrite		10
-	.def	iIOPort_rmw		10
+	.def	iIOPort_readwrite		12
+	.def	iIOPort_rmw		12
 
 	.macro	IOPort_Compare		value, opcode, destination
 		cmp	#_Zero+{0}

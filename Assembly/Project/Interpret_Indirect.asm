@@ -311,11 +311,11 @@ b_1:
 		tcd
 		.if {0} == 0x91
 		{
-			ldy	#_iIOPort_sta*2
+			ldy	#_iIOPort_stai*2
 		}
 		.else
 		{
-			ldy	#_iIOPort_lda*2
+			ldy	#_iIOPort_ldai*2
 		}
 		call	Recompiler__GetIOAccess
 		// Load 24-bit call pointer

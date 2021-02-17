@@ -21,6 +21,7 @@ IO__Error:
 	.mx	0x30
 	
 IO__r2000_a:
+IO__r2000_a_i:
 IO__r2000_x:
 IO__r2000_y:
 	rtl
@@ -32,6 +33,7 @@ IO__w2000_y:
 	sty	$_IO_2000
 	bra	$+IO__w2000_in
 IO__w2000_a:
+IO__w2000_a_i:
 	sta	$_IO_2000
 IO__w2000_in:
 	lock
@@ -80,10 +82,12 @@ IO__w2000_a_inc32:
 
 
 IO__r2001_a:
+IO__r2001_a_i:
 IO__r2001_x:
 IO__r2001_y:
 	rtl
 IO__w2001_a:
+IO__w2001_a_i:
 	sta	$_IO_2001
 	rtl
 IO__w2001_x:
@@ -95,6 +99,7 @@ IO__w2001_y:
 
 
 IO__r2002_a:
+IO__r2002_a_i:
 IO__r2002_x:
 IO__r2002_y:
 	php
@@ -176,6 +181,7 @@ IO__r2002_NewCall:
 	rtl
 
 IO__w2002_a:
+IO__w2002_a_i:
 	rtl
 IO__w2002_x:
 	rtl
@@ -184,10 +190,12 @@ IO__w2002_y:
 
 	
 IO__r2003_a:
+IO__r2003_a_i:
 IO__r2003_x:
 IO__r2003_y:
 	rtl
 IO__w2003_a:
+IO__w2003_a_i:
 	rtl
 IO__w2003_x:
 	rtl
@@ -196,10 +204,12 @@ IO__w2003_y:
 
 
 IO__r2004_a:
+IO__r2004_a_i:
 IO__r2004_x:
 IO__r2004_y:
 	rtl
 IO__w2004_a:
+IO__w2004_a_i:
 	rtl
 IO__w2004_x:
 	rtl
@@ -208,6 +218,7 @@ IO__w2004_y:
 
 	
 IO__r2005_a:
+IO__r2005_a_i:
 IO__r2005_x:
 IO__r2005_y:
 	rtl
@@ -235,6 +246,7 @@ b_high:
 	.endm
 
 IO__w2005_a:
+IO__w2005_a_i:
 	IO__w2005_Mac	a
 IO__w2005_x:
 	IO__w2005_Mac	x
@@ -243,6 +255,7 @@ IO__w2005_y:
 
 
 IO__r2006_a:
+IO__r2006_a_i:
 IO__r2006_x:
 IO__r2006_y:
 	rtl
@@ -253,6 +266,7 @@ IO__w2006_x:
 	stx	$_IO_Temp
 	bra	$+b_in
 IO__w2006_a:
+IO__w2006_a_i:
 	sta	$_IO_Temp
 b_in:
 	php
@@ -394,6 +408,7 @@ IO__w2006_SR2AND38:
 
 
 IO__r2007_a:
+IO__r2007_a_i:
 IO__r2007_x:
 IO__r2007_y:
 	php
@@ -537,6 +552,7 @@ IO__w2007_x:
 	stx	$_IO_Temp
 	bra	$+IO__w2007_In
 IO__w2007_a:
+IO__w2007_a_i:
 	sta	$_IO_Temp
 	//bra	$+IO__w2007_In
 
@@ -966,6 +982,7 @@ b_loop:
 
 	.mx	0x30
 IO__r4014_a:
+IO__r4014_a_i:
 IO__r4014_x:
 IO__r4014_y:
 	stz	$_IO_Temp
@@ -977,6 +994,7 @@ IO__w4014_y:
 	sty	$_IO_Temp
 	bra	$+IO__w4014_In
 IO__w4014_a:
+IO__w4014_a_i:
 	sta	$_IO_Temp
 	//bra	$+IO__w4014_In
 	
@@ -2088,6 +2106,7 @@ IO__w4013_a_x:		IO_w40xx	0x13, x
 IO__w4013_a_y:		IO_w40xx	0x13, y
 
 IO__r4000_a:
+IO__r4000_a_i:
 IO__r4000_x:
 IO__r4000_y:
 	rtl
@@ -2097,6 +2116,7 @@ IO__w4000_ind:
 	sta	$_Sound_NesRegs+0x0
 	IO_w40xx_Return
 IO__w4000_a:
+IO__w4000_a_i:
 	sta	$_Sound_NesRegs+0x0
 	rtl
 IO__w4000_x:
@@ -2108,6 +2128,7 @@ IO__w4000_y:
 
 
 IO__r4001_a:
+IO__r4001_a_i:
 IO__r4001_x:
 IO__r4001_y:
 	rtl
@@ -2125,6 +2146,7 @@ IO__w4001_y:
 	sty	$_Sound_NesRegs+0x1
 	bra	$+b_in
 IO__w4001_a:
+IO__w4001_a_i:
 	sta	$_Sound_NesRegs+0x1
 b_in:
 	php
@@ -2140,6 +2162,7 @@ b_in:
 
 
 IO__r4002_a:
+IO__r4002_a_i:
 IO__r4002_x:
 IO__r4002_y:
 	rtl
@@ -2149,6 +2172,7 @@ IO__w4002_ind:
 	sta	$_Sound_NesRegs+0x2
 	IO_w40xx_Return
 IO__w4002_a:
+IO__w4002_a_i:
 	sta	$_Sound_NesRegs+0x2
 	rtl
 IO__w4002_x:
@@ -2160,6 +2184,7 @@ IO__w4002_y:
 
 
 IO__r4003_a:
+IO__r4003_a_i:
 IO__r4003_x:
 IO__r4003_y:
 	rtl
@@ -2182,6 +2207,7 @@ IO__w4003_y:
 	sty	$_Sound_NesRegs+0x3
 	bra	$+b_in
 IO__w4003_a:
+IO__w4003_a_i:
 	sta	$_Sound_NesRegs+0x3
 b_in:
 	php
@@ -2200,6 +2226,7 @@ b_in:
 
 
 IO__r4004_a:
+IO__r4004_a_i:
 IO__r4004_x:
 IO__r4004_y:
 	rtl
@@ -2209,6 +2236,7 @@ IO__w4004_ind:
 	sta	$_Sound_NesRegs+0x4
 	IO_w40xx_Return
 IO__w4004_a:
+IO__w4004_a_i:
 	sta	$_Sound_NesRegs+0x4
 	rtl
 IO__w4004_x:
@@ -2220,6 +2248,7 @@ IO__w4004_y:
 
 
 IO__r4005_a:
+IO__r4005_a_i:
 IO__r4005_x:
 IO__r4005_y:
 	rtl
@@ -2237,6 +2266,7 @@ IO__w4005_y:
 	sty	$_Sound_NesRegs+0x5
 	bra	$+b_in
 IO__w4005_a:
+IO__w4005_a_i:
 	sta	$_Sound_NesRegs+0x5
 b_in:
 	php
@@ -2252,6 +2282,7 @@ b_in:
 
 
 IO__r4006_a:
+IO__r4006_a_i:
 IO__r4006_x:
 IO__r4006_y:
 	rtl
@@ -2261,6 +2292,7 @@ IO__w4006_ind:
 	sta	$_Sound_NesRegs+0x6
 	IO_w40xx_Return
 IO__w4006_a:
+IO__w4006_a_i:
 	sta	$_Sound_NesRegs+0x6
 	rtl
 IO__w4006_x:
@@ -2272,6 +2304,7 @@ IO__w4006_y:
 
 
 IO__r4007_a:
+IO__r4007_a_i:
 IO__r4007_x:
 IO__r4007_y:
 	rtl
@@ -2294,6 +2327,7 @@ IO__w4007_y:
 	sty	$_Sound_NesRegs+0x7
 	bra	$+b_in
 IO__w4007_a:
+IO__w4007_a_i:
 	sta	$_Sound_NesRegs+0x7
 b_in:
 	php
@@ -2312,6 +2346,7 @@ b_in:
 
 
 IO__r4008_a:
+IO__r4008_a_i:
 IO__r4008_x:
 IO__r4008_y:
 	rtl
@@ -2329,6 +2364,7 @@ IO__w4008_y:
 	sty	$_Sound_NesRegs+0x8
 	bra	$+b_in
 IO__w4008_a:
+IO__w4008_a_i:
 	sta	$_Sound_NesRegs+0x8
 b_in:
 	php
@@ -2341,6 +2377,7 @@ b_in:
 
 
 IO__r4009_a:
+IO__r4009_a_i:
 IO__r4009_x:
 IO__r4009_y:
 	rtl
@@ -2350,6 +2387,7 @@ IO__w4009_ind:
 	sta	$_Sound_NesRegs+0x9
 	IO_w40xx_Return
 IO__w4009_a:
+IO__w4009_a_i:
 	sta	$_Sound_NesRegs+0x9
 	rtl
 IO__w4009_x:
@@ -2361,6 +2399,7 @@ IO__w4009_y:
 
 
 IO__r400a_a:
+IO__r400a_a_i:
 IO__r400a_x:
 IO__r400a_y:
 	rtl
@@ -2370,6 +2409,7 @@ IO__w400a_ind:
 	sta	$_Sound_NesRegs+0xa
 	IO_w40xx_Return
 IO__w400a_a:
+IO__w400a_a_i:
 	sta	$_Sound_NesRegs+0xa
 	rtl
 IO__w400a_x:
@@ -2381,6 +2421,7 @@ IO__w400a_y:
 
 
 IO__r400b_a:
+IO__r400b_a_i:
 IO__r400b_x:
 IO__r400b_y:
 	rtl
@@ -2396,6 +2437,7 @@ IO__w400b_y:
 	sty	$_Sound_NesRegs+0xb
 	bra	$+b_in
 IO__w400b_a:
+IO__w400b_a_i:
 	sta	$_Sound_NesRegs+0xb
 b_in:
 	php
@@ -2418,6 +2460,7 @@ b_in2:
 
 
 IO__r400c_a:
+IO__r400c_a_i:
 IO__r400c_x:
 IO__r400c_y:
 	rtl
@@ -2427,6 +2470,7 @@ IO__w400c_ind:
 	sta	$_Sound_NesRegs+0xc
 	IO_w40xx_Return
 IO__w400c_a:
+IO__w400c_a_i:
 	sta	$_Sound_NesRegs+0xc
 	rtl
 IO__w400c_x:
@@ -2438,6 +2482,7 @@ IO__w400c_y:
 
 
 IO__r400d_a:
+IO__r400d_a_i:
 IO__r400d_x:
 IO__r400d_y:
 	rtl
@@ -2447,6 +2492,7 @@ IO__w400d_ind:
 	sta	$_Sound_NesRegs+0xd
 	IO_w40xx_Return
 IO__w400d_a:
+IO__w400d_a_i:
 	sta	$_Sound_NesRegs+0xd
 	rtl
 IO__w400d_x:
@@ -2458,6 +2504,7 @@ IO__w400d_y:
 
 
 IO__r400e_a:
+IO__r400e_a_i:
 IO__r400e_x:
 IO__r400e_y:
 	rtl
@@ -2467,6 +2514,7 @@ IO__w400e_ind:
 	sta	$_Sound_NesRegs+0xe
 	IO_w40xx_Return
 IO__w400e_a:
+IO__w400e_a_i:
 	sta	$_Sound_NesRegs+0xe
 	rtl
 IO__w400e_x:
@@ -2478,6 +2526,7 @@ IO__w400e_y:
 
 
 IO__r400f_a:
+IO__r400f_a_i:
 IO__r400f_x:
 IO__r400f_y:
 	rtl
@@ -2499,6 +2548,7 @@ IO__w400f_y:
 	sty	$_Sound_NesRegs+0xf
 	bra	$+b_in
 IO__w400f_a:
+IO__w400f_a_i:
 	sta	$_Sound_NesRegs+0xf
 b_in:
 	php
@@ -2516,6 +2566,7 @@ b_in:
 
 
 IO__r4010_a:
+IO__r4010_a_i:
 IO__r4010_x:
 IO__r4010_y:
 	rtl
@@ -2525,6 +2576,7 @@ IO__w4010_ind:
 	sta	$_Sound_NesRegs+0x10
 	IO_w40xx_Return
 IO__w4010_a:
+IO__w4010_a_i:
 	sta	$_Sound_NesRegs+0x10
 	rtl
 IO__w4010_x:
@@ -2536,6 +2588,7 @@ IO__w4010_y:
 
 
 IO__r4011_a:
+IO__r4011_a_i:
 IO__r4011_x:
 IO__r4011_y:
 	rtl
@@ -2545,6 +2598,7 @@ IO__w4011_ind:
 	sta	$_Sound_NesRegs+0x11
 	IO_w40xx_Return
 IO__w4011_a:
+IO__w4011_a_i:
 	sta	$_Sound_NesRegs+0x11
 	rtl
 IO__w4011_x:
@@ -2556,6 +2610,7 @@ IO__w4011_y:
 
 
 IO__r4012_a:
+IO__r4012_a_i:
 IO__r4012_x:
 IO__r4012_y:
 	rtl
@@ -2565,6 +2620,7 @@ IO__w4012_ind:
 	sta	$_Sound_NesRegs+0x12
 	IO_w40xx_Return
 IO__w4012_a:
+IO__w4012_a_i:
 	sta	$_Sound_NesRegs+0x12
 	rtl
 IO__w4012_x:
@@ -2576,6 +2632,7 @@ IO__w4012_y:
 
 
 IO__r4013_a:
+IO__r4013_a_i:
 IO__r4013_x:
 IO__r4013_y:
 	rtl
@@ -2585,6 +2642,7 @@ IO__w4013_ind:
 	sta	$_Sound_NesRegs+0x13
 	IO_w40xx_Return
 IO__w4013_a:
+IO__w4013_a_i:
 	sta	$_Sound_NesRegs+0x13
 	rtl
 IO__w4013_x:
@@ -2596,6 +2654,7 @@ IO__w4013_y:
 
 
 IO__r4015_a:
+IO__r4015_a_i:
 IO__r4015_x:
 IO__r4015_y:
 	php
@@ -2621,6 +2680,7 @@ IO__w4015_y:
 	sty	$_IO_Temp
 	bra	$+IO__w4015_in
 IO__w4015_a:
+IO__w4015_a_i:
 	sta	$_IO_Temp
 	//bra	$+IO__w4015_in
 
@@ -2676,6 +2736,7 @@ b_1:
 	// Input registers
 
 IO__r4016_a:
+IO__r4016_a_i:
 	xba
 	lda	$0x4016
 	sta	$_IO_Temp
@@ -2699,11 +2760,13 @@ IO__w4016_y:
 	rtl
 
 IO__w4016_a:
+IO__w4016_a_i:
 	sta	$0x4016
 	rtl
 
 
 IO__r4017_a:
+IO__r4017_a_i:
 	xba
 	lda	$0x4017
 	sta	$_IO_Temp
@@ -2727,6 +2790,7 @@ IO__w4017_y:
 	rtl
 
 IO__w4017_a:
+IO__w4017_a_i:
 	sta	$0x4017
 	rtl
 

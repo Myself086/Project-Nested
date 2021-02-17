@@ -61,21 +61,25 @@ Mapper1__8000:
 		caseat	iIOPort_sta		Mapper1__w8000_a
 		caseat	iIOPort_stx		Mapper1__w8000_x
 		caseat	iIOPort_sty		Mapper1__w8000_y
+		caseat	iIOPort_stai	Mapper1__w8000_a_i
 Mapper1__a000:
 	iIOPort_InterfaceSwitch		Mapper1__Error
 		caseat	iIOPort_sta		Mapper1__wa000_a
 		caseat	iIOPort_stx		Mapper1__wa000_x
 		caseat	iIOPort_sty		Mapper1__wa000_y
+		caseat	iIOPort_stai	Mapper1__wa000_a_i
 Mapper1__c000:
 	iIOPort_InterfaceSwitch		Mapper1__Error
 		caseat	iIOPort_sta		Mapper1__wc000_a
 		caseat	iIOPort_stx		Mapper1__wc000_x
 		caseat	iIOPort_sty		Mapper1__wc000_y
+		caseat	iIOPort_stai	Mapper1__wc000_a_i
 Mapper1__e000:
 	iIOPort_InterfaceSwitch		Mapper1__Error
 		caseat	iIOPort_sta		Mapper1__we000_a
 		caseat	iIOPort_stx		Mapper1__we000_x
 		caseat	iIOPort_sty		Mapper1__we000_y
+		caseat	iIOPort_stai	Mapper1__we000_a_i
 
 	//	-----------------------------------------------------------------------
 
@@ -99,6 +103,7 @@ Mapper1__w8000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__w8000
 Mapper1__w8000_a:
+Mapper1__w8000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__w8000
 Mapper1__w8000:
@@ -175,6 +180,7 @@ Mapper1__wa000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__wa000
 Mapper1__wa000_a:
+Mapper1__wa000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__wa000
 Mapper1__wa000:
@@ -246,6 +252,7 @@ Mapper1__wc000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__wc000
 Mapper1__wc000_a:
+Mapper1__wc000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__wc000
 Mapper1__wc000:
@@ -319,6 +326,7 @@ Mapper1__we000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__we000
 Mapper1__we000_a:
+Mapper1__we000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__we000
 Mapper1__we000:

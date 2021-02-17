@@ -3101,223 +3101,283 @@ Recompiler__GetIOAccess_ReturnMapper:
 Recompiler__GetIOAccess_2000:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2000_a
+		caseat	iIOPort_ldai	IO__r2000_a_i
 		caseat	iIOPort_sta		IO__w2000_a
 		caseat	iIOPort_stx		IO__w2000_x
 		caseat	iIOPort_sty		IO__w2000_y
+		caseat	iIOPort_stai	IO__w2000_a_i
 Recompiler__GetIOAccess_2001:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2001_a
+		caseat	iIOPort_ldai	IO__r2001_a_i
 		caseat	iIOPort_sta		IO__w2001_a
 		caseat	iIOPort_stx		IO__w2001_x
 		caseat	iIOPort_sty		IO__w2001_y
+		caseat	iIOPort_stai	IO__w2001_a_i
 Recompiler__GetIOAccess_2002:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2002_a
+		caseat	iIOPort_ldai	IO__r2002_a_i
 		caseat	iIOPort_sta		IO__w2002_a
 		caseat	iIOPort_stx		IO__w2002_x
 		caseat	iIOPort_sty		IO__w2002_y
+		caseat	iIOPort_stai	IO__w2002_a_i
 Recompiler__GetIOAccess_2003:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2003_a
+		caseat	iIOPort_ldai	IO__r2003_a_i
 		caseat	iIOPort_sta		IO__w2003_a
 		caseat	iIOPort_stx		IO__w2003_x
 		caseat	iIOPort_sty		IO__w2003_y
+		caseat	iIOPort_stai	IO__w2003_a_i
 Recompiler__GetIOAccess_2004:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2004_a
+		caseat	iIOPort_ldai	IO__r2004_a_i
 		caseat	iIOPort_sta		IO__w2004_a
 		caseat	iIOPort_stx		IO__w2004_x
 		caseat	iIOPort_sty		IO__w2004_y
+		caseat	iIOPort_stai	IO__w2004_a_i
 Recompiler__GetIOAccess_2005:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2005_a
+		caseat	iIOPort_ldai	IO__r2005_a_i
 		caseat	iIOPort_sta		IO__w2005_a
 		caseat	iIOPort_stx		IO__w2005_x
 		caseat	iIOPort_sty		IO__w2005_y
+		caseat	iIOPort_stai	IO__w2005_a_i
 Recompiler__GetIOAccess_2006:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2006_a
+		caseat	iIOPort_ldai	IO__r2006_a_i
 		caseat	iIOPort_sta		IO__w2006_a
 		caseat	iIOPort_stx		IO__w2006_x
 		caseat	iIOPort_sty		IO__w2006_y
+		caseat	iIOPort_stai	IO__w2006_a_i
 Recompiler__GetIOAccess_2007:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r2007_a
+		caseat	iIOPort_ldai	IO__r2007_a_i
 		caseat	iIOPort_sta		IO__w2007_a
 		caseat	iIOPort_stx		IO__w2007_x
 		caseat	iIOPort_sty		IO__w2007_y
+		caseat	iIOPort_stai	IO__w2007_a_i
 Recompiler__GetIOAccess_4000:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4000_a
+		caseat	iIOPort_ldai	IO__r4000_a_i
 		caseat	iIOPort_sta		IO__w4000_a
 		caseat	iIOPort_stx		IO__w4000_x
 		caseat	iIOPort_sty		IO__w4000_y
 		caseat	iIOPort_stax	IO__w4000_a_x
 		caseat	iIOPort_stay	IO__w4000_a_y
+		caseat	iIOPort_stai	IO__w4000_a_i
 Recompiler__GetIOAccess_4001:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4001_a
+		caseat	iIOPort_ldai	IO__r4001_a_i
 		caseat	iIOPort_sta		IO__w4001_a
 		caseat	iIOPort_stx		IO__w4001_x
 		caseat	iIOPort_sty		IO__w4001_y
 		caseat	iIOPort_stax	IO__w4001_a_x
 		caseat	iIOPort_stay	IO__w4001_a_y
+		caseat	iIOPort_stai	IO__w4001_a_i
 Recompiler__GetIOAccess_4002:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4002_a
+		caseat	iIOPort_ldai	IO__r4002_a_i
 		caseat	iIOPort_sta		IO__w4002_a
 		caseat	iIOPort_stx		IO__w4002_x
 		caseat	iIOPort_sty		IO__w4002_y
 		caseat	iIOPort_stax	IO__w4002_a_x
 		caseat	iIOPort_stay	IO__w4002_a_y
+		caseat	iIOPort_stai	IO__w4002_a_i
 Recompiler__GetIOAccess_4003:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4003_a
+		caseat	iIOPort_ldai	IO__r4003_a_i
 		caseat	iIOPort_sta		IO__w4003_a
 		caseat	iIOPort_stx		IO__w4003_x
 		caseat	iIOPort_sty		IO__w4003_y
 		caseat	iIOPort_stax	IO__w4003_a_x
 		caseat	iIOPort_stay	IO__w4003_a_y
+		caseat	iIOPort_stai	IO__w4003_a_i
 Recompiler__GetIOAccess_4004:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4004_a
+		caseat	iIOPort_ldai	IO__r4004_a_i
 		caseat	iIOPort_sta		IO__w4004_a
 		caseat	iIOPort_stx		IO__w4004_x
 		caseat	iIOPort_sty		IO__w4004_y
 		caseat	iIOPort_stax	IO__w4004_a_x
 		caseat	iIOPort_stay	IO__w4004_a_y
+		caseat	iIOPort_stai	IO__w4004_a_i
 Recompiler__GetIOAccess_4005:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4005_a
+		caseat	iIOPort_ldai	IO__r4005_a_i
 		caseat	iIOPort_sta		IO__w4005_a
 		caseat	iIOPort_stx		IO__w4005_x
 		caseat	iIOPort_sty		IO__w4005_y
 		caseat	iIOPort_stax	IO__w4005_a_x
 		caseat	iIOPort_stay	IO__w4005_a_y
+		caseat	iIOPort_stai	IO__w4005_a_i
 Recompiler__GetIOAccess_4006:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4006_a
+		caseat	iIOPort_ldai	IO__r4006_a_i
 		caseat	iIOPort_sta		IO__w4006_a
 		caseat	iIOPort_stx		IO__w4006_x
 		caseat	iIOPort_sty		IO__w4006_y
 		caseat	iIOPort_stax	IO__w4006_a_x
 		caseat	iIOPort_stay	IO__w4006_a_y
+		caseat	iIOPort_stai	IO__w4006_a_i
 Recompiler__GetIOAccess_4007:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4007_a
+		caseat	iIOPort_ldai	IO__r4007_a_i
 		caseat	iIOPort_sta		IO__w4007_a
 		caseat	iIOPort_stx		IO__w4007_x
 		caseat	iIOPort_sty		IO__w4007_y
 		caseat	iIOPort_stax	IO__w4007_a_x
 		caseat	iIOPort_stay	IO__w4007_a_y
+		caseat	iIOPort_stai	IO__w4007_a_i
 Recompiler__GetIOAccess_4008:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4008_a
+		caseat	iIOPort_ldai	IO__r4008_a_i
 		caseat	iIOPort_sta		IO__w4008_a
 		caseat	iIOPort_stx		IO__w4008_x
 		caseat	iIOPort_sty		IO__w4008_y
 		caseat	iIOPort_stax	IO__w4008_a_x
 		caseat	iIOPort_stay	IO__w4008_a_y
+		caseat	iIOPort_stai	IO__w4008_a_i
 Recompiler__GetIOAccess_4009:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4009_a
+		caseat	iIOPort_ldai	IO__r4009_a_i
 		caseat	iIOPort_sta		IO__w4009_a
 		caseat	iIOPort_stx		IO__w4009_x
 		caseat	iIOPort_sty		IO__w4009_y
 		caseat	iIOPort_stax	IO__w4009_a_x
 		caseat	iIOPort_stay	IO__w4009_a_y
+		caseat	iIOPort_stai	IO__w4009_a_i
 Recompiler__GetIOAccess_400a:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r400a_a
+		caseat	iIOPort_ldai	IO__r400a_a_i
 		caseat	iIOPort_sta		IO__w400a_a
 		caseat	iIOPort_stx		IO__w400a_x
 		caseat	iIOPort_sty		IO__w400a_y
 		caseat	iIOPort_stax	IO__w400a_a_x
 		caseat	iIOPort_stay	IO__w400a_a_y
+		caseat	iIOPort_stai	IO__w400a_a_i
 Recompiler__GetIOAccess_400b:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r400b_a
+		caseat	iIOPort_ldai	IO__r400b_a_i
 		caseat	iIOPort_sta		IO__w400b_a
 		caseat	iIOPort_stx		IO__w400b_x
 		caseat	iIOPort_sty		IO__w400b_y
 		caseat	iIOPort_stax	IO__w400b_a_x
 		caseat	iIOPort_stay	IO__w400b_a_y
+		caseat	iIOPort_stai	IO__w400b_a_i
 Recompiler__GetIOAccess_400c:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r400c_a
+		caseat	iIOPort_ldai	IO__r400c_a_i
 		caseat	iIOPort_sta		IO__w400c_a
 		caseat	iIOPort_stx		IO__w400c_x
 		caseat	iIOPort_sty		IO__w400c_y
 		caseat	iIOPort_stax	IO__w400c_a_x
 		caseat	iIOPort_stay	IO__w400c_a_y
+		caseat	iIOPort_stai	IO__w400c_a_i
 Recompiler__GetIOAccess_400d:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r400d_a
+		caseat	iIOPort_ldai	IO__r400d_a_i
 		caseat	iIOPort_sta		IO__w400d_a
 		caseat	iIOPort_stx		IO__w400d_x
 		caseat	iIOPort_sty		IO__w400d_y
 		caseat	iIOPort_stax	IO__w400d_a_x
 		caseat	iIOPort_stay	IO__w400d_a_y
+		caseat	iIOPort_stai	IO__w400d_a_i
 Recompiler__GetIOAccess_400e:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r400e_a
+		caseat	iIOPort_ldai	IO__r400e_a_i
 		caseat	iIOPort_sta		IO__w400e_a
 		caseat	iIOPort_stx		IO__w400e_x
 		caseat	iIOPort_sty		IO__w400e_y
 		caseat	iIOPort_stax	IO__w400e_a_x
 		caseat	iIOPort_stay	IO__w400e_a_y
+		caseat	iIOPort_stai	IO__w400e_a_i
 Recompiler__GetIOAccess_400f:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r400f_a
+		caseat	iIOPort_ldai	IO__r400f_a_i
 		caseat	iIOPort_sta		IO__w400f_a
 		caseat	iIOPort_stx		IO__w400f_x
 		caseat	iIOPort_sty		IO__w400f_y
 		caseat	iIOPort_stax	IO__w400f_a_x
 		caseat	iIOPort_stay	IO__w400f_a_y
+		caseat	iIOPort_stai	IO__w400f_a_i
 Recompiler__GetIOAccess_4010:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4010_a
+		caseat	iIOPort_ldai	IO__r4010_a_i
 		caseat	iIOPort_sta		IO__w4010_a
 		caseat	iIOPort_stx		IO__w4010_x
 		caseat	iIOPort_sty		IO__w4010_y
 		caseat	iIOPort_stax	IO__w4010_a_x
 		caseat	iIOPort_stay	IO__w4010_a_y
+		caseat	iIOPort_stai	IO__w4010_a_i
 Recompiler__GetIOAccess_4011:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4011_a
+		caseat	iIOPort_ldai	IO__r4011_a_i
 		caseat	iIOPort_sta		IO__w4011_a
 		caseat	iIOPort_stx		IO__w4011_x
 		caseat	iIOPort_sty		IO__w4011_y
 		caseat	iIOPort_stax	IO__w4011_a_x
 		caseat	iIOPort_stay	IO__w4011_a_y
+		caseat	iIOPort_stai	IO__w4011_a_i
 Recompiler__GetIOAccess_4012:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4012_a
+		caseat	iIOPort_ldai	IO__r4012_a_i
 		caseat	iIOPort_sta		IO__w4012_a
 		caseat	iIOPort_stx		IO__w4012_x
 		caseat	iIOPort_sty		IO__w4012_y
 		caseat	iIOPort_stax	IO__w4012_a_x
 		caseat	iIOPort_stay	IO__w4012_a_y
+		caseat	iIOPort_stai	IO__w4012_a_i
 Recompiler__GetIOAccess_4013:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4013_a
+		caseat	iIOPort_ldai	IO__r4013_a_i
 		caseat	iIOPort_sta		IO__w4013_a
 		caseat	iIOPort_stx		IO__w4013_x
 		caseat	iIOPort_sty		IO__w4013_y
 		caseat	iIOPort_stax	IO__w4013_a_x
 		caseat	iIOPort_stay	IO__w4013_a_y
+		caseat	iIOPort_stai	IO__w4013_a_i
 Recompiler__GetIOAccess_4014:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4014_a
+		caseat	iIOPort_ldai	IO__r4014_a_i
 		caseat	iIOPort_sta		IO__w4014_a
 		caseat	iIOPort_stx		IO__w4014_x
 		caseat	iIOPort_sty		IO__w4014_y
+		caseat	iIOPort_stai	IO__w4014_a_i
 Recompiler__GetIOAccess_4015:
 	iIOPort_InterfaceSwitch		IO__Error
 		caseat	iIOPort_lda		IO__r4015_a
+		caseat	iIOPort_ldai	IO__r4015_a_i
 		caseat	iIOPort_sta		IO__w4015_a
 		caseat	iIOPort_stx		IO__w4015_x
 		caseat	iIOPort_sty		IO__w4015_y
+		caseat	iIOPort_stai	IO__w4015_a_i
 	// TODO: 4016 and 4017
 
 

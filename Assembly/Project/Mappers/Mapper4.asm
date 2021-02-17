@@ -129,6 +129,7 @@ b_1:
 			plp
 			rtl
 		case	iIOPort_sta
+		case	iIOPort_stai
 			php
 			pha
 
@@ -209,6 +210,7 @@ Mapper4__8001:
 			sty	$_IO_temp
 			bra	$+b_in
 		case	iIOPort_sta
+		case	iIOPort_stai
 			php
 			sta	$_IO_temp
 b_in:
@@ -316,6 +318,7 @@ Mapper4__a000:
 			sty	$_IO_temp
 			bra	$+b_in
 		case	iIOPort_sta
+		case	iIOPort_stai
 			sta	$_IO_temp
 b_in:
 			php
@@ -349,6 +352,7 @@ Mapper4__a001:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+		case	iIOPort_stai
 			// TODO
 			rtl
 
@@ -364,6 +368,7 @@ Mapper4__c000:
 			sty	$_Mapper4_IRQ_Latch
 			rtl
 		case	iIOPort_sta
+		case	iIOPort_stai
 			sta	$_Mapper4_IRQ_Latch
 			rtl
 
@@ -375,6 +380,7 @@ Mapper4__c001:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+		case	iIOPort_stai
 			php
 			xba
 
@@ -406,6 +412,7 @@ Mapper4__e000:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+		case	iIOPort_stai
 			stz	$_Scanline_IRQ
 			stz	$_Mapper4_IRQ_Enabled
 			rtl
@@ -418,6 +425,7 @@ Mapper4__e001:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+		case	iIOPort_stai
 			php
 			xba
 

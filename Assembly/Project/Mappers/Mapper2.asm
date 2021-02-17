@@ -40,6 +40,7 @@ Mapper2__8000:
 			phx
 			bra	$+b_in
 		case	iIOPort_sta
+		case	iIOPort_stai
 		case	iIOPort_stax
 		case	iIOPort_stay
 			php
