@@ -26,20 +26,44 @@ IO__r2000_x:
 IO__r2000_y:
 	rtl
 
-IO__w2000_x:
-	stx	$_IO_2000
-	bra	$+IO__w2000_in
-IO__w2000_y:
-	sty	$_IO_2000
-	bra	$+IO__w2000_in
 IO__w2000_a:
+	CoreCall_Begin
+	CoreCall_Lock
+	CoreCall_Push
+	CoreCall_Call	IO__w2000_a_i
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w2000_x:
+	CoreCall_Begin
+	CoreCall_Lock
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		stx	$_IO_2000
+b_1:
+	CoreCall_Call	IO__w2000_in
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w2000_y:
+	CoreCall_Begin
+	CoreCall_Lock
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		sty	$_IO_2000
+b_1:
+	CoreCall_Call	IO__w2000_in
+	CoreCall_Pull
+	CoreCall_End
+
 IO__w2000_a_i:
 	sta	$_IO_2000
 IO__w2000_in:
-	lock
 	php
+	lock
 	xba
 
+IO__w2000_in2:
 	lda	$_IO_2000
 	bit	#0x04
 	bne	$+IO__w2000_a_inc32
@@ -58,7 +82,6 @@ IO__w2000_in:
 
 		xba
 		plp
-		unlock
 		rtl
 
 IO__w2000_a_inc32:
@@ -77,7 +100,6 @@ IO__w2000_a_inc32:
 
 		xba
 		plp
-		unlock
 		rtl
 
 
