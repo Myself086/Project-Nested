@@ -6,15 +6,15 @@ Gfx_PaletteTable:
 Gfx_PaletteOffset:
 	.macro	Gfx_PaletteOffset_mac
 		// Background palettes
-		.data8	0x80, 0x41, 0x44, 0x45
+		.data8	0x00, 0x41, 0x44, 0x45
 		.data8	0x50, 0x51, 0x54, 0x55
 		.data8	0x60, 0x61, 0x64, 0x65
 		.data8	0x70, 0x71, 0x74, 0x75
 		// Sprite palettes
 		.data8	0x00, 0x81, 0x84, 0x85
-		.data8	0x90, 0x91, 0x94, 0x95
-		.data8	0xa0, 0xa1, 0xa4, 0xa5
-		.data8	0xb0, 0xb1, 0xb4, 0xb5
+		.data8	0x50, 0x91, 0x94, 0x95
+		.data8	0x60, 0xa1, 0xa4, 0xa5
+		.data8	0x70, 0xb1, 0xb4, 0xb5
 	.endm
 	Gfx_PaletteOffset_mac
 	Gfx_PaletteOffset_mac
@@ -26,7 +26,7 @@ Gfx_PaletteOffset:
 	Gfx_PaletteOffset_mac
 
 	// Palette layout
-	//	10 !! !! !! -- !! !! !!  -- !! !! !! -- !! !! !! <- First palette for BGs
+	//	00 !! !! !! -- !! !! !!  -- !! !! !! -- !! !! !! <- First palette for BGs
 	//	-- !! !! !! -- !! !! !!  -- !! !! !! -- !! !! !!
 	//	-- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --
 	//	-- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --

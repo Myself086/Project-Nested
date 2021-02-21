@@ -547,12 +547,14 @@ IO__r2007_skip20:
 		phx
 
 		ldx	$_IO_PPUADDR
+		lda	$=IO__w2007_PaletteMirror,x
+		tax
 		lda	$_PaletteNes,x
 		// Immediate return instead of next read
 		sta	$_IO_Temp
 
 		// Increment address
-		txa
+		lda	$_IO_PPUADDR
 		clc
 		adc	$_IO_PPUADDR_INC
 		sta	$_IO_PPUADDR
@@ -713,8 +715,10 @@ IO__w2007_skip20:
 	bne	$+IO__w2007_skip3f
 		phx
 
-		lda	$_IO_Temp
 		ldx	$_IO_PPUADDR
+		lda	$=IO__w2007_PaletteMirror,x
+		tax
+		lda	$_IO_Temp
 		cmp	$_PaletteNes,x
 		beq	$-IO__w2007_NoChanges
 		sta	$_PaletteNes,x
@@ -748,7 +752,10 @@ IO__w2007_skip3f:
 	plp
 	rtl
 
-	
+IO__w2007_PaletteMirror:
+	.repeat	8, ".data8	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,  0x00, 0x11, 0x12, 0x13, 0x04, 0x15, 0x16, 0x17, 0x08, 0x19, 0x1a, 0x1b, 0x0c, 0x1d, 0x1e, 0x1f"
+
+
 	.macro	IO__w4014_mac8x8	addr
 		//ldy	#0xef
 		cpy	$.Zero+0+{0}

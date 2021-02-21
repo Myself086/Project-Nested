@@ -21,6 +21,7 @@ Dev build:
 - Fixed pulse and noise halt bit
 - Added opcode $42 to patch forcing native return
 - Added inline capability to IO port emulation
+- Fixed palette mirrors
 
 v1.2
 - Fixed JMP to WRAM
