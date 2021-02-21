@@ -958,50 +958,21 @@ Recompiler__Build_OpcodeType_Abs_IO:
 		bcc	$+Recompiler__Build_OpcodeType_Abs_Pass4
 
 Recompiler__Build_OpcodeType_Abs_Pass3:
-	// Preserve interpreter address
-	tax
-	// Write calling IO address
-	lda	$.DP_ZeroBank-1
-	ora	#0x0022
-	//lda	#_IO__BANK*0x100+0x22
-	ldy	#0x0002
-	sta	[$.writeAddr]
-	sta	[$.writeAddr],y
-	txa
-	dey
-	sta	[$.writeAddr],y
+	jmp	$_Recompiler__Build_CoreCall
 
-	// Add to write address
-	lda	#0x0004
-	clc
-	adc	$.writeAddr
-	sta	$.writeAddr
-	rts
-	
 Recompiler__Build_OpcodeType_Abs_Pass4:
-	// Write calling IO address
-	tax
-	lda	$.DP_ZeroBank-1
-	ora	#0x0022
-	//lda	#_IO__BANK*0x100+0x22
-	ldy	#0x0002
-	sta	[$.writeAddr]
-	sta	[$.writeAddr],y
-	txa
-	dey
-	sta	[$.writeAddr],y
+	jsr	$_Recompiler__Build_CoreCall
 
 	// Write original read
 	lda	$.thisOpcodeX2
 	lsr	a
-	ldy	#0x0004
-	sta	[$.writeAddr],y
+	ldy	#0x0001
+	sta	[$.writeAddr]
 	lda	#_IO_Temp
-	iny
 	sta	[$.writeAddr],y
 
 	// Add to write address, assume carry clear from the 'lsr'
-	lda	#0x0007
+	lda	#0x0003
 	adc	$.writeAddr
 	sta	$.writeAddr
 	rts
@@ -1016,7 +987,7 @@ Recompiler__Build_OpcodeType_Abs_Pass2:
 	rts
 
 Recompiler__Build_OpcodeType_Abs_PassRmw:
-	ldy	#_iIOPort_sta*2
+	ldy	#_iIOPort_stai*2
 	tax
 	call	Recompiler__GetIOAccess
 	pha
@@ -2848,6 +2819,321 @@ b_1:
 	// Return whether target range is considered static
 	lsr	a
 	rts
+
+
+	// Entry: A = Call address, ZeroBank = Bank for call address
+Recompiler__Build_CoreCall:
+	tay
+
+	// Do we have instructions for calling this function?
+	lda	[$.DP_Zero],y
+	and	#0x00ff
+	beq	$+b_else
+		// No, call this function directly
+		tyx
+		lda	$.DP_ZeroBank-1
+		ora	#0x0022
+		ldy	#0x0002
+		sta	[$.writeAddr]
+		sta	[$.writeAddr],y
+		txa
+		dey
+		sta	[$.writeAddr],y
+
+		// Add to write address
+		lda	#0x0004
+		clc
+		adc	$.writeAddr
+		sta	$.writeAddr
+		rts
+b_else:
+		.local	_pushFlags, _freeRegs, =src
+		stz	$.pushFlags
+
+		// Default free registers (TODO: Predictions)
+		stz	$.freeRegs
+
+		// Prepare proper source pointer
+		lda	$.DP_Zero+1
+		sta	$.src+1
+		iny
+		sty	$.src
+
+Recompiler__Build_CoreCall_Switch_Break:
+			// Next instruction
+			lda	[$.src]
+			inc	$.src
+			and	#0x00ff
+			asl	a
+			tax
+			jmp	($_Recompiler__Build_CoreCall_Switch,x)
+
+
+Recompiler__Build_CoreCall_Switch:
+	switch	0x100, Recompiler__Build_CoreCall_Switch_Default, Recompiler__Build_CoreCall_Switch_Break
+Recompiler__Build_CoreCall_Switch_Default:
+		unlock
+		trap
+		Exception	"Inline failed{}{}{}Undefined inline instruction for a core call."
+
+	case	CoreCall_End
+		rts
+
+	case	CoreCall_Call
+		// Write JSL to destination
+		lda	$.DP_ZeroBank-1
+		ora	#0x0022
+		ldy	#0x0002
+		sta	[$.writeAddr]
+		sta	[$.writeAddr],y
+		lda	[$.src]
+		inc	$.src
+		inc	$.src
+		dey
+		sta	[$.writeAddr],y
+
+		// Add to write address
+		lda	#0x0004
+		clc
+		adc	$.writeAddr
+		sta	$.writeAddr
+		break
+
+	case	CoreCall_Lock
+		// Lock thread regardless of PHP/PLP
+		lda	#_CoreCallFlag_Lock
+		tsb	$.pushFlags
+		break
+
+	case	CoreCall_UseA8
+		lda	$.freeRegs
+		and	#0x0100
+		bne	$+b_1
+			lda	#_CoreCallFlag_Xba
+			tsb	$.pushFlags
+			lda	#_CoreCallFlag_PushA
+			trb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_UseA16
+		lda	$.freeRegs
+		and	#0x0100
+		bne	$+b_1
+			lda	#_CoreCallFlag_PushA
+			tsb	$.pushFlags
+			lda	#_CoreCallFlag_Xba
+			trb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_UseX
+		lda	$.freeRegs
+		and	#0x0200
+		bne	$+b_1
+			lda	#_CoreCallFlag_PushX
+			tsb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_UseY
+		lda	$.freeRegs
+		and	#0x0400
+		bne	$+b_1
+			lda	#_CoreCallFlag_PushY
+			tsb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_UseN
+		lda	$.freeRegs
+		and	#0x0080
+		bne	$+b_1
+			lda	#_CoreCallFlag_PushP
+			tsb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_UseV
+		lda	$.freeRegs
+		and	#0x0040
+		bne	$+b_1
+			lda	#_CoreCallFlag_PushP
+			tsb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_UseZ
+		lda	$.freeRegs
+		and	#0x0002
+		bne	$+b_1
+			lda	#_CoreCallFlag_PushP
+			tsb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_UseC
+		lda	$.freeRegs
+		and	#0x0002
+		bne	$+b_1
+			lda	#_CoreCallFlag_PushP
+			tsb	$.pushFlags
+b_1:
+		break
+
+	case	CoreCall_Push
+		.macro	Recompiler__Build_CoreCall_PushFlag		flag, opcode
+			lda	#_{0}
+			and	$.pushFlags
+			beq	$+b_1__
+				lda	#0x00{1}
+				sta	[$.writeAddr]
+				inc	$.writeAddr
+b_1__:
+		.endm
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_Lock,  78		// Sei
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushP, 08		// Php
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_Xba,   EB		// Xba
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushA, 48		// Pha
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushX, DA		// Phx
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushY, 5A		// Phy
+		break
+
+	case	CoreCall_Pull
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushY, 7A		// Ply
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushX, FA		// Plx
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushA, 68		// Pla
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_Xba,   EB		// Xba
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_PushP, 28		// Plp
+		Recompiler__Build_CoreCall_PushFlag		CoreCallFlag_Lock,  58		// Cli
+		break
+
+		.macro	Recompiler__Build_CoreCall_IfGoto
+			lda	${0}
+			and	#{1}
+			b{2}	$-b_branch
+			inc	$.src
+			break
+		.endm
+
+b_branch:
+		lda	[$.src]
+		and	#0x00ff
+		clc
+		adc	#0x7f80
+		eor	#0x7f80
+		adc	$.src
+		inc	a
+		sta	$.src
+		break
+
+	case	CoreCall_IfFreeA
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, ne
+
+	case	CoreCall_IfNotFreeA
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, eq
+
+	case	CoreCall_IfFreeX
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, ne
+
+	case	CoreCall_IfNotFreeX
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, eq
+
+	case	CoreCall_IfFreeY
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, ne
+
+	case	CoreCall_IfNotFreeY
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, eq
+
+	case	CoreCall_IfJit
+		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, ne
+
+	case	CoreCall_IfAot
+		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, eq
+
+	case	CoreCall_Jump
+		lda	[$.src]
+		sta	$.src
+		break
+
+	case	CoreCall_Copy		// TODO: Test it
+		// Prepare data source pointer
+		.local	=dataSrc
+		lda	$.src+1
+		sta	$.dataSrc+1
+		lda	[$.src]
+		inc	$.src
+		inc	$.src
+		sta	$.dataSrc
+
+		// Y = number of bytes to copy
+		lda	[$.src]
+		inc	$.src
+		inc	$.src
+		sec
+		sbc	$.dataSrc
+		tax				// Keep correct byte count before rounding down
+		dec	a
+		and	#0xfffe
+		tay
+b_loop:
+			lda	[$.dataSrc],y
+			sta	[$.writeAddr],y
+			dey
+			dey
+			bpl	$-b_loop
+
+		// Add to write address
+		txa
+		clc
+		adc	$.writeAddr
+		sta	$.writeAddr
+
+		break
+		.unlocal	=dataSrc
+
+	case	CoreCall_CopyUpTo
+		lda	[$.src]
+		inc	$.src
+		and	#0x00ff
+		tax				// Keep number of bytes copied
+		dec	a
+		and	#0xfffe
+		tay				// Y = number of bytes to copy but we can go slightly over
+		bmi	$+b_exit
+b_loop:
+			lda	[$.src],y
+			sta	[$.writeAddr],y
+			dey
+			dey
+			bpl	$-b_loop
+b_exit:
+
+		// Add to write address
+		txa
+		clc
+		adc	$.writeAddr
+		sta	$.writeAddr
+
+		// Go to next instruction
+		txa
+		clc
+		adc	$.src
+		sta	$.src
+
+		break
+
+	case	CoreCall_Remove		// TODO: Test it
+		// Remove some written bytes
+		lda	$.writeAddr
+		sec
+		sbc	[$.src]
+		inc	$.src
+		inc	$.src
+		sta	$.writeAddr
+		break
+
+	.unlocal	_pushFlags, _freeRegs, =src
 
 	// ---------------------------------------------------------------------------
 

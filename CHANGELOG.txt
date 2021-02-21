@@ -20,6 +20,7 @@ Dev build:
 - Added options to define ROM ranges as being static
 - Fixed pulse and noise halt bit
 - Added opcode $42 to patch forcing native return
+- Added inline capability to IO port emulation
 
 v1.2
 - Fixed JMP to WRAM

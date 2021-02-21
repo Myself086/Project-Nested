@@ -17,7 +17,6 @@
 
 - Add ports $2003 and $2004
 - Optimize $2007
-- Add inline capability
 - Emulate $4016 and $4017 instead of using the SNES ports directly (for Duck Hunt, custom controls and GUI menus maybe)
 
 ----------------------------------------------------------------
