@@ -687,7 +687,7 @@ b_loop:
 		sta	$=Debug_NameTable+0x780,x
 		dex
 		dex
-		bne	$-b_loop
+		bpl	$-b_loop
 
 	// Mark all lines
 	lda	#0xffff
