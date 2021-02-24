@@ -2,80 +2,113 @@
 	// ---------------------------------------------------------------------------
 
 Cop__Table:
-	// 0x00, Wait4Vblank infinite loop
-	.data16	_Cop__Wait4VblankInfinite
+	.fill16	0x100, Cop__Error
+	.macro	Cop__Table		ID, Address
+		.pushaddr
+			.addr	Cop__Table+{0}*2
+			.data16	{1}
+		.pulladdr
+	.endm
 
-
-	.fill16	0xff, _Cop__Wait4VblankInfinite_Error
+	Cop__Table		0x00, Cop__Wait4Interrupt
+	Cop__Table		0x01, Cop__Wait4VBlank
+	Cop__Table		0x02, Cop__GetScanline			// A = Scanline
+	Cop__Table		0x03, Cop__SetScanline			// Scanline = A
+	Cop__Table		0x04, Cop__AddScanline			// Scanline += A
+	Cop__Table		0x05, Cop__IncScanline			// Scanline++
 
 	// ---------------------------------------------------------------------------
 
-Cop__Wait4VblankInfinite:
-	//        1-2 3-5     6-7
-	// Stack: dp, return, originalReturn
+Cop__Error:
+	trap
+	Exception	"Unknown COP{}{}{}Opcode 0x02 (COP) was executed with an unknown operand.{}{}If you are using a patch, make sure you are using the correct SMC version."
+
+	// ---------------------------------------------------------------------------
+
+Cop__Wait4Interrupt:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		jsr	$=Interpret__Idle
+b_1:
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__Wait4VBlank:
 	.vstack		_VSTACK_START
+	CoreCall_Begin
+	CoreCall_UseA16
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+b_loop:
+		jsr	$=Interpret__Idle
+		lda	$_Scanline_HDMA
+		bne	$-b_loop
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
-	// Call NMI infinitely
-
-	// Change mode
-	rep	#0x31
-	.mx	0x00
-
-	// Fix for my private disassembler
-	pla
-	pha
-
-	// Change DP
-	phd
-	lda	#_VSTACK_PAGE
-	tcd
-
-	// Get stack pointer
-	tsx
-
-	// Keep return address for RTI, minus 7 because we loop back to this call infinitely, assume carry clear then carry set
-	lda	$7,s
-	sbc	#0x0001
-	sta	$7,s
-	sta	$_StackEmu_Compare+7-0x100,x
-	lda	$3,s
-	sbc	#0x0008
-	sta	$3,s
-	sta	$_StackEmu_LowBits+7-0x100,x
-	lda	$4,s
-	sta	$_StackEmu_HighBits+7-0x100,x
-
-	// Wait for next NMI
-	call	Interpret__Wait4Vblank
-
-	// Call NMI address
-	.precall	Recompiler__CallFunction		_originalFunction
-	phb
-	lda	$_Program_Bank_3+1
-	pha
-	plb
-	plb
-	lda	$0xfffa
-	sta	$.Param_originalFunction
-	call
-	plb
-
-	// Write return
-	iny
-	lda	[$.Recompiler_FunctionList+3],y
-	sta	$4,s
-	dey
-	lda	[$.Recompiler_FunctionList+3],y
-	dec	a
-	sta	$3,s
-
-	// Return
-	sep	#0x30
-	pld
-	rtl
-	
 	// ---------------------------------------------------------------------------
 
-Cop__Wait4VblankInfinite_Error:
-	bra	$-Cop__Wait4VblankInfinite_Error
+Cop__GetScanline:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		lda	$_Scanline_HDMA
+b_1:
+	CoreCall_End
 
+	// ---------------------------------------------------------------------------
+
+Cop__SetScanline:
+	.vstack		_VSTACK_START
+	CoreCall_Begin
+	CoreCall_UseA16
+	CoreCall_UseX
+	CoreCall_UseY
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Scanline
+		rep	#0x10
+		call	Hdma__UpdateScrolling
+		sep	#0x30
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__AddScanline:
+	.vstack		_VSTACK_START
+	CoreCall_Begin
+	CoreCall_UseA16
+	CoreCall_UseX
+	CoreCall_UseY
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		clc
+		adc	$_Scanline_HDMA
+		sta	$_Scanline
+		call	Hdma__UpdateScrolling
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__IncScanline:
+	.vstack		_VSTACK_START
+	CoreCall_Begin
+	CoreCall_UseA16
+	CoreCall_UseX
+	CoreCall_UseY
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		lda	$_Scanline_HDMA
+		inc	a
+		sta	$_Scanline
+		call	Hdma__UpdateScrolling
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------

@@ -365,10 +365,10 @@ Recompiler__Build_loop1_loop_switch_SnesReturn:
 Recompiler__Build_loop1_loop_switch_JmpIndexed:
 Recompiler__Build_loop1_loop_switch_Error:
 Recompiler__Build_loop1_loop_switch_Return:
-Recompiler__Build_loop1_loop_switch_Cop:
 					// Break from this loop
 					jmp	$_Recompiler__Build_loop1_next
 
+Recompiler__Build_loop1_loop_switch_Cop:
 Recompiler__Build_loop1_loop_switch_Regular:
 Recompiler__Build_loop1_loop_next:
 			// Next opcode
@@ -2554,54 +2554,17 @@ Recompiler__Build_OpcodeType_Pla_SkipPullReturn:
 
 
 Recompiler__Build_OpcodeType_Cop:
-	// Call interpreter based on Cop number:
-	// pea $_originalReturn
-	// jsr $=Cop
-	// bra $-6
-	//		0	1	2	3	4	5	6	7	8	9
-	//		pea	#	#	php	jsr	#	#	#	bra	-6
-	
-	// Write PEA and PHP
-	lda	#0xf4f4
-	sta	[$.writeAddr]
-	ldy	#0x0002
-	sta	[$.writeAddr],y
-	
-	// Write return address
-	lda	$.readAddr
-	inc	a
-	inc	a
-	dey
-	sta	[$.writeAddr],y
-
-	// Write JSL and destination bank
-	lda	#_Interpret__BANK*0x100+0x22
-	ldy	#0x0004
-	sta	[$.writeAddr],y
-	ldy	#0x0006
-	sta	[$.writeAddr],y
-
-	// Read first 2 bytes, swap them and multiply by 2. Expected result for high bits is 0x04
+	// Read first 2 bytes, swap them and multiply by 2. Expected result for high byte is 0x04 or 0x05
 	lda	[$.readAddr]
 	xba
 	asl	a
 	tax
+	// Read COP function pointer
 	lda	$=Cop__Table-0x400,x
-
-	// Write destination address
-	dey
-	sta	[$.writeAddr],y
-
-	// Write branch back
-	lda	#0xfa80
-	ldy	#0x0008
-	sta	[$.writeAddr],y
-	
-	// Add to write address, assume carry clear from asl
-	lda	#0x000a
-	adc	$.writeAddr
-	sta	$.writeAddr
-	rts
+	// Write core call
+	ldy	#_Cop__Table/0x10000
+	sty	$.DP_ZeroBank
+	jmp	$_Recompiler__Build_CoreCall
 
 
 Recompiler__Build_OpcodeType_Brk:

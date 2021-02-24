@@ -22,6 +22,7 @@ Dev build:
 - Added opcode $42 to patch forcing native return
 - Added inline capability to IO port emulation
 - Fixed palette mirrors
+- Added the ability to patch timed scroll changes
 
 v1.2
 - Fixed JMP to WRAM
