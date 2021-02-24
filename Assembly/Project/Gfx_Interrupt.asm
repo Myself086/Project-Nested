@@ -709,14 +709,17 @@ Gfx__VramQueue_Switch:
 
 Gfx__VramQueue_VramQ_Init:
 	.macro	Gfx__VramQueue_VramQ_Init_Mac	VarName, DmaChannel
-		ldy	$_{0}_Front
-		sty	$_Zero+0x4302+{1}*0x10
+		//lda	$_{0}_Front
+		sta	$_Zero+0x4302+{1}*0x10
 	.endm
+	pha
+	lda	#_Addition
 	Gfx__VramQueue_VramQ_Init_Mac	HDMA_Scroll, 6
 	Gfx__VramQueue_VramQ_Init_Mac	HDMA_CHR, 5
 	Gfx__VramQueue_VramQ_Init_Mac	HDMA_SpriteCHR, 4
 	Gfx__VramQueue_VramQ_Init_Mac	HDMA_LayersEnabled, 3
 	Gfx__VramQueue_VramQ_Init_Mac	HDMA_Sound, 1
+	pla
 
 	// Activate HDMA (01111010b)
 	ldy	#0x7a
