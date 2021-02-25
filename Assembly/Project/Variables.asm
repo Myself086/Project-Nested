@@ -606,11 +606,11 @@ IRQ_VSTACK_START:
 
 	// ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------
-	// SRAM feedback for statically recompiling known calls
+	// Indirect JMP list, initially in SRAM
 
-	.def	JMPi_Bank					0xb10000
 	.def	JMPi_EmptyPointer			0xb17000
-	.def	JMPi_ArrayTop				0xb17fff
+	.def	JMPi_CurrentPoolTop			0xb17003
+	.def	JMPi_PoolSize				0x001000
 
 	// Structure:
 	//	[0] = 16-bit comparison for the top 24-bit of the original address

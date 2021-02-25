@@ -23,9 +23,15 @@ JMPi__Listing_End:
 	.mx	0x00
 	.func	JMPi__Init
 JMPi__Init:
-	// Reset empty pointer
-	lda	#_JMPi_EmptyPointer+2
+	// Reset pointers
+	lda	#_JMPi_EmptyPointer/0x100
+	sta	$=JMPi_EmptyPointer+1
+	sta	$=JMPi_CurrentPoolTop+1
+	lda	#_JMPi_EmptyPointer+6
 	sta	$=JMPi_EmptyPointer
+	clc
+	adc	#_JMPi_PoolSize
+	sta	$=JMPi_CurrentPoolTop
 
 	// Reset pointers to the linker
 	ldx	#0x02fd
@@ -135,20 +141,33 @@ JMPi__Add:
 	.local	=nodeAddr, =oldNodeAddr
 
 	// Reserve another node
-	lda	#_JMPi_EmptyPointer/0x100
+	lda	$=JMPi_EmptyPointer+1
 	sta	$.nodeAddr+1
 	lda	$=JMPi_EmptyPointer
 	sta	$.nodeAddr
 	clc
 	adc	#_JMPi_Inc
+	sta	$=JMPi_EmptyPointer
 
 	// Do we have enough space for the new node?
-	cmp	#_JMPi_ArrayTop+1
-	trapcs
-	Exception	"Indirect JMP List Full{}{}{}The list of known destinations for indirect JMP is full.{}{}Nothing can be done about it until a later version implements dynamic memory allocation for this list."
+	cmp	$=JMPi_CurrentPoolTop
+	bcc	$+b_1
+		// Create new pool
+		lda	#0x007f
+		ldx	#_JMPi_PoolSize
+		call	Memory__Alloc
 
-	// Write address back
-	sta	$=JMPi_EmptyPointer
+		xba
+		sta	$=JMPi_EmptyPointer+1
+		sta	$.nodeAddr+1
+		sta	$=JMPi_CurrentPoolTop+1
+		txa
+		sta	$=JMPi_EmptyPointer
+		sta	$.nodeAddr
+		clc
+		adc	#_JMPi_PoolSize
+		sta	$=JMPi_CurrentPoolTop
+b_1:
 
 	// Copy code template
 	smx	#0x30
