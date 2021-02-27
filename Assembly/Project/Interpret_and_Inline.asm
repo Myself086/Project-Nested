@@ -1228,10 +1228,25 @@ Interpret__JmpIError:
 
 	// ---------------------------------------------------------------------------
 
-Interpret__Error:
-	nop
-	bra	$-Interpret__Error
-	
+Inline__UnsupportedOpcode:
+Inline__UnsupportedOpcode_PC:
+	pea	$0x50da
+Inline__UnsupportedOpcode_OpcodeAndBank:
+	pea	$0x50da
+	jmp	$=Interpret__UnsupportedOpcode
+
+	.data8	0
+
+	Interpret_Misalign
+
+Interpret__UnsupportedOpcode:
+	// Stack: opcode, NES bank, NES PC.lo, NES PC.hi
+	rep	#0x30
+	pla
+	ply
+	trap
+	Exception	"Unsupported Opcode{}{}{}The CPU attempted to execute opcode 0x{a:X} at NES address {ah:X}:{Y:X}"
+
 	// ---------------------------------------------------------------------------
 
 	// Make sure that Interpret__Idle's address doesn't contain any 0x00

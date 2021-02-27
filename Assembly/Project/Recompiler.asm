@@ -2569,31 +2569,45 @@ Recompiler__Build_OpcodeType_Cop:
 
 Recompiler__Build_OpcodeType_Brk:
 Recompiler__Build_OpcodeType_None:
-	// Load opcode in A
-	lsr	a
-	xba
-	ora	#0x00a9
-	sta	[$.writeAddr]
+	ldx	#_Inline__UnsupportedOpcode
+	lda	#_Inline__UnsupportedOpcode/0x10000
+	jsr	$_Recompiler__Build_InlineNoInc
+	tyx
 
-	// Write branch back
-	lda	#0xfe80
-	ldy	#0x0002
+	// Write original PC
+	lda	$.readAddr
+	ldy	#_Inline__UnsupportedOpcode_PC-Inline__UnsupportedOpcode+1
 	sta	[$.writeAddr],y
 
-	// Add to write address, assume carry clear from asl
-	lda	#0x0004
+	// 8-bit A
+	tya
+	smx	#0x20
+
+	// Write original bank
+	lda	$.readAddr+1
+	and	#0xe0
+	tay
+	lda	$_Program_BankNum,y
+	ldy	#_Inline__UnsupportedOpcode_OpcodeAndBank-Inline__UnsupportedOpcode+2
+	sta	[$.writeAddr],y
+	// Write opcode
+	lda	$.opcodeX2+1
+	lsr	a
+	lda	$.opcodeX2
+	ror	a
+	dey
+	sta	[$.writeAddr],y
+
+	// 16-bit A
+	rmx	#0x01
+
+	// Add to write address
+	txa
 	adc	$.writeAddr
 	sta	$.writeAddr
 	rts
 
 
-	// Error
-	lda	$.thisOpcodeX2
-	lsr	a
-	tay
-	bra	$-Recompiler__Build_OpcodeType_None
-
-	
 Recompiler__Build_Inline:
 	// Entry: X = source address, A = source bank
 	.local	=inline
