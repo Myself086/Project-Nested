@@ -339,6 +339,12 @@ b_else:
 		Gui__WriteTextFormat	Gui__Text_RegisterBottom16, 2, 21, 30
 b_1:
 
+	// Disable HDMA
+	stz	$0x420b
+	// Show BG3
+	lda	#0x0004
+	sta	$0x212C
+
 Gui__BlueScreen_done:
 	lda	#0x8000
 	sta	$.BlueScreen_WaitState
