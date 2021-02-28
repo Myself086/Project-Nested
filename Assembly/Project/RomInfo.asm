@@ -1,4 +1,26 @@
 
+	.align	0x100
+
+	// 4x 256 bytes of Nes bank to Snes bank translation
+RomInfo_BankLut:
+RomInfo_BankLut_80:
+	.fill	0x100
+RomInfo_BankLut_a0:
+	.fill	0x100
+RomInfo_BankLut_c0:
+	.fill	0x100
+RomInfo_BankLut_e0:
+	.fill	0x100
+
+	// 256 CHR banks; low bits on first half, high bits on second half
+RomInfo_ChrBankLut:
+RomInfo_ChrBankLut_lo:
+	.fill	0x100
+RomInfo_ChrBankLut_hi:
+	.fill	0x100
+
+	// ---------------------------------------------------------------------------
+
 	// Mapper number in 16-bit
 RomInfo_Mapper:
 	.data16	0
@@ -114,28 +136,6 @@ RomInfo_RecompilePrgRam:
 	// Defines whether page range is static, 1 bit per range, 8 ranges in total, bit is set when range is static
 RomInfo_StaticRanges:
 	.data8	0x00
-
-	// ---------------------------------------------------------------------------
-
-	.align	0x100
-
-	// 4x 256 bytes of Nes bank to Snes bank translation
-RomInfo_BankLut:
-RomInfo_BankLut_80:
-	.fill	0x100
-RomInfo_BankLut_a0:
-	.fill	0x100
-RomInfo_BankLut_c0:
-	.fill	0x100
-RomInfo_BankLut_e0:
-	.fill	0x100
-
-	// 256 CHR banks; low bits on first half, high bits on second half
-RomInfo_ChrBankLut:
-RomInfo_ChrBankLut_lo:
-	.fill	0x100
-RomInfo_ChrBankLut_hi:
-	.fill	0x100
 
 	// ---------------------------------------------------------------------------
 
