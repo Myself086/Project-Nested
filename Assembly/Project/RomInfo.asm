@@ -12,7 +12,7 @@ RomInfo_BankLut_c0:
 RomInfo_BankLut_e0:
 	.fill	0x100
 
-	// 256 CHR banks; low bits on first half, high bits on second half
+	// 256 CHR banks; "lo" and "hi" represent page and bank of SNES addresses, always page aligned
 RomInfo_ChrBankLut:
 RomInfo_ChrBankLut_lo:
 	.fill	0x100
