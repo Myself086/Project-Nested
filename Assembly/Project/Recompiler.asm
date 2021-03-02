@@ -63,8 +63,9 @@ Recompiler__Reset:
 	WDM_ExportCallList
 
 	// Prepare recompile RAM range
-	lda	$=RomInfo_RecompilePrgRam-1
-	bpl	$+b_else
+	lda	$=RomInfo_CpuSettings
+	and	#_RomInfo_Cpu_RecompilePrgRam
+	beq	$+b_else
 		lda	#0x6000
 		bra	$+b_1
 b_else:
@@ -196,6 +197,16 @@ Recompiler__Build_loop1_loop_switch:
 				.data16	_Recompiler__Build_loop1_loop_switch_Branch
 				.data16	_Recompiler__Build_loop1_loop_switch_NesReturn
 				.data16	_Recompiler__Build_loop1_loop_switch_SnesReturn
+				.data16	_Recompiler__Build_loop1_loop_switch_IllegalNop
+
+Recompiler__Build_loop1_loop_switch_IllegalNop:
+					// Are we allowed to recompile it?
+					lda	$=RomInfo_CpuSettings
+					and	#_RomInfo_Cpu_IllegalNop
+					jeq	$_Recompiler__Build_loop1_loop_switch_Error
+						// Yes
+						jmp	$_Recompiler__Build_loop1_loop_next
+
 
 Recompiler__Build_loop1_loop_switch_Branch:
 					// Add destination
@@ -841,6 +852,7 @@ Recompiler__Build_OpcodeType:
 	.data16	_Recompiler__Build_OpcodeType_Rmw
 	.data16	_Recompiler__Build_OpcodeType_RmwX
 	.data16	_Recompiler__Build_OpcodeType_RtlSnes
+	.data16	_Recompiler__Build_OpcodeType_IllyNop
 
 	// Entry: A = Opcode * 2, X = Free, Y = Free
 	// Allowed to return any mode
@@ -2605,6 +2617,15 @@ Recompiler__Build_OpcodeType_None:
 	txa
 	adc	$.writeAddr
 	sta	$.writeAddr
+	rts
+
+
+Recompiler__Build_OpcodeType_IllyNop:
+	// Are we allowed to recompile it?
+	lda	$=RomInfo_CpuSettings
+	and	#_RomInfo_Cpu_IllegalNop
+	jeq	$_Recompiler__Build_OpcodeType_None
+		// Yes, do nothing
 	rts
 
 

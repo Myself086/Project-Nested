@@ -23,6 +23,7 @@ Dev build:
 - Added inline capability to IO port emulation
 - Fixed palette mirrors
 - Added the ability to patch timed scroll changes
+- Added option to support illegal NOP opcodes
 
 v1.2
 - Fixed JMP to WRAM

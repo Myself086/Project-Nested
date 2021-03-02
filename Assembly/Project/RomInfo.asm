@@ -129,9 +129,10 @@ RomInfo_StackEmulation:
 RomInfo_VramQBufferSize:
 	.data16	0x1000
 
-	// Negative when recompiling PRG RAM instead of interpreting
-RomInfo_RecompilePrgRam:
-	.data8	0x00
+RomInfo_CpuSettings:
+	.data16	0x0000
+	.def	RomInfo_Cpu_RecompilePrgRam				0x0001
+	.def	RomInfo_Cpu_IllegalNop					0x0002
 
 	// Defines whether page range is static, 1 bit per range, 8 ranges in total, bit is set when range is static
 RomInfo_StaticRanges:
@@ -245,7 +246,23 @@ RomInfo_Description:
 	RomInfo_DefineMac	"public void Tab_Cpu : CPU related rules.", 0, 0
 
 		RomInfo_SummaryMac	"This option is for games that store static code into PRG RAM."
-		RomInfo_DefineMac	"public bool Cpu.RecompilePrgRam : Recompile PRG RAM", RomInfo_RecompilePrgRam, 0x80
+		RomInfo_DefineMac	"public bool Cpu.RecompilePrgRam : Recompile PRG RAM", RomInfo_CpuSettings, RomInfo_Cpu_RecompilePrgRam
+
+		RomInfo_SummaryMac	"Allow recompiling illegal NOP opcodes."
+		RomInfo_SummaryMac	"Activating this may break games that derail the disassembler."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Supports the following opcodes:"
+		RomInfo_SummaryMac	" 0C"
+		RomInfo_SummaryMac	" 14, 1A, 1C"
+		RomInfo_SummaryMac	" 34, 3A, 3C"
+		RomInfo_SummaryMac	" 54, 5A, 5C"
+		RomInfo_SummaryMac	" 74, 7A, 7C"
+		RomInfo_SummaryMac	" 80, 82, 89"
+		RomInfo_SummaryMac	" C2"
+		RomInfo_SummaryMac	" D4, DA, DC"
+		RomInfo_SummaryMac	" E2"
+		RomInfo_SummaryMac	" F4, FA, FC"
+		RomInfo_DefineMac	"public bool Cpu.IllegalNop : Allow illegal NOPs", RomInfo_CpuSettings, RomInfo_Cpu_IllegalNop
 
 	RomInfo_DefineMac	"public void Tab_Stack : Stack related rules.", 0, 0
 

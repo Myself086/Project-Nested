@@ -21,41 +21,41 @@
 
 Opcode__BytesTable:
 	//      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 2, 1, 0, 0, 3, 3, 0
-	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 3, 0, 0, 0, 3, 3, 0
+	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0
 	.data16	3, 2, 4, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
-	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 3, 0, 0, 0, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0
 	.data16	1, 2, 0, 0, 0, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
-	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 3, 0, 0, 0, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0
 	.data16	1, 2, 1, 0, 0, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
-	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 3, 0, 0, 0, 3, 3, 0
-	.data16	0, 2, 0, 0, 2, 2, 2, 0, 1, 0, 1, 0, 3, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
 	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 0, 3, 0, 0
 	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
 	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0
-	.data16	2, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
-	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 3, 0, 0, 0, 3, 3, 0
-	.data16	2, 2, 0, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
-	.data16	2, 2, 2, 0, 0, 2, 2, 0, 1, 3, 0, 0, 0, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 2, 1, 0, 3, 3, 3, 0
+	.data16	2, 2, 2, 0, 2, 2, 2, 0, 1, 3, 1, 0, 3, 3, 3, 0
 
 Opcode__BytesTable_OneOrMore:
 	//      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 2, 1, 1, 1, 3, 3, 1
-	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 3, 1, 1, 1, 3, 3, 1
+	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 3, 3, 3, 1
 	.data16	3, 2, 4, 1, 2, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
-	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 3, 1, 1, 1, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 3, 3, 3, 1
 	.data16	1, 2, 1, 1, 1, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
-	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 3, 1, 1, 1, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 3, 3, 3, 1
 	.data16	1, 2, 1, 1, 1, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
-	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 3, 1, 1, 1, 3, 3, 1
-	.data16	1, 2, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 3, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 3, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
 	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 1, 3, 1, 1
 	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
 	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 3, 3, 3, 1
-	.data16	2, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
-	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 3, 1, 1, 1, 3, 3, 1
-	.data16	2, 2, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
-	.data16	2, 2, 2, 1, 1, 2, 2, 1, 1, 3, 1, 1, 1, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 3, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 2, 1, 1, 3, 3, 3, 1
+	.data16	2, 2, 2, 1, 2, 2, 2, 1, 1, 3, 1, 1, 3, 3, 3, 1
 	
 Opcode__BytesTable65816:
 	//      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
@@ -256,26 +256,27 @@ Opcode__UseTable6502:
 	.def	Opcode__A_Rmw			0x5c
 	.def	Opcode__A_RmwX			0x5e
 	.def	Opcode__A_RtlSnes		0x60
+	.def	Opcode__A_IllyNop		0x62
 
 Opcode__AddrMode:
-	//      0                 1                   2                  3                4                5                6                7                8                9                    a                b                c                 d                   e                f
-	.data16	_Opcode__A_Brk,   _Opcode__A_XInd,    _Opcode__A_Cop,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Php,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
-	.data16	_Opcode__A_Jsr,   _Opcode__A_XInd,    _Opcode__A_Jsl,    _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Plp,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_Abs,   _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
-	.data16	_Opcode__A_Rti,   _Opcode__A_XInd,    _Opcode__A_RtlSnes,_Opcode__A_None, _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Pha,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_Jmp,   _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Cli,  _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
-	.data16	_Opcode__A_Rts,   _Opcode__A_XInd,    _Opcode__A_RtsNes, _Opcode__A_None, _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Pla,  _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_JmpI,  _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Sei,  _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
-	.data16	_Opcode__A_None,  _Opcode__A_StaXInd, _Opcode__A_None,   _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_None,     _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_StyA,  _Opcode__A_StaA,    _Opcode__A_StxA, _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_StaIndY, _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_StaAbsY,  _Opcode__A_Txs,  _Opcode__A_None, _Opcode__A_None,  _Opcode__A_StaAbsX, _Opcode__A_None, _Opcode__A_None, 
-	.data16	_Opcode__A_Const, _Opcode__A_LdaXInd, _Opcode__A_Const,  _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_LdaConst, _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_LdyA,  _Opcode__A_LdaA,    _Opcode__A_LdxA, _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_LdaIndY, _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_LdaAbsY,  _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_YAbsX, _Opcode__A_LdaAbsX, _Opcode__A_AbsY, _Opcode__A_None, 
-	.data16	_Opcode__A_Const, _Opcode__A_XInd,    _Opcode__A_None,   _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_Abs,   _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
-	.data16	_Opcode__A_Const, _Opcode__A_XInd,    _Opcode__A_None,   _Opcode__A_None, _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_Const,    _Opcode__A_Impl, _Opcode__A_None, _Opcode__A_Abs,   _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
-	.data16	_Opcode__A_Br,    _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_None, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_None, _Opcode__A_None, _Opcode__A_None,  _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
-	
+	//      0                  1                   2                  3                4                   5                6                7                8                9                    a                   b                c                   d                   e                f
+	.data16	_Opcode__A_Brk,    _Opcode__A_XInd,    _Opcode__A_Cop,    _Opcode__A_None, _Opcode__A_None,    _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Php,  _Opcode__A_Const,    _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_IllyNop, _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
+	.data16	_Opcode__A_Jsr,    _Opcode__A_XInd,    _Opcode__A_Jsl,    _Opcode__A_None, _Opcode__A_Zpg,     _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Plp,  _Opcode__A_Const,    _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_Abs,     _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_IllyNop, _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
+	.data16	_Opcode__A_Rti,    _Opcode__A_XInd,    _Opcode__A_RtlSnes,_Opcode__A_None, _Opcode__A_None,    _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Pha,  _Opcode__A_Const,    _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_Jmp,     _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Cli,  _Opcode__A_AbsY,     _Opcode__A_IllyNop, _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
+	.data16	_Opcode__A_Rts,    _Opcode__A_XInd,    _Opcode__A_RtsNes, _Opcode__A_None, _Opcode__A_None,    _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Pla,  _Opcode__A_Const,    _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_JmpI,    _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Sei,  _Opcode__A_AbsY,     _Opcode__A_IllyNop, _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
+	.data16	_Opcode__A_IllyNop,_Opcode__A_StaXInd, _Opcode__A_IllyNop,_Opcode__A_None, _Opcode__A_Zpg,     _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_IllyNop,  _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_StyA,    _Opcode__A_StaA,    _Opcode__A_StxA, _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_StaIndY, _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_ZpgX,    _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_StaAbsY,  _Opcode__A_Txs,     _Opcode__A_None, _Opcode__A_None,    _Opcode__A_StaAbsX, _Opcode__A_None, _Opcode__A_None, 
+	.data16	_Opcode__A_Const,  _Opcode__A_LdaXInd, _Opcode__A_Const,  _Opcode__A_None, _Opcode__A_Zpg,     _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_LdaConst, _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_LdyA,    _Opcode__A_LdaA,    _Opcode__A_LdxA, _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_LdaIndY, _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_ZpgX,    _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_LdaAbsY,  _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_YAbsX,   _Opcode__A_LdaAbsX, _Opcode__A_AbsY, _Opcode__A_None, 
+	.data16	_Opcode__A_Const,  _Opcode__A_XInd,    _Opcode__A_IllyNop,_Opcode__A_None, _Opcode__A_Zpg,     _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_Const,    _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_Abs,     _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_IllyNop, _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
+	.data16	_Opcode__A_Const,  _Opcode__A_XInd,    _Opcode__A_IllyNop,_Opcode__A_None, _Opcode__A_Zpg,     _Opcode__A_Zpg,  _Opcode__A_Zpg,  _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_Const,    _Opcode__A_Impl,    _Opcode__A_None, _Opcode__A_Abs,     _Opcode__A_Abs,     _Opcode__A_Rmw,  _Opcode__A_None, 
+	.data16	_Opcode__A_Br,     _Opcode__A_IndY,    _Opcode__A_Brw,    _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_ZpgX, _Opcode__A_ZpgX, _Opcode__A_None, _Opcode__A_Impl, _Opcode__A_AbsY,     _Opcode__A_IllyNop, _Opcode__A_None, _Opcode__A_IllyNop, _Opcode__A_AbsX,    _Opcode__A_RmwX, _Opcode__A_None, 
+
 	// Instruction type
 	.def	Opcode__I____			0x00
 	.def	Opcode__I_Adc			0x02
@@ -366,25 +367,26 @@ Opcode__Instruction:
 	// 18 = Brw
 	// 1a = NES Return
 	// 1c = SNES Return
+	// 1e =	Illegal NOP
 
 Opcode__RecompileType:
 	//      0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f
-	.data16	0x0c, 0x02, 0x10, 0x00, 0x00, 0x02, 0x02, 0x00, 0x12, 0x02, 0x02, 0x00, 0x00, 0x02, 0x02, 0x00
-	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
+	.data16	0x0c, 0x02, 0x10, 0x00, 0x00, 0x02, 0x02, 0x00, 0x12, 0x02, 0x02, 0x00, 0x1e, 0x02, 0x02, 0x00
+	.data16	0x04, 0x02, 0x18, 0x00, 0x1e, 0x02, 0x02, 0x00, 0x02, 0x02, 0x1e, 0x00, 0x1e, 0x02, 0x02, 0x00
 	.data16	0x0a, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x14, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
-	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
+	.data16	0x04, 0x02, 0x18, 0x00, 0x1e, 0x02, 0x02, 0x00, 0x02, 0x02, 0x1e, 0x00, 0x1e, 0x02, 0x02, 0x00
 	.data16	0x0e, 0x02, 0x1c, 0x00, 0x00, 0x02, 0x02, 0x00, 0x12, 0x02, 0x02, 0x00, 0x06, 0x02, 0x02, 0x00
-	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
+	.data16	0x04, 0x02, 0x18, 0x00, 0x1e, 0x02, 0x02, 0x00, 0x02, 0x02, 0x1e, 0x00, 0x1e, 0x02, 0x02, 0x00
 	.data16	0x0e, 0x02, 0x1a, 0x00, 0x00, 0x02, 0x02, 0x00, 0x14, 0x02, 0x02, 0x00, 0x08, 0x02, 0x02, 0x00
-	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
-	.data16	0x00, 0x02, 0x00, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x00, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
+	.data16	0x04, 0x02, 0x18, 0x00, 0x1e, 0x02, 0x02, 0x00, 0x02, 0x02, 0x1e, 0x00, 0x1e, 0x02, 0x02, 0x00
+	.data16	0x1e, 0x02, 0x1e, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x1e, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
 	.data16	0x04, 0x02, 0x18, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00
 	.data16	0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
 	.data16	0x04, 0x02, 0x18, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x16, 0x00, 0x02, 0x02, 0x02, 0x00
-	.data16	0x02, 0x02, 0x00, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
-	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
-	.data16	0x02, 0x02, 0x00, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
-	.data16	0x04, 0x02, 0x18, 0x00, 0x00, 0x02, 0x02, 0x00, 0x02, 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x00
+	.data16	0x02, 0x02, 0x1e, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
+	.data16	0x04, 0x02, 0x18, 0x00, 0x1e, 0x02, 0x02, 0x00, 0x02, 0x02, 0x1e, 0x00, 0x1e, 0x02, 0x02, 0x00
+	.data16	0x02, 0x02, 0x1e, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00, 0x02, 0x02, 0x02, 0x00
+	.data16	0x04, 0x02, 0x18, 0x00, 0x1e, 0x02, 0x02, 0x00, 0x02, 0x02, 0x1e, 0x00, 0x1e, 0x02, 0x02, 0x00
 
 	// 0=None, 1=X, 2=Y
 Opcode__IndexRegister:
