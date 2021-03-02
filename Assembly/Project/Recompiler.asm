@@ -2591,9 +2591,9 @@ Recompiler__Build_OpcodeType_None:
 	ldy	#_Inline__UnsupportedOpcode_OpcodeAndBank-Inline__UnsupportedOpcode+2
 	sta	[$.writeAddr],y
 	// Write opcode
-	lda	$.opcodeX2+1
+	lda	$.thisOpcodeX2+1
 	lsr	a
-	lda	$.opcodeX2
+	lda	$.thisOpcodeX2
 	ror	a
 	dey
 	sta	[$.writeAddr],y

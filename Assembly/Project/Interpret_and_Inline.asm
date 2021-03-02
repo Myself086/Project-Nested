@@ -1245,7 +1245,7 @@ Interpret__UnsupportedOpcode:
 	pla
 	ply
 	trap
-	Exception	"Unsupported Opcode{}{}{}The CPU attempted to execute opcode 0x{a:X} at NES address {ah:X}:{Y:X}"
+	Exception	"Unsupported Opcode{}{}{}The CPU attempted to execute opcode 0x{a:X} at NES address {ah:X}:{Y:X}{}{}Some illegal opcodes are supported but must be activated on the EXE under CPU settings."
 
 	// ---------------------------------------------------------------------------
 
