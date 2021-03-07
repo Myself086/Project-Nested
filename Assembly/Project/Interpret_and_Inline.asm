@@ -806,9 +806,9 @@ Interpret__Jsr_RewriteJmp:
 		// Before
 		//		0	1	2	3	4	5	6	7	8	9
 		//		pea	#	#	pea	#	#	jsr	#	#	#
-		// After: dummy sta for debugging, dummy branch forward, no actual nop, jsr to the recompiled function
+		// After
 		//		0	1	2	3	4	5	6	7	8	9
-		//		pea	#	#	bra	+1	nop	jsr	#	#	#
+		//		pea	#	#	jmp	#	#	#	nop	nop	nop
 
 		// Fix return address so we point to the first PEA
 		lda	$.return
@@ -816,27 +816,27 @@ Interpret__Jsr_RewriteJmp:
 		sbc	#0x0009
 		sta	$.return
 
-		// Rewrite code
-		lda	#0x0180
+		// Write JMP
+		lda	#0x005c
 		ldy	#0x0003
-		sta	[$.return],y
-
-		// Change JSR to JMP
-		ldy	#0x0006
-		lda	[$.return],y
-		and	#0xff00
-		ora	#0x005c
 		sta	[$.return],y
 
 		// Rewrite JMP destination
 		ldy	$.functionListIndex
 		lda	[$.Recompiler_FunctionList+3],y
-		ldy	#0x0007
+		ldy	#0x0004
 		sta	[$.return],y
 		ldy	$.functionListIndex
 		iny
 		lda	[$.Recompiler_FunctionList+3],y
-		ldy	#0x0008
+		ldy	#0x0005
+		sta	[$.return],y
+
+		// Write NOPs
+		lda	#0xeaea
+		ldy	#7
+		sta	[$.return],y
+		iny
 		sta	[$.return],y
 
 		// Fix stack
@@ -853,12 +853,12 @@ Interpret__Jsr_RewriteJmp:
 		ldy	#0x000a
 		lda	[$.return],y
 		cmp	#0x6bea
-		bne	$+b_1
+		bne	$+b_else
 			// Remove the first PEA
 			lda	#0xeaea
 			ldy	#1
 			sta	[$.return],y
-			lda	#0x0480
+			lda	#0x0180
 			sta	[$.return]
 
 			// Fix stack, remove the original return
@@ -870,16 +870,45 @@ Interpret__Jsr_RewriteJmp:
 			sta	$4,s
 			pla
 			sta	$1,s
+
+			bra	$+b_1
+b_else:
+			breakpoint
+
+			ldy	$.functionListIndex
+			iny
+			iny
+			iny
+			lda	[$.Recompiler_FunctionList+3],y
+			and	#_Opcode_F_HasReturn
+			beq	$+b_1
+				.precall	JMPi__Add	=originalCall, =newAddr
+				lda	$.return+1
+				sta	$.Param_newAddr+1
+				lda	$.return
+				clc
+				adc	#0x000a
+				sta	$.Param_newAddr
+				lda	$8,s
+				inc	a
+				tay
+				and	#0xe000
+				xba
+				tax
+				lda	$_Program_BankNum-1,x
+				sta	$.Param_originalCall+1
+				sty	$.Param_originalCall
+				call
 b_1:
 
-
-		// Fake return
-		//lda	#_Interpret__Jsr_FakeReturn/256
-		//sta	$9,s
-		//lda	#_Interpret__Jsr_FakeReturn
-		//sta	$8,s
-
-		// Continue as normal
+		// Return back to the JMP
+		lda	$.return+1
+		sta	$6,s
+		lda	$.return
+		clc
+		adc	#0x0002
+		sta	$5,s
+		bra	$+Interpret__Jsr_FakeReturn
 
 Interpret__Jsr_NoRewrite:
 	// Return back to JSR to trigger stack debugger on EmulSNES
@@ -900,6 +929,7 @@ Interpret__Jsr_NoRewrite:
 	//dec	a
 	//sta	$5,s
 
+Interpret__Jsr_FakeReturn:
 	// Return
 	sep	#0x30
 	lda	$.a
@@ -908,7 +938,6 @@ Interpret__Jsr_NoRewrite:
 	pld
 	plb
 	plp
-Interpret__Jsr_FakeReturn:
 	WDM_StorePreviousEntryPoint
 	rtl
 

@@ -24,6 +24,7 @@ Dev build:
 - Fixed palette mirrors
 - Added the ability to patch timed scroll changes
 - Added option to support illegal NOP opcodes
+- Fixed a memory leak when RTS is interpreted (non-native return address)
 
 v1.2
 - Fixed JMP to WRAM
