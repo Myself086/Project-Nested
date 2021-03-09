@@ -11,6 +11,8 @@
 - Allow NMI to happen during NMI execution
 - Fix stack tracing for cross-bank JMP and indirect JMP
 - Fix memory emulation for STA (ZP,X) when writing to ROM
+- Interpret RTI
+- Stack wrap
 
 ----------------------------------------------------------------
 	IO ports
@@ -18,6 +20,7 @@
 - Add ports $2003 and $2004
 - Optimize $2007
 - Emulate $4016 and $4017 instead of using the SNES ports directly (for Duck Hunt, custom controls and GUI menus maybe)
+- Optimize most ports with the new inline script
 
 ----------------------------------------------------------------
 	PPU
@@ -27,6 +30,8 @@
 - Randomize VRAM allocation for CHR when 2 or more CHR buffers are found to have the same amount of different bytes
 - Fix 8 sprites per scanline sometimes showing 9 for 8x8 and 8x16 sprite size.
 - Palette option
+- Redo VRAM map to allow sprite pattern table swap
+- Mid-frame palette changes
 
 ----------------------------------------------------------------
 	APU
