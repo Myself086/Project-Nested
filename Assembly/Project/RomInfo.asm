@@ -270,7 +270,7 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Turn this option OFF to test whether the game has stack emulation issues."
 		RomInfo_SummaryMac	""
-		RomInfo_SummaryMac	"Disabling this option disables SRM feedback as well as every other stack options."
+		RomInfo_SummaryMac	"Disabling this option disables other stack options."
 		RomInfo_DefineMac	"public bool StackEmulation.NativeReturn : Stack emulation, Native return address", RomInfo_StackEmulation, RomInfo_StackEmu_NativeReturn
 
 		RomInfo_SummaryMac	"Take a more lazy approach when solving double return."
