@@ -296,7 +296,6 @@ Gui__BlueScreen:
 	Gui__WriteTextAt		Gui__Text_Error, 13, 3
 
 	// Find error tag
-	breakpoint
 	.precall	Dict__FindElement		=list, =compareString, .length
 	ldx	#_ExceptionData_Start
 	stx	$.Param_list

@@ -873,8 +873,6 @@ Interpret__Jsr_RewriteJmp:
 
 			bra	$+b_1
 b_else:
-			breakpoint
-
 			ldy	$.functionListIndex
 			iny
 			iny
