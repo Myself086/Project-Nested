@@ -31,14 +31,12 @@ Game "Empty                ", 0x00, 0x00
 	.addr	0x808000, 0x80feff
 
 	// Interpret_Indirect.asm is first in the bank because it starts with a page alignment
-	// Must be in the same bank as Interpret_and_Inline.asm and can't be bank 0x00
+	// Must be in the same bank as Interpret_and_Inline.asm and can't be bank 0x00 nor HiROM banks
 	.include	"Project/Interpret_Indirect.asm"
+	.include	"Project/Interpret_and_Inline.asm"
 
 	.include	"Project/Chr.asm"
 	.include	"Project/IO.asm"
-	.include	"Project/Interpret_and_Inline.asm"
-	.include	"Project/JMPiList.asm"
-	.include	"Project/Cop.asm"
 	.def	IO__BANK			0x80
 	.def	Interpret__BANK		0x80
 
@@ -50,29 +48,28 @@ Game "Empty                ", 0x00, 0x00
 
 	// Sound
 Spc_Code_Start:
-	.offsetfrom		0x0400
+	//.offsetfrom		0x0400
 	.includeSPC	"Project/Spc700/Spc.asm"
-	.offsetend
+	//.offsetend
 Spc_Code_End:
 
 	.include	"Project/Gui.asm"
 	.include	"Project/Gui.StringFormat.asm"
-	.include	"Project/Hdma.asm"
-	.include	"Project/Sound.asm"
+	.include	"Project/JMPiList.asm"
 
 	// Exception data must be at the end of the bank and in the same bank as Gui
 ExceptionData_Start:
 ExceptionData:
 
 	// ---------------------------------------------------------------------------
-	// Bank 81: Recompiler, opcode tables and mappers must be in the same bank
+	// Bank 81
 
 	.addr	0x818000, 0x81fffe
 
 	.include	"Project/Main.asm"
 	.include	"Project/Gfx_Interrupt.asm"
 
-	// Recompiler
+	// Recompiler, opcode tables and mappers must be in the same bank
 	.include	"Project/Recompiler.asm"
 	.include	"Project/OpcodeTables.asm"
 	.include	"Project/Mappers/Mapper1.asm"
@@ -90,6 +87,10 @@ ExceptionData:
 
 	// Low level emulation
 	.include	"Project/Interpreter.asm"
+
+	.include	"Project/Cop.asm"
+	.include	"Project/Hdma.asm"
+	.include	"Project/Sound.asm"
 
 	// Trap unsupported mappers
 	[0x81ffff] = 0x00
