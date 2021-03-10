@@ -59,6 +59,14 @@ StaticRec__Main_LoopFormat:
 		bcc	$-StaticRec__Main_LoopFormat
 		beq	$-StaticRec__Main_LoopFormat
 
+	// Are we using native stack? If not, turn off every other stack options
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturn
+	bne	$+b_1
+		//lda	#0
+		sta	$=RomInfo_StackEmulation
+b_1:
+
 	// Index for the first 8 bits
 	.local	_lowBits
 	lda	#0x00ff
@@ -196,14 +204,6 @@ StaticRec__Main_Loop2_End:
 	// Disable StaticRec mode
 	lda	#0
 	sta	$=StaticRec_Active
-
-	// Are we using native stack? If not, turn off every other stack options
-	lda	$=RomInfo_StackEmulation
-	and	#_RomInfo_StackEmu_NativeReturn
-	bne	$+b_1
-		//lda	#0
-		sta	$=RomInfo_StackEmulation
-b_1:
 
 	return
 
