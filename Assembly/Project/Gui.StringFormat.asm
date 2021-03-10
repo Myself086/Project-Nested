@@ -393,6 +393,7 @@ Gui__WriteTextFormat_VarList:
 	Gui__WriteTextFormat_VarList		"PC", BlueScreen_PC, 3
 	Gui__WriteTextFormat_VarList		"title", RomInfo_Title, 0
 	Gui__WriteTextFormat_VarList		"version", RomInfo_Version, 0
+	Gui__WriteTextFormat_VarList		"buildDate", RomInfo_BuildDate, 0
 	Dict_Null
 
 	// ---------------------------------------------------------------------------

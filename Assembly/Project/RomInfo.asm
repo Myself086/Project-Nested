@@ -146,6 +146,9 @@ RomInfo_Title:
 	.string0	"Project Nested"
 RomInfo_Version:
 	.string0	"1.2.1 (indev)"
+RomInfo_BuildDate:
+	.printdate	"yyyy-MM-dd"
+	.data8	0
 
 	// ---------------------------------------------------------------------------
 

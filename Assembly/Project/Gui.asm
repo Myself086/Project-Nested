@@ -768,8 +768,8 @@ Gui__Text_RegisterTop8:
 	.string0	"A:{ah:X} {a:X}  P:     {P:X}  DB:  {DB:X}"
 
 Gui__Text_RegisterBottom16:
-	.string0	"X: {X:X}  SP:  {S:X}  DP:{DP:X}{}Y: {Y:X}  PC:{PC:X}{}{}{title} v{version}"
+	.string0	"X: {X:X}  SP:  {S:X}  DP:{DP:X}{}Y: {Y:X}  PC:{PC:X}{}{}{title} v{version}{}{}Build date: {buildDate}"
 
 Gui__Text_RegisterBottom8:
-	.string0	"X:   {x:X}  SP:  {S:X}  DP:{DP:X}{}Y:   {y:X}  PC:{PC:X}{}{}{title} v{version}"
+	.string0	"X:   {x:X}  SP:  {S:X}  DP:{DP:X}{}Y:   {y:X}  PC:{PC:X}{}{}{title} v{version}{}{}Build date: {buildDate}"
 
