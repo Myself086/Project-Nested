@@ -163,11 +163,16 @@ JMPi__Add:
 		sta	$.nodeAddr+1
 		sta	$=JMPi_CurrentPoolTop+1
 		txa
-		sta	$=JMPi_EmptyPointer
 		sta	$.nodeAddr
 		clc
 		adc	#_JMPi_PoolSize
 		sta	$=JMPi_CurrentPoolTop
+
+		// Reserve another node
+		txa
+		clc
+		adc	#_JMPi_Inc
+		sta	$=JMPi_EmptyPointer
 b_1:
 
 	// Copy code template
