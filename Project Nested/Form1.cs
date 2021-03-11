@@ -466,7 +466,7 @@ namespace Project_Nested
                         var profileName = reader.GetProfileName();
 
                         // Condition for applying feedback to current profile
-                        bool pass = ConvertPathToTitle(profileName) == this.profileLoaded;
+                        bool pass = profileName == this.profileLoaded;
 
                         // Is the profile name valid?
                         if (profileName == NO_PROFILE)
