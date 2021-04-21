@@ -42,6 +42,8 @@
             this.lblInstructions = new System.Windows.Forms.Label();
             this.lblKnownCalls = new System.Windows.Forms.Label();
             this.btnCredits = new System.Windows.Forms.Button();
+            this.btnPatreon = new System.Windows.Forms.Button();
+            this.btnCompatibility = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,7 +62,7 @@
             this.btnSave.Location = new System.Drawing.Point(12, 140);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 2;
+            this.btnSave.TabIndex = 1;
             this.btnSave.Text = "Save Snes";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
@@ -103,7 +105,7 @@
             this.btnLoadSrm.Location = new System.Drawing.Point(12, 245);
             this.btnLoadSrm.Name = "btnLoadSrm";
             this.btnLoadSrm.Size = new System.Drawing.Size(75, 23);
-            this.btnLoadSrm.TabIndex = 5;
+            this.btnLoadSrm.TabIndex = 2;
             this.btnLoadSrm.Text = "Load SRM";
             this.btnLoadSrm.UseVisualStyleBackColor = true;
             this.btnLoadSrm.Click += new System.EventHandler(this.btnLoadSrm_Click);
@@ -111,10 +113,10 @@
             // btnSettingsText
             // 
             this.btnSettingsText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSettingsText.Location = new System.Drawing.Point(12, 375);
+            this.btnSettingsText.Location = new System.Drawing.Point(12, 317);
             this.btnSettingsText.Name = "btnSettingsText";
             this.btnSettingsText.Size = new System.Drawing.Size(75, 23);
-            this.btnSettingsText.TabIndex = 5;
+            this.btnSettingsText.TabIndex = 3;
             this.btnSettingsText.Text = "Settings text";
             this.btnSettingsText.UseVisualStyleBackColor = true;
             this.btnSettingsText.Click += new System.EventHandler(this.btnSettingsText_Click);
@@ -176,16 +178,38 @@
             this.btnCredits.Location = new System.Drawing.Point(12, 404);
             this.btnCredits.Name = "btnCredits";
             this.btnCredits.Size = new System.Drawing.Size(75, 23);
-            this.btnCredits.TabIndex = 11;
+            this.btnCredits.TabIndex = 6;
             this.btnCredits.Text = "Credits";
             this.btnCredits.UseVisualStyleBackColor = true;
             this.btnCredits.Click += new System.EventHandler(this.btnCredits_Click);
+            // 
+            // btnPatreon
+            // 
+            this.btnPatreon.Location = new System.Drawing.Point(12, 375);
+            this.btnPatreon.Name = "btnPatreon";
+            this.btnPatreon.Size = new System.Drawing.Size(75, 23);
+            this.btnPatreon.TabIndex = 5;
+            this.btnPatreon.Text = "Patreon";
+            this.btnPatreon.UseVisualStyleBackColor = true;
+            this.btnPatreon.Click += new System.EventHandler(this.btnPatreon_Click);
+            // 
+            // btnCompatibility
+            // 
+            this.btnCompatibility.Location = new System.Drawing.Point(12, 346);
+            this.btnCompatibility.Name = "btnCompatibility";
+            this.btnCompatibility.Size = new System.Drawing.Size(75, 23);
+            this.btnCompatibility.TabIndex = 4;
+            this.btnCompatibility.Text = "Compatibility";
+            this.btnCompatibility.UseVisualStyleBackColor = true;
+            this.btnCompatibility.Click += new System.EventHandler(this.btnCompatibility_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(496, 439);
+            this.Controls.Add(this.btnCompatibility);
+            this.Controls.Add(this.btnPatreon);
             this.Controls.Add(this.btnCredits);
             this.Controls.Add(this.lblKnownCalls);
             this.Controls.Add(this.btnSaveProfile);
@@ -222,6 +246,8 @@
         private System.Windows.Forms.Panel panel;
         private System.Windows.Forms.Label lblKnownCalls;
         private System.Windows.Forms.Button btnCredits;
+        private System.Windows.Forms.Button btnPatreon;
+        private System.Windows.Forms.Button btnCompatibility;
     }
 }
 

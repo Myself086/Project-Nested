@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -538,6 +539,20 @@ namespace Project_Nested
                 "\n" +
                 "Thanks to the nesdev.com community.\n"
                 );
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Web Links
+
+        private void btnPatreon_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://www.patreon.com/Myself086");
+        }
+
+        private void btnCompatibility_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://docs.google.com/spreadsheets/d/1xKZIyNz1DSI3ZBdMfaTEaa_9b6IEABx-ZPwOb6XqcLQ/edit?usp=sharing");
         }
 
         #endregion
