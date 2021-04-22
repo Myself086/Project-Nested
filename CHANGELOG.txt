@@ -1,5 +1,5 @@
 
-Dev build:
+v1.3
 - Added support for read-modify-write to IO ports
 - Port $2000 is now thread safe, fixes Final Fantasy I random crashes
 - Fixed AOT JMP across banks
