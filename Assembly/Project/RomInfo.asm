@@ -141,7 +141,7 @@ RomInfo_StaticRanges:
 	// ---------------------------------------------------------------------------
 
 	// Version number
-	[80ffdB] = 0x02
+	[80ffdB] = 0x03
 RomInfo_Title:
 	.string0	"Project Nested"
 RomInfo_Version:
@@ -167,7 +167,7 @@ RomInfo_BuildDate:
 	// Pointer used in Header.asm
 RomInfo_Description:
 
-	RomInfo_DefineMac	"public void Tab_Version : smc version 1.2.1 (indev)", 0, 0
+	RomInfo_DefineMac	"public void Tab_Version : smc version 1.3", 0, 0
 
 	RomInfo_DefineMac	"private void Tab_Warning : Settings in RED are for debugging purposes ONLY.", 0, 0
 
