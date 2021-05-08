@@ -131,7 +131,6 @@ b_1:
 		case	iIOPort_sta
 		case	iIOPort_stai
 			php
-			pha
 
 			// Detect changes
 			eor	$_Mapper4_BankSelect
@@ -140,7 +139,7 @@ b_1:
 			bit	#0xc0
 			bne	$+b_1
 				// Save current value
-				pla
+				eor	$_Mapper4_BankSelect
 				sta	$_Mapper4_BankSelect
 
 				// Return
@@ -189,7 +188,7 @@ b_1:
 b_1:
 
 			// Save current value
-			pla
+			eor	$_Mapper4_BankSelect
 			sta	$_Mapper4_BankSelect
 
 			// Return
