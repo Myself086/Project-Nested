@@ -153,7 +153,7 @@ b_1:
 			beq	$+b_1
 				pha
 
-				lda	$_IO_temp
+				eor	$_Mapper4_BankSelect
 				rol	a
 				rol	a
 				sta	$_IO_MapperChrBankSwap
