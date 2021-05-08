@@ -6,5 +6,6 @@ Assembly/*.lnk
 Assembly/PatchList.txt
 Assembly/Games
 Assembly/Profiles
+Assembly/Test
 project nested/bin
 project nested/obj
