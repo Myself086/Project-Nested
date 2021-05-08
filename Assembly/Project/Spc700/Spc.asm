@@ -24,7 +24,16 @@
 	.def	pcm_length      0x53   // 0x4013
 
 	.def	sound_ctrl		0x55   // 0x4015
+
 	.def	no4016			0x56   // 0x4016
+		// 0x01 = Reset square 0
+		// 0x02 = Reset square 1
+		// 0x04 = Reset triangle
+		// 0x08 = Reset noise
+		// 0x10 = 
+		// 0x20 = Mono
+		// 0x40 = Square 0 sweep
+		// 0x80 = Square 1 sweep
 
 //========================================
 //       SPC Memory
@@ -378,7 +387,7 @@ nextsq0:
 
         call !check_timer3
 
-        mov a,0x56
+        mov a,no4016
         and a,#00000001b
         beq no_reset
 
@@ -601,7 +610,7 @@ nextsq1:
         and a,#00010000b
         bne decay_disabled2
 
-        mov a,0x56
+        mov a,no4016
         and a,#00000010b
         beq no_reset2
         bra no_reset2
@@ -809,7 +818,7 @@ noise_enabled:
 
         bra no_reset3
 
-//        mov a,0x56
+//        mov a,no4016
 //        and a,#00001000b
 //        beq no_reset3
 //
@@ -937,7 +946,7 @@ check_timer3:
         jmp !no_decay1
 decay1:
 
-        mov a,0x56
+        mov a,no4016
         and a,#00000001b
         beq no_decay_reset
 
@@ -1059,7 +1068,7 @@ no_decay1:
         jmp !no_decay2
 decay2:
 
-        mov a,0x56
+        mov a,no4016
         and a,#00000010b
         beq no_decay_reset2
 
@@ -1187,7 +1196,7 @@ no_decay2:
         and a,#00001000b
         beq no_decay3
 
-        mov a,0x56
+        mov a,no4016
         and a,#00001000b
         beq no_decay_reset3
 
