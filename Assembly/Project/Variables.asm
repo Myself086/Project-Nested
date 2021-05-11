@@ -610,6 +610,7 @@ IRQ_VSTACK_START:
 
 	.def	JMPi_EmptyPointer			0xb17000
 	.def	JMPi_CurrentPoolTop			0xb17003
+	.def	JMPi_InitialPoolTopValue	0xb18000
 	.def	JMPi_PoolSize				0x001000
 
 	// Structure:

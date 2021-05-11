@@ -30,8 +30,7 @@ JMPi__Init:
 	sta	$=JMPi_CurrentPoolTop+1
 	lda	#_JMPi_EmptyPointer+6
 	sta	$=JMPi_EmptyPointer
-	clc
-	adc	#_JMPi_PoolSize
+	lda	#_JMPi_InitialPoolTopValue
 	sta	$=JMPi_CurrentPoolTop
 
 	// Reset pointers to the linker
