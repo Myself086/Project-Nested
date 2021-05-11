@@ -2563,11 +2563,20 @@ IO__r400f_y:
 IO__w400f_ind:
 	xba
 	sta	$_Sound_NesRegs+0xf
+
+	// Update length
 	tax
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_noise_length
+
+	// Enable noise
 	lda	#0x08
 	tsb	$_Sound_NesRegs+0x15
+
+	// Reset noise
+	//lda	#0x08
+	tsb	$_Sound_ExtraControl
+
 	txa
 	IO_w40xx_Return
 IO__w400f_x:
@@ -2583,11 +2592,20 @@ b_in:
 	php
 	phx
 	xba
+
+	// Update length
 	ldx	$_Sound_NesRegs+0xf
 	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
 	sta	$_Sound_noise_length
+
+	// Enable noise
 	lda	#0x08
 	tsb	$_Sound_NesRegs+0x15
+
+	// Reset noise
+	//lda	#0x08
+	tsb	$_Sound_ExtraControl
+
 	xba
 	plx
 	plp
