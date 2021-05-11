@@ -712,9 +712,8 @@ tri_enabled:
 
         mov a,pcm_raw
         lsr a
-        lsr a
         mov temp_add,a
-        mov a,#0x3F
+        mov a,#0x7F
 
         setc
         sbc a,temp_add
@@ -1301,9 +1300,9 @@ needed:
 timer3_ongoing:        
 
         mov 0xF2,#0x20    // set volume
-        mov 0xF3,#0x3F
+        mov 0xF3,#0x7F
         mov 0xF2,#0x21
-        mov 0xF3,#0x3F
+        mov 0xF3,#0x7F
 
 not_needed:
         ret
