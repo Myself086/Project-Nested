@@ -4,6 +4,7 @@ Dev build:
 - Fixed indirect JMP list initial upper bound, was likely to crash games using non-native return address
 - Fixed noise channel from not playing for some games
 - Fixed triangle volume from going quiet sometimes
+- Added more triangle samples for supporting higher frequencies
 
 v1.3
 - Added support for read-modify-write to IO ports

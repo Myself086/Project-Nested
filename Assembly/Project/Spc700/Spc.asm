@@ -80,6 +80,8 @@
 	.def	decay3rate				0x8C
 	.def	temp_add				0x8D
 
+	.def	tri_sample              0x8E
+
 //========================================
 
 
@@ -778,22 +780,28 @@ notimer:
         mov y,#0
         mov a,[temp1]+y
         mov 0xF2,#0x22
-
-        setc
-        cmp a,#0
-        beq nomess1
-        cmp a,#1
-        beq nomess1
-        sbc a,#2
-nomess1:
         mov 0xF3,a
 
         inc y
         mov a,[temp1]+y
+		and	a,#0x1f
         mov 0xF2,#0x23
-        sbc a,#0
         mov 0xF3,a
 
+		// Change sample
+		mov a,[temp1]+y
+		and	a,#0xe0
+		xcn	a
+		lsr	a
+		adc	a,#triangle_sample_num	// Assume carry clear from LSR
+		cmp	a,tri_sample
+		beq	triangle_skip1
+			mov	tri_sample,a
+			mov	0xF2,#0x24			// Sample # reg
+			mov	0xF3,a
+			mov	0xF2,#0x4C			// Key on
+			mov	0xF3,#0x04
+triangle_skip1:
 
 //=====================================
 
@@ -1801,7 +1809,7 @@ set_directory:
         //mov !0x0341,a
         //mov !0x0343,a
 
-		mov	x, #0x43
+		mov	x, #0x5f
 set_directory_loop:
 			mov	a,!set_directory_lut+x
 			mov	!0x0200+x,a
@@ -1815,7 +1823,8 @@ set_directory_lut:
 		.data16	_pulse1,_pulse1, _pulse1d,_pulse1d, _pulse1c,_pulse1c, _pulse1b,_pulse1b
 		.data16	_pulse2,_pulse2, _pulse2d,_pulse2d, _pulse2c,_pulse2c, _pulse2b,_pulse2b
 		.data16	_pulse3,_pulse3, _pulse3d,_pulse3d, _pulse3c,_pulse3c, _pulse3b,_pulse3b
-		.data16	_triang,_triang
+		.data16	_tri_samp0,_tri_samp0 _tri_samp1,_tri_samp1 _tri_samp2,_tri_samp2 _tri_samp3,_tri_samp3
+		.data16	_tri_samp4,_tri_samp4 _tri_samp5,_tri_samp5 _tri_samp6,_tri_samp6 _tri_samp7,_tri_samp7
 
 		.def	triangle_sample_num		0x10
 
@@ -1968,14 +1977,8 @@ pulse1b: .include "Project/Spc700/pl3-1.asm"
 pulse2b: .include "Project/Spc700/pl3-2.asm"
 pulse3b: .include "Project/Spc700/pl3-3.asm"
 
-// 2 samples (again?)
-pulse0e: .include "Project/Spc700/pl1-0.asm"
-pulse1e: .include "Project/Spc700/pl1-1.asm"
-pulse2e: .include "Project/Spc700/pl1-2.asm"
-pulse3e: .include "Project/Spc700/pl1-3.asm"
-
 freqtable: .include "Project/Spc700/snestabl.asm"
-tritable: .include "Project/Spc700/tritabl2.asm"
+tritable: .include "Project/Spc700/tritabl3.asm"
 
 
 
@@ -1986,5 +1989,12 @@ tritable: .include "Project/Spc700/tritabl2.asm"
 //        .include "Project/Spc700/pl2.asm"
 
 
-triang: .include "Project/Spc700/tri5.asm"
+tri_samp0: .include "Project/Spc700/tri6_sl3.asm"
+tri_samp1: .include "Project/Spc700/tri6_sl2.asm"
+tri_samp2: .include "Project/Spc700/tri6_sl1.asm"
+tri_samp3: .include "Project/Spc700/tri6.asm"
+tri_samp4: .include "Project/Spc700/tri6_sr1.asm"
+tri_samp5: .include "Project/Spc700/tri6_sr2.asm"
+tri_samp6: .include "Project/Spc700/tri6_sr3.asm"
+tri_samp7: .include "Project/Spc700/tri6_sr4.asm"
 
