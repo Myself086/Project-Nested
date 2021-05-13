@@ -180,20 +180,26 @@ Sound__Update:
 	sep	#0x30
 	.mx	0x30
 
-	// Update sound
+	// Update length counters
 	Sound__EmulateLengthCounter
+
+	lda	$.Sound_ExtraControl
+	sta	$.Sound_NesRegs+0x16
+	stz	$.Sound_ExtraControl
+
+	// Is sound buffer ready?
+	lda	$.Sound_Ready
+	beq	$+b_1
+		pld
+		return
+b_1:
+
+	// Update sound
 	smx	#0x20
 	Sound__UpdateDsp
 
-	// Update HDMA buffer if ready
-	lda	$.Sound_Ready
-	bne	$+b_1
-		lda	$.Sound_ExtraControl
-		sta	$.Sound_NesRegs+0x16
-		stz	$.Sound_ExtraControl
-
-		dec	$.Sound_Ready
-b_1:
+	lda	#0xff
+	sta	$.Sound_Ready
 
 	pld
 	return
