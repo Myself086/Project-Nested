@@ -131,6 +131,7 @@ b_1:
 		case	iIOPort_sta
 		case	iIOPort_stai
 			php
+			lock
 
 			// Detect changes
 			eor	$_Mapper4_BankSelect
