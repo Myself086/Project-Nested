@@ -125,54 +125,51 @@ Start__Irq_Fast:
 	sta	$_a
 	tsc
 	sta	$_s
-	lda	#_IRQ_STACK
+	lda	#_HDMA_SideBufferReady&0xff00		// Change both DP and SP to the same page
 	tcs
 	// Push the rest of the registers to interrupt stack
 	phx
 	phy
 	phd
+	tcd
+
+	// Change mode
+	.mx	0x10
+	sep	#0x10
 
 	// Are we in Vblank? Also acknowledge IRQ at the same time
-	ldx	$0x4211
+	lda	$0x4211
 	bpl	$+b_1
-		// Change DP to HDMA buffer page because we're changing DP soon after this anyway
-		lda	#_HDMA_SideBufferReady&0xff00
-		tcd
 		// Swap HDMA buffers if ready
-		lda	$.HDMA_SideBufferReady
+		ldx	$.HDMA_SideBufferReady+1
 		beq	$+b_2
 			stz	$.HDMA_SideBufferReady
 			.macro	Gfx__HdmaSwap_Mac	VarName, DmaChannel
-				lda	$.{0}_Front
-				ldy	$.{0}_Side
-				sta	$.{0}_Side
-				sty	$.{0}_Front
-				sty	$_Zero+0x4302+{1}*0x10
+				ldx	$.{0}_Front+1
+				ldy	$.{0}_Side+1
+				stx	$.{0}_Side+1
+				sty	$.{0}_Front+1
+				sty	$_Zero+0x4303+{1}*0x10
 			.endm
 			Gfx__HdmaSwap_Mac	HDMA_Scroll, 6
 			Gfx__HdmaSwap_Mac	HDMA_CHR, 5
 			Gfx__HdmaSwap_Mac	HDMA_SpriteCHR, 4
 			Gfx__HdmaSwap_Mac	HDMA_LayersEnabled, 3
 b_2:
-		lda	$.Sound_Ready
+		ldx	$.Sound_Ready
 		beq	$+b_1
 			// Always swap sound buffers
 			Gfx__HdmaSwap_Mac	HDMA_Sound, 1
 			stz	$.Sound_Ready
 b_1:
 
+	// Has VramQ overflown? Keep result in carry for Gfx__VramQueue
+	lda	[$.Vram_Queue_Top_2]
+	cmp	#1
+
 	// Change DP to page 21 for faster IO access
 	lda	#0x2100
 	tcd
-
-	// Has VramQ overflown? Keep result in carry for Gfx__VramQueue
-	ldx	$_Vram_Queue_Top
-	lda	$0x7e0000,x
-	cmp	#1
-
-	// Change mode
-	.mx	0x10
-	sep	#0x10
 
 	// Black screen until transfer is done (TODO: Test recycling the value read from $0x4211)
 	//cpx	#0x80
@@ -545,24 +542,6 @@ Int__TestMainThread_BranchType:
 
 	// ------------------------------------------------------------------------
 
-Gfx__WindowClip_LUT:
-	.macro	Gfx__WindowClip_LUT_Mac
-		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
-		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
-		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
-		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
-	.endm
-	Gfx__WindowClip_LUT_Mac
-	Gfx__WindowClip_LUT_Mac
-	Gfx__WindowClip_LUT_Mac
-	Gfx__WindowClip_LUT_Mac
-	Gfx__WindowClip_LUT_Mac
-	Gfx__WindowClip_LUT_Mac
-	Gfx__WindowClip_LUT_Mac
-	Gfx__WindowClip_LUT_Mac
-
-	// ------------------------------------------------------------------------
-
 	// End()
 	.def	VramQ_End					0x00
 	// Init()
@@ -638,13 +617,13 @@ Gfx__WindowClip_LUT:
 	.macro	Gfx__VramQueue
 		// Entry: Carry set if the queue overflown
 
+		// Has VramQ overflown?
+		bcs	$+Gfx__VramQueue_VramQ_SkipError
+
 		// Write ending and reset queue reading position
 		stz	$0x80
 		ldy	#.Vram_Queue/0x100
 		sty	$0x82
-
-		// Has VramQ overflown?
-		bcs	$+Gfx__VramQueue_VramQ_SkipError
 
 		// PPU increment mode on first byte
 		ldx	#0
@@ -664,7 +643,7 @@ Gfx__VramQueue_VramQ_End:
 		sta	$_Vram_Queue_PpuAddr
 Gfx__VramQueue_VramQ_SkipError:
 
-		// Reset Wram direct access for queuing NMI actions
+		// Reset Wram direct access for queuing vblank actions
 		lda	#_Vram_Queue
 		sta	$0x81
 	.endm
@@ -1367,6 +1346,22 @@ Gfx__VramQueue_loop1:
 	// ------------------------------------------------------------------------
 
 	.align	0x100
+
+Gfx__WindowClip_LUT:
+	.macro	Gfx__WindowClip_LUT_Mac
+		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
+		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
+		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
+		.data8	0x11, 0x11, 0x10, 0x10, 0x01, 0x01, 0x00, 0x00
+	.endm
+	Gfx__WindowClip_LUT_Mac
+	Gfx__WindowClip_LUT_Mac
+	Gfx__WindowClip_LUT_Mac
+	Gfx__WindowClip_LUT_Mac
+	Gfx__WindowClip_LUT_Mac
+	Gfx__WindowClip_LUT_Mac
+	Gfx__WindowClip_LUT_Mac
+	Gfx__WindowClip_LUT_Mac
 
 Gfx__TileAttributeAddrLUT:
 	// eor'd with 0x0300 for palettes 4-7

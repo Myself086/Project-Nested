@@ -452,6 +452,8 @@ Main__InitMemory:
 	lda	#0x7e00
 	sta	$_Vram_Queue_Top+1
 	stx	$_Vram_Queue_Top
+	sta	$_Vram_Queue_Top_2+1
+	stx	$_Vram_Queue_Top_2
 
 	// Heap start 7f
 	lda	#_Memory_HeapStart_7f

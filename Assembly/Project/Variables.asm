@@ -21,7 +21,7 @@
 	// 0d = stack high bits for emulating original return addresses
 	// 0e = SNES sprites (Requires even page alignment)
 	// 0f = "
-	// 10 = " + mapper memory (with some unused memory)
+	// 10 = " + mapper memory + <Unused> + IRQ stack
 	//*11 = HDMA pointers + CHR banks + sound
 	// 12 = NES palette (with some unused memory, reserved for 4bpp hacks?)
 	// 13 = Function pointer start index, used for the semi-sorted function list (only used while recompiling, could be moved later)
@@ -34,7 +34,7 @@
 	// 1a = <Unused>
 	// 1b = <Unused>
 	//*1c = NES sprite remap when reading from pages outside of WRAM
-	//*1d = IRQ
+	//*1d = IRQ data (stack moved before HDMA pointers)
 	//*1e = Main thread
 	// 1f = Addition table, with open bus mirror in page 20 (TODO: Verify if it works with HDMA active)
 	// * Pages that may use DP register for faster access (page 01 is possible but unpractical)
@@ -274,12 +274,12 @@ NameTable_Remap:
 	// ---------------------------------------------------------------------------
 	// Unused
 
-	.addr	0x1040, 0x10ff
+	.addr	0x1040, 0x10df
 
 	// ---------------------------------------------------------------------------
 	// HDMA pointers, CHR banks and sound (Must all be in the same page because we are using DP shortcuts)
 
-	.addr	0x1100, 0x11ff
+	.addr	0x1101, 0x11ff
 
 	.macro	HDMA_Struct_Mac		name, channelNum
 		// Front = Ehat is currently shown on screen
@@ -411,9 +411,13 @@ Sound_UpdateNumber:
 Sound_UpdateNumberNew:
 	.fill	1
 
-	// Non-zero when sound buffers are ready to be swapped
+	// Low byte non-zero when sound buffers are ready to be swapped
 Sound_Ready:
 	.fill	2
+
+	// Pointer for verifying whether VramQ overflowed (duplicate)
+Vram_Queue_Top_2:
+	.fill	3
 
 	// ---------------------------------------------------------------------------
 	// Palette
@@ -493,7 +497,7 @@ BlueScreen_P:
 BlueScreen_PC:
 	.fill	3
 
-	// TODO: Pointer for verifying whether VramQ overflowed
+	// Pointer for verifying whether VramQ overflowed
 Vram_Queue_Top:
 	.fill	3
 
@@ -523,7 +527,7 @@ Debug_LastMemoryUsage:
 IRQ_VSTACK_START:
 	.def	IRQ_VSTACK_PAGE				0x1d00
 	//.def	IRQ_VSTACK_START
-	.def	IRQ_STACK					0x1dff
+	//.def	IRQ_STACK					0x1dff
 
 	// ---------------------------------------------------------------------------
 	// Main thread
