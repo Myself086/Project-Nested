@@ -2741,7 +2741,6 @@ IO__w4015_in2:
 	and	#0x1f
 	trb	$_Sound_NesRegs+0x15
 	trb	$_Sound_ExtraControl
-	trb	$_Sound_NesRegs+0x16
 
 	lsr	$_IO_Temp
 	bcs	$+b_1

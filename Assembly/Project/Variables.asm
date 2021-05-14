@@ -387,9 +387,8 @@ HDMA_VSTACK_START:
 Sound_NesRegs:
 	.fill	0x18
 
-	// Extra control bits passed to Sound_NesRegs+0x16
-Sound_ExtraControl:
-	.fill	1
+	// Extra control bits
+	.def	Sound_ExtraControl		Sound_NesRegs+0x16
 
 	// Sound is active when this variable is -1
 Sound_Active:

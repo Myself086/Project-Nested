@@ -183,10 +183,6 @@ Sound__Update:
 	// Update length counters
 	Sound__EmulateLengthCounter
 
-	lda	$.Sound_ExtraControl
-	sta	$.Sound_NesRegs+0x16
-	stz	$.Sound_ExtraControl
-
 	// Is sound buffer ready?
 	lda	$.Sound_Ready
 	beq	$+b_1
@@ -197,6 +193,8 @@ b_1:
 	// Update sound
 	smx	#0x20
 	Sound__UpdateDsp
+
+	stz	$.Sound_ExtraControl
 
 	lda	#0xff
 	sta	$.Sound_Ready
