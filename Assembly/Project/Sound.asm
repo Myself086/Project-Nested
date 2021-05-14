@@ -206,70 +206,87 @@ b_1:
 
 	.mx	0x30
 	.macro	Sound__EmulateLengthCounter
+		// Load status register and set triangle
+		lda	$.Sound_NesRegs+0x15
+		ora	#0x04
+		tay
+
 		// Square 0
-		lda	#0x01
-		bit	$.Sound_NesRegs+0x15
+		bit	#0x01
 		beq	$+b_1
 			// Test Halt bit
 			lda	$.Sound_NesRegs+0x00
 			and	#0x20
-			bne	$+b_1
+			bne	$+b_2
 				ldx	$.Sound_square0_length
-				beq	$+b_else
-					dec	$.Sound_square0_length
+				bne	$+b_else
+					tya
+					and	#0xfe
+					tay
 					bra	$+b_1
 b_else:
-					lda	#0x01
-					trb	$.Sound_NesRegs+0x15
+					dex
+					stx	$.Sound_square0_length
+b_2:
+			tya
 b_1:
 
 		// Square 1
-		lda	#0x02
-		bit	$.Sound_NesRegs+0x15
+		bit	#0x02
 		beq	$+b_1
 			// Test Halt bit
 			lda	$.Sound_NesRegs+0x04
 			and	#0x20
-			bne	$+b_1
+			bne	$+b_2
 				ldx	$.Sound_square1_length
-				beq	$+b_else
-					dec	$.Sound_square1_length
+				bne	$+b_else
+					tya
+					and	#0xfd
+					tay
 					bra	$+b_1
 b_else:
-					lda	#0x02
-					trb	$.Sound_NesRegs+0x15
-b_1:
-
-		// Triangle
-		lda	#0x04
-		tsb	$.Sound_NesRegs+0x15
-		ldx	$.Sound_NesRegs+0x8
-		bpl	$+b_1
-			ldx	$.Sound_triangle_length
-			beq	$+b_else
-				dec	$.Sound_triangle_length
-				bra	$+b_1
-b_else:
-				//lda	#0x04
-				trb	$.Sound_NesRegs+0x15
+					dex
+					stx	$.Sound_square1_length
+b_2:
+			tya
 b_1:
 
 		// Noise channel
-		lda	#0x08
-		bit	$.Sound_NesRegs+0x15
+		bit	#0x08
 		beq	$+b_1
 			// Test Halt bit
 			lda	$.Sound_NesRegs+0x0c
 			and	#0x20
-			bne	$+b_1
+			bne	$+b_2
 				ldx	$.Sound_noise_length
-				beq	$+b_else
-					dec	$.Sound_noise_length
+				bne	$+b_else
+					tya
+					and	#0xf7
+					tay
 					bra	$+b_1
 b_else:
-					lda	#0x08
-					trb	$.Sound_NesRegs+0x15
+					dex
+					stx	$.Sound_noise_length
+b_2:
+			tya
 b_1:
+
+		// Triangle
+		ldx	$.Sound_NesRegs+0x8
+		bpl	$+b_1
+			ldx	$.Sound_triangle_length
+			bne	$+b_else
+				//tya
+				and	#0xfb
+				//tay
+				bra	$+b_1
+b_else:
+				dex
+				stx	$.Sound_triangle_length
+b_1:
+
+		// Save status register
+		sta	$.Sound_NesRegs+0x15
 	.endm
 
 //Sound__EmulateLengthCounter_length_d3_0:
