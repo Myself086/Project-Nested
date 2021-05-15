@@ -108,16 +108,31 @@ IO__r2001_a_i:
 IO__r2001_x:
 IO__r2001_y:
 	rtl
-IO__w2001_a:
+
 IO__w2001_a_i:
 	sta	$_IO_2001
 	rtl
+
+IO__w2001_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_IO_2001
+b_1:
+	CoreCall_End
+
 IO__w2001_x:
-	stx	$_IO_2001
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_IO_2001
+b_1:
+	CoreCall_End
+
 IO__w2001_y:
-	sty	$_IO_2001
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_IO_2001
+b_1:
+	CoreCall_End
 
 
 IO__r2002_a:
