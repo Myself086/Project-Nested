@@ -3121,13 +3121,14 @@ b_exit:
 
 		break
 
-	case	CoreCall_Remove		// TODO: Test it
+	case	CoreCall_Remove
 		// Remove some written bytes
-		lda	$.writeAddr
+		lda	[$.src]
+		inc	$.src
+		and	#0x00ff
+		eor	#0xffff
 		sec
-		sbc	[$.src]
-		inc	$.src
-		inc	$.src
+		adc	$.writeAddr
 		sta	$.writeAddr
 		break
 
