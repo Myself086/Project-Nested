@@ -2211,16 +2211,31 @@ IO__w4000_ind:
 	xba
 	sta	$_Sound_NesRegs+0x0
 	IO_w40xx_Return
-IO__w4000_a:
+
 IO__w4000_a_i:
 	sta	$_Sound_NesRegs+0x0
 	rtl
+
+IO__w4000_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x0
+b_1:
+	CoreCall_End
+
 IO__w4000_x:
-	stx	$_Sound_NesRegs+0x0
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x0
+b_1:
+	CoreCall_End
+
 IO__w4000_y:
-	sty	$_Sound_NesRegs+0x0
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x0
+b_1:
+	CoreCall_End
 
 
 IO__r4001_a:
@@ -2235,26 +2250,64 @@ IO__w4001_ind:
 	xba
 	sta	$_Sound_NesRegs+0x1
 	IO_w40xx_Return
-IO__w4001_x:
-	stx	$_Sound_NesRegs+0x1
-	bra	$+b_in
-IO__w4001_y:
-	sty	$_Sound_NesRegs+0x1
-	bra	$+b_in
-IO__w4001_a:
+
 IO__w4001_a_i:
 	sta	$_Sound_NesRegs+0x1
-b_in:
 	php
 	xba
 	lda	#0x40
 	tsb	$_Sound_ExtraControl
 	xba
-	// TODO: Sweep compare
-//	lda	$_Sound_NesRegs+0x1
-//b_
 	plp
 	rtl
+
+IO__w4001_x:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x1
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		lda	#0x40
+		tsb	$_Sound_ExtraControl
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4001_y:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x1
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		lda	#0x40
+		tsb	$_Sound_ExtraControl
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4001_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x1
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		lda	#0x40
+		tsb	$_Sound_ExtraControl
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 
 IO__r4002_a:
@@ -2267,16 +2320,31 @@ IO__w4002_ind:
 	xba
 	sta	$_Sound_NesRegs+0x2
 	IO_w40xx_Return
-IO__w4002_a:
+
 IO__w4002_a_i:
 	sta	$_Sound_NesRegs+0x2
 	rtl
+
+IO__w4002_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x2
+b_1:
+	CoreCall_End
+
 IO__w4002_x:
-	stx	$_Sound_NesRegs+0x2
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x2
+b_1:
+	CoreCall_End
+
 IO__w4002_y:
-	sty	$_Sound_NesRegs+0x2
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x2
+b_1:
+	CoreCall_End
 
 
 IO__r4003_a:
@@ -2285,40 +2353,84 @@ IO__r4003_x:
 IO__r4003_y:
 	rtl
 
+	.macro	IO__w4003_Mac
+		lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
+		sta	$_Sound_square0_length
+		lda	#0x01
+		tsb	$_Sound_NesRegs+0x15
+		tsb	$_Sound_ExtraControl
+	.endm
+
 IO__w4003_ind:
 	xba
 	sta	$_Sound_NesRegs+0x3
 	tax
-	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-	sta	$_Sound_square0_length
-	lda	#0x01
-	tsb	$_Sound_NesRegs+0x15
-	tsb	$_Sound_ExtraControl
+	IO__w4003_Mac
 	txa
 	IO_w40xx_Return
-IO__w4003_x:
-	stx	$_Sound_NesRegs+0x3
-	bra	$+b_in
-IO__w4003_y:
-	sty	$_Sound_NesRegs+0x3
-	bra	$+b_in
-IO__w4003_a:
+
 IO__w4003_a_i:
 	sta	$_Sound_NesRegs+0x3
-b_in:
 	php
 	phx
-	xba
-	ldx	$_Sound_NesRegs+0x3
-	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-	sta	$_Sound_square0_length
-	lda	#0x01
-	tsb	$_Sound_NesRegs+0x15
-	tsb	$_Sound_ExtraControl
-	xba
+	tax
+	IO__w4003_Mac
+	txa
 	plx
 	plp
 	rtl
+
+IO__w4003_x:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x3
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		IO__w4003_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4003_y:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x3
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tyx
+		IO__w4003_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4003_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x3
+b_1:
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tax
+		IO__w4003_Mac
+		txa					// Removed when A is unused
+b_1:
+	CoreCall_IfFreeA	+b_1
+		CoreCall_Remove	1
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 
 IO__r4004_a:
@@ -2331,16 +2443,31 @@ IO__w4004_ind:
 	xba
 	sta	$_Sound_NesRegs+0x4
 	IO_w40xx_Return
-IO__w4004_a:
+
 IO__w4004_a_i:
 	sta	$_Sound_NesRegs+0x4
 	rtl
+
+IO__w4004_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x4
+b_1:
+	CoreCall_End
+
 IO__w4004_x:
-	stx	$_Sound_NesRegs+0x4
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x4
+b_1:
+	CoreCall_End
+
 IO__w4004_y:
-	sty	$_Sound_NesRegs+0x4
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x4
+b_1:
+	CoreCall_End
 
 
 IO__r4005_a:
@@ -2355,26 +2482,64 @@ IO__w4005_ind:
 	xba
 	sta	$_Sound_NesRegs+0x5
 	IO_w40xx_Return
-IO__w4005_x:
-	stx	$_Sound_NesRegs+0x5
-	bra	$+b_in
-IO__w4005_y:
-	sty	$_Sound_NesRegs+0x5
-	bra	$+b_in
-IO__w4005_a:
+
 IO__w4005_a_i:
 	sta	$_Sound_NesRegs+0x5
-b_in:
 	php
 	xba
 	lda	#0x80
 	tsb	$_Sound_ExtraControl
 	xba
-	// TODO: Sweep compare
-//	lda	$_Sound_NesRegs+0x5
-//b_
 	plp
 	rtl
+
+IO__w4005_x:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x5
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		lda	#0x80
+		tsb	$_Sound_ExtraControl
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4005_y:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x5
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		lda	#0x80
+		tsb	$_Sound_ExtraControl
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4005_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x5
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		lda	#0x80
+		tsb	$_Sound_ExtraControl
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 
 IO__r4006_a:
@@ -2387,16 +2552,31 @@ IO__w4006_ind:
 	xba
 	sta	$_Sound_NesRegs+0x6
 	IO_w40xx_Return
-IO__w4006_a:
+
 IO__w4006_a_i:
 	sta	$_Sound_NesRegs+0x6
 	rtl
+
+IO__w4006_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x6
+b_1:
+	CoreCall_End
+
 IO__w4006_x:
-	stx	$_Sound_NesRegs+0x6
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x6
+b_1:
+	CoreCall_End
+
 IO__w4006_y:
-	sty	$_Sound_NesRegs+0x6
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x6
+b_1:
+	CoreCall_End
 
 
 IO__r4007_a:
@@ -2405,40 +2585,84 @@ IO__r4007_x:
 IO__r4007_y:
 	rtl
 
+	.macro	IO__w4007_Mac
+		lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
+		sta	$_Sound_square1_length
+		lda	#0x02
+		tsb	$_Sound_NesRegs+0x15
+		tsb	$_Sound_ExtraControl
+	.endm
+
 IO__w4007_ind:
 	xba
 	sta	$_Sound_NesRegs+0x7
 	tax
-	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-	sta	$_Sound_square1_length
-	lda	#0x02
-	tsb	$_Sound_NesRegs+0x15
-	tsb	$_Sound_ExtraControl
+	IO__w4007_Mac
 	txa
 	IO_w40xx_Return
-IO__w4007_x:
-	stx	$_Sound_NesRegs+0x7
-	bra	$+b_in
-IO__w4007_y:
-	sty	$_Sound_NesRegs+0x7
-	bra	$+b_in
-IO__w4007_a:
+
 IO__w4007_a_i:
 	sta	$_Sound_NesRegs+0x7
-b_in:
 	php
 	phx
-	xba
-	ldx	$_Sound_NesRegs+0x7
-	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-	sta	$_Sound_square1_length
-	lda	#0x02
-	tsb	$_Sound_NesRegs+0x15
-	tsb	$_Sound_ExtraControl
-	xba
+	tax
+	IO__w4007_Mac
+	txa
 	plx
 	plp
 	rtl
+
+IO__w4007_x:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x7
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		IO__w4007_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4007_y:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x7
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tyx
+		IO__w4007_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4007_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x7
+b_1:
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tax
+		IO__w4007_Mac
+		txa					// Removed when A is unused
+b_1:
+	CoreCall_IfFreeA	+b_1
+		CoreCall_Remove	1
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 
 IO__r4008_a:
@@ -2448,28 +2672,34 @@ IO__r4008_y:
 	rtl
 
 IO__w4008_ind:
-	//lda	#0x04
-	//tsb	$_Sound_ExtraControl
 	xba
 	sta	$_Sound_NesRegs+0x8
 	IO_w40xx_Return
-IO__w4008_x:
-	stx	$_Sound_NesRegs+0x8
-	bra	$+b_in
-IO__w4008_y:
-	sty	$_Sound_NesRegs+0x8
-	bra	$+b_in
-IO__w4008_a:
+
 IO__w4008_a_i:
 	sta	$_Sound_NesRegs+0x8
-b_in:
-	php
-	xba
-	//lda	#0x04
-	//tsb	$_Sound_ExtraControl
-	xba
-	plp
 	rtl
+
+IO__w4008_x:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x8
+b_1:
+	CoreCall_End
+
+IO__w4008_y:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x8
+b_1:
+	CoreCall_End
+
+IO__w4008_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x8
+b_1:
+	CoreCall_End
 
 
 IO__r4009_a:
@@ -2482,16 +2712,31 @@ IO__w4009_ind:
 	xba
 	sta	$_Sound_NesRegs+0x9
 	IO_w40xx_Return
-IO__w4009_a:
+
 IO__w4009_a_i:
 	sta	$_Sound_NesRegs+0x9
 	rtl
+
+IO__w4009_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x9
+b_1:
+	CoreCall_End
+
 IO__w4009_x:
-	stx	$_Sound_NesRegs+0x9
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x9
+b_1:
+	CoreCall_End
+
 IO__w4009_y:
-	sty	$_Sound_NesRegs+0x9
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x9
+b_1:
+	CoreCall_End
 
 
 IO__r400a_a:
@@ -2504,16 +2749,31 @@ IO__w400a_ind:
 	xba
 	sta	$_Sound_NesRegs+0xa
 	IO_w40xx_Return
-IO__w400a_a:
+
 IO__w400a_a_i:
 	sta	$_Sound_NesRegs+0xa
 	rtl
+
+IO__w400a_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0xa
+b_1:
+	CoreCall_End
+
 IO__w400a_x:
-	stx	$_Sound_NesRegs+0xa
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0xa
+b_1:
+	CoreCall_End
+
 IO__w400a_y:
-	sty	$_Sound_NesRegs+0xa
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0xa
+b_1:
+	CoreCall_End
 
 
 IO__r400b_a:
@@ -2522,37 +2782,85 @@ IO__r400b_x:
 IO__r400b_y:
 	rtl
 
+	.macro	IO__w400b_Mac
+		lda	#0x04
+		tsb	$_Sound_ExtraControl
+		tsb	$_Sound_NesRegs+0x15
+
+		lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
+		sta	$_Sound_triangle_length
+	.endm
+
 IO__w400b_ind:
 	xba
 	sta	$_Sound_NesRegs+0xb
-	bra	$+b_in2
-IO__w400b_x:
-	stx	$_Sound_NesRegs+0xb
-	bra	$+b_in
-IO__w400b_y:
-	sty	$_Sound_NesRegs+0xb
-	bra	$+b_in
-IO__w400b_a:
+	tax
+	IO__w400b_Mac
+	txa
+	IO_w40xx_Return
+
 IO__w400b_a_i:
 	sta	$_Sound_NesRegs+0xb
-b_in:
 	php
 	phx
-b_in2:
-	xba
-
-	lda	#0x04
-	tsb	$_Sound_ExtraControl
-	tsb	$_Sound_NesRegs+0x15
-
-	ldx	$_Sound_NesRegs+0xb
-	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-	sta	$_Sound_triangle_length
-
-	xba
+	tax
+	IO__w400b_Mac
+	txa
 	plx
 	plp
 	rtl
+
+IO__w400b_x:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0xb
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		IO__w400b_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w400b_y:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0xb
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tyx
+		IO__w400b_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w400b_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0xb
+b_1:
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tax
+		IO__w400b_Mac
+		txa					// Removed when A is unused
+b_1:
+	CoreCall_IfFreeA	+b_1
+		CoreCall_Remove	1
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 
 IO__r400c_a:
@@ -2565,16 +2873,31 @@ IO__w400c_ind:
 	xba
 	sta	$_Sound_NesRegs+0xc
 	IO_w40xx_Return
-IO__w400c_a:
+
 IO__w400c_a_i:
 	sta	$_Sound_NesRegs+0xc
 	rtl
+
+IO__w400c_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0xc
+b_1:
+	CoreCall_End
+
 IO__w400c_x:
-	stx	$_Sound_NesRegs+0xc
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0xc
+b_1:
+	CoreCall_End
+
 IO__w400c_y:
-	sty	$_Sound_NesRegs+0xc
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0xc
+b_1:
+	CoreCall_End
 
 
 IO__r400d_a:
@@ -2587,16 +2910,31 @@ IO__w400d_ind:
 	xba
 	sta	$_Sound_NesRegs+0xd
 	IO_w40xx_Return
-IO__w400d_a:
+
 IO__w400d_a_i:
 	sta	$_Sound_NesRegs+0xd
 	rtl
+
+IO__w400d_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0xd
+b_1:
+	CoreCall_End
+
 IO__w400d_x:
-	stx	$_Sound_NesRegs+0xd
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0xd
+b_1:
+	CoreCall_End
+
 IO__w400d_y:
-	sty	$_Sound_NesRegs+0xd
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0xd
+b_1:
+	CoreCall_End
 
 
 IO__r400e_a:
@@ -2609,16 +2947,31 @@ IO__w400e_ind:
 	xba
 	sta	$_Sound_NesRegs+0xe
 	IO_w40xx_Return
-IO__w400e_a:
+
 IO__w400e_a_i:
 	sta	$_Sound_NesRegs+0xe
 	rtl
+
+IO__w400e_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0xe
+b_1:
+	CoreCall_End
+
 IO__w400e_x:
-	stx	$_Sound_NesRegs+0xe
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0xe
+b_1:
+	CoreCall_End
+
 IO__w400e_y:
-	sty	$_Sound_NesRegs+0xe
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0xe
+b_1:
+	CoreCall_End
 
 
 IO__r400f_a:
@@ -2627,56 +2980,87 @@ IO__r400f_x:
 IO__r400f_y:
 	rtl
 
+	.macro	IO__w400f_Mac
+		// Update length
+		lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
+		sta	$_Sound_noise_length
+
+		// Enable noise
+		lda	#0x08
+		tsb	$_Sound_NesRegs+0x15
+		tsb	$_Sound_ExtraControl
+	.endm
+
 IO__w400f_ind:
 	xba
 	sta	$_Sound_NesRegs+0xf
-
-	// Update length
 	tax
-	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-	sta	$_Sound_noise_length
-
-	// Enable noise
-	lda	#0x08
-	tsb	$_Sound_NesRegs+0x15
-
-	// Reset noise
-	//lda	#0x08
-	tsb	$_Sound_ExtraControl
-
+	IO__w400f_Mac
 	txa
 	IO_w40xx_Return
-IO__w400f_x:
-	stx	$_Sound_NesRegs+0xf
-	bra	$+b_in
-IO__w400f_y:
-	sty	$_Sound_NesRegs+0xf
-	bra	$+b_in
-IO__w400f_a:
+
 IO__w400f_a_i:
 	sta	$_Sound_NesRegs+0xf
-b_in:
 	php
 	phx
-	xba
-
-	// Update length
-	ldx	$_Sound_NesRegs+0xf
-	lda	$=Sound__EmulateLengthCounter_length_d3_mixed,x
-	sta	$_Sound_noise_length
-
-	// Enable noise
-	lda	#0x08
-	tsb	$_Sound_NesRegs+0x15
-
-	// Reset noise
-	//lda	#0x08
-	tsb	$_Sound_ExtraControl
-
-	xba
+	tax
+	IO__w400f_Mac
+	txa
 	plx
 	plp
 	rtl
+
+IO__w400f_x:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0xf
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		IO__w400f_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w400f_y:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0xf
+b_1:
+	CoreCall_UseA8
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tyx
+		IO__w400f_Mac
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w400f_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0xf
+b_1:
+	CoreCall_UseX
+	CoreCall_UseN
+	CoreCall_UseZ
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tax
+		IO__w400f_Mac
+		txa					// Removed when A is unused
+b_1:
+	CoreCall_IfFreeA	+b_1
+		CoreCall_Remove	1
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 
 IO__r4010_a:
@@ -2689,16 +3073,31 @@ IO__w4010_ind:
 	xba
 	sta	$_Sound_NesRegs+0x10
 	IO_w40xx_Return
-IO__w4010_a:
+
 IO__w4010_a_i:
 	sta	$_Sound_NesRegs+0x10
 	rtl
+
+IO__w4010_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x10
+b_1:
+	CoreCall_End
+
 IO__w4010_x:
-	stx	$_Sound_NesRegs+0x10
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x10
+b_1:
+	CoreCall_End
+
 IO__w4010_y:
-	sty	$_Sound_NesRegs+0x10
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x10
+b_1:
+	CoreCall_End
 
 
 IO__r4011_a:
@@ -2711,16 +3110,31 @@ IO__w4011_ind:
 	xba
 	sta	$_Sound_NesRegs+0x11
 	IO_w40xx_Return
-IO__w4011_a:
+
 IO__w4011_a_i:
 	sta	$_Sound_NesRegs+0x11
 	rtl
+
+IO__w4011_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x11
+b_1:
+	CoreCall_End
+
 IO__w4011_x:
-	stx	$_Sound_NesRegs+0x11
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x11
+b_1:
+	CoreCall_End
+
 IO__w4011_y:
-	sty	$_Sound_NesRegs+0x11
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x11
+b_1:
+	CoreCall_End
 
 
 IO__r4012_a:
@@ -2733,16 +3147,31 @@ IO__w4012_ind:
 	xba
 	sta	$_Sound_NesRegs+0x12
 	IO_w40xx_Return
-IO__w4012_a:
+
 IO__w4012_a_i:
 	sta	$_Sound_NesRegs+0x12
 	rtl
+
+IO__w4012_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x12
+b_1:
+	CoreCall_End
+
 IO__w4012_x:
-	stx	$_Sound_NesRegs+0x12
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x12
+b_1:
+	CoreCall_End
+
 IO__w4012_y:
-	sty	$_Sound_NesRegs+0x12
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x12
+b_1:
+	CoreCall_End
 
 
 IO__r4013_a:
@@ -2755,16 +3184,31 @@ IO__w4013_ind:
 	xba
 	sta	$_Sound_NesRegs+0x13
 	IO_w40xx_Return
-IO__w4013_a:
+
 IO__w4013_a_i:
 	sta	$_Sound_NesRegs+0x13
 	rtl
+
+IO__w4013_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sta	$_Sound_NesRegs+0x13
+b_1:
+	CoreCall_End
+
 IO__w4013_x:
-	stx	$_Sound_NesRegs+0x13
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		stx	$_Sound_NesRegs+0x13
+b_1:
+	CoreCall_End
+
 IO__w4013_y:
-	sty	$_Sound_NesRegs+0x13
-	rtl
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		sty	$_Sound_NesRegs+0x13
+b_1:
+	CoreCall_End
 
 
 IO__r4015_a:
