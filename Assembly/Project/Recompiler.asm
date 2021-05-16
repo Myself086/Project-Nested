@@ -2972,7 +2972,7 @@ b_1:
 
 	case	CoreCall_UseC
 		lda	$.freeRegs
-		and	#0x0002
+		and	#0x0001
 		bne	$+b_1
 			lda	#_CoreCallFlag_PushP
 			tsb	$.pushFlags
