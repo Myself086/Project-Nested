@@ -88,6 +88,27 @@ Mapper1__e000:
 Mapper1__Error:
 	rtl
 
+Mapper1__w8000_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		bit	#0x80
+		bne	$+b_reset
+		lsr	a
+		ror	$_Mapper1_value
+		bcc	$+b_2
+			jsr	$=Mapper1__w8000_DoStuff2
+			bra	$+b_1
+b_reset:
+			jsr	$=Mapper1__w8000_ResetBits
+			bra	$+b_1
+b_2:
+		bpl	$+b_3
+			sec
+b_3:
+		rol	a
+b_1:
+	CoreCall_End
+
 Mapper1__w8000_ResetBits:
 	// Reset shift and return
 	xba
@@ -102,7 +123,7 @@ Mapper1__w8000_x:
 Mapper1__w8000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__w8000
-Mapper1__w8000_a:
+
 Mapper1__w8000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__w8000
@@ -116,6 +137,13 @@ Mapper1__w8000:
 	ror	$_Mapper1_value
 	bcs	$+Mapper1__w8000_DoStuff
 	rtl
+
+Mapper1__w8000_DoStuff2:
+	// Fix A
+	bmi	$+b_1
+		clc
+b_1:
+	rol	a
 
 Mapper1__w8000_DoStuff:
 	php
@@ -165,6 +193,27 @@ Mapper1__w8000_BGmirrorsLUT:
 
 	//	-----------------------------------------------------------------------
 
+Mapper1__wa000_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		bit	#0x80
+		bne	$+b_reset
+		lsr	a
+		ror	$_Mapper1_value
+		bcc	$+b_2
+			jsr	$=Mapper1__wa000_DoStuff2
+			bra	$+b_1
+b_reset:
+			jsr	$=Mapper1__wa000_ResetBits
+			bra	$+b_1
+b_2:
+		bpl	$+b_3
+			sec
+b_3:
+		rol	a
+b_1:
+	CoreCall_End
+
 Mapper1__wa000_ResetBits:
 	// Reset shift and return
 	xba
@@ -179,7 +228,7 @@ Mapper1__wa000_x:
 Mapper1__wa000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__wa000
-Mapper1__wa000_a:
+
 Mapper1__wa000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__wa000
@@ -193,6 +242,13 @@ Mapper1__wa000:
 	ror	$_Mapper1_value
 	bcs	$+Mapper1__wa000_DoStuff
 	rtl
+
+Mapper1__wa000_DoStuff2:
+	// Fix A
+	bmi	$+b_1
+		clc
+b_1:
+	rol	a
 
 Mapper1__wa000_DoStuff:
 	phx
@@ -236,6 +292,27 @@ b_1:
 	rtl
 
 	//	-----------------------------------------------------------------------
+
+Mapper1__wc000_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		bit	#0x80
+		bne	$+b_reset
+		lsr	a
+		ror	$_Mapper1_value
+		bcc	$+b_2
+			jsr	$=Mapper1__wc000_DoStuff2
+			bra	$+b_1
+b_reset:
+			jsr	$=Mapper1__wc000_ResetBits
+			bra	$+b_1
+b_2:
+		bpl	$+b_3
+			sec
+b_3:
+		rol	a
+b_1:
+	CoreCall_End
 	
 Mapper1__wc000_ResetBits:
 	// Reset shift and return
@@ -251,7 +328,7 @@ Mapper1__wc000_x:
 Mapper1__wc000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__wc000
-Mapper1__wc000_a:
+
 Mapper1__wc000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__wc000
@@ -265,6 +342,13 @@ Mapper1__wc000:
 	ror	$_Mapper1_value
 	bcs	$+Mapper1__wc000_DoStuff
 	rtl
+
+Mapper1__wc000_DoStuff2:
+	// Fix A
+	bmi	$+b_1
+		clc
+b_1:
+	rol	a
 
 Mapper1__wc000_DoStuff:
 	phx
@@ -311,6 +395,27 @@ b_1:
 	
 	.mx	0x30
 
+Mapper1__we000_a:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		bit	#0x80
+		bne	$+b_reset
+		lsr	a
+		ror	$_Mapper1_value
+		bcc	$+b_2
+			jsr	$=Mapper1__we000_DoStuff2
+			bra	$+b_1
+b_reset:
+			jsr	$=Mapper1__we000_ResetBits
+			bra	$+b_1
+b_2:
+		bpl	$+b_3
+			sec
+b_3:
+		rol	a
+b_1:
+	CoreCall_End
+
 Mapper1__we000_ResetBits:
 	// Reset shift and return
 	xba
@@ -325,7 +430,7 @@ Mapper1__we000_x:
 Mapper1__we000_y:
 	sty	$_Mapper1_temp
 	bra	$+Mapper1__we000
-Mapper1__we000_a:
+
 Mapper1__we000_a_i:
 	sta	$_Mapper1_temp
 	//bra	$+Mapper1__we000
@@ -339,6 +444,13 @@ Mapper1__we000:
 	ror	$_Mapper1_value
 	bcs	$+Mapper1__we000_DoStuff
 	rtl
+
+Mapper1__we000_DoStuff2:
+	// Fix A
+	bmi	$+b_1
+		clc
+b_1:
+	rol	a
 
 Mapper1__we000_DoStuff:
 	phx
