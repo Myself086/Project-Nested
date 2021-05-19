@@ -2426,7 +2426,7 @@ b_1:
 		IO__w4003_Mac
 		txa					// Removed when A is unused
 b_1:
-	CoreCall_IfFreeA	+b_1
+	CoreCall_IfNotFreeA	+b_1
 		CoreCall_Remove	1
 b_1:
 	CoreCall_Pull
@@ -2658,7 +2658,7 @@ b_1:
 		IO__w4007_Mac
 		txa					// Removed when A is unused
 b_1:
-	CoreCall_IfFreeA	+b_1
+	CoreCall_IfNotFreeA	+b_1
 		CoreCall_Remove	1
 b_1:
 	CoreCall_Pull
@@ -2856,7 +2856,7 @@ b_1:
 		IO__w400b_Mac
 		txa					// Removed when A is unused
 b_1:
-	CoreCall_IfFreeA	+b_1
+	CoreCall_IfNotFreeA	+b_1
 		CoreCall_Remove	1
 b_1:
 	CoreCall_Pull
@@ -3056,7 +3056,7 @@ b_1:
 		IO__w400f_Mac
 		txa					// Removed when A is unused
 b_1:
-	CoreCall_IfFreeA	+b_1
+	CoreCall_IfNotFreeA	+b_1
 		CoreCall_Remove	1
 b_1:
 	CoreCall_Pull

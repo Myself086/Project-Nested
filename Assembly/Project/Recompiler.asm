@@ -3026,28 +3026,28 @@ b_branch:
 		break
 
 	case	CoreCall_IfFreeA
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, eq
-
-	case	CoreCall_IfNotFreeA
 		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, ne
 
-	case	CoreCall_IfFreeX
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, eq
+	case	CoreCall_IfNotFreeA
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, eq
 
-	case	CoreCall_IfNotFreeX
+	case	CoreCall_IfFreeX
 		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, ne
 
-	case	CoreCall_IfFreeY
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, eq
+	case	CoreCall_IfNotFreeX
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, eq
 
-	case	CoreCall_IfNotFreeY
+	case	CoreCall_IfFreeY
 		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, ne
 
+	case	CoreCall_IfNotFreeY
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, eq
+
 	case	CoreCall_IfJit
-		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, eq
+		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, ne
 
 	case	CoreCall_IfAot
-		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, ne
+		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, eq
 
 	case	CoreCall_Jump
 		lda	[$.src]
