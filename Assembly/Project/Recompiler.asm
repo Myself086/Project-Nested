@@ -3043,6 +3043,12 @@ b_branch:
 	case	CoreCall_IfNotFreeY
 		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, eq
 
+	case	CoreCall_IfFreeP
+		Recompiler__Build_CoreCall_IfGoto	.pushFlags, _CoreCallFlag_PushP, eq
+
+	case	CoreCall_IfNotFreeP
+		Recompiler__Build_CoreCall_IfGoto	.pushFlags, _CoreCallFlag_PushP, ne
+
 	case	CoreCall_IfJit
 		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, ne
 

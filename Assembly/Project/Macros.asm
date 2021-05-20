@@ -367,6 +367,8 @@ b_skip__:
 	CoreCall_DEFINE		CoreCall_IfNotFreeX		".data8 {0}"		// If X isn't free, goto {0}
 	CoreCall_DEFINE		CoreCall_IfFreeY		".data8 {0}"		// If Y is free, goto {0}
 	CoreCall_DEFINE		CoreCall_IfNotFreeY		".data8 {0}"		// If Y isn't free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfFreeP		".data8 {0}"		// If P is free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfNotFreeP		".data8 {0}"		// If P isn't free, goto {0}
 	CoreCall_DEFINE		CoreCall_IfJit			".data8 {0}"		// If JIT, goto {0}
 	CoreCall_DEFINE		CoreCall_IfAot			".data8 {0}"		// If AOT, goto {0}
 	CoreCall_DEFINE		CoreCall_Jump			".data16 {0}"		// goto {0}
