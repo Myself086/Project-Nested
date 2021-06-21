@@ -5,6 +5,7 @@ Dev build:
 - Fixed noise channel from not playing for some games
 - Fixed triangle volume from going quiet sometimes
 - Added more triangle samples for supporting higher frequencies
+- Fixed an error when attempting to import SRM feedback to an unsaved profile
 
 v1.3
 - Added support for read-modify-write to IO ports

@@ -498,7 +498,7 @@ namespace Project_Nested
                             injector.SetSetting(callsString);
 
                         // Save to file
-                        if (profileName != string.Empty && profileName != null)
+                        if (profileName != string.Empty && profileName != NO_PROFILE && profileName != NEW_PROFILE && profileName != null)
                             File.AppendAllText(profilePath + profileName + ".txt", Environment.NewLine + callsString);
                     }
                 }
