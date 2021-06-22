@@ -109,8 +109,7 @@ namespace Project_Nested.Injection
             Label label = new Label();
             label.Location = new Point(X, Y);
             label.Text = setting.TitleWithPrivacy;
-            if (!setting.IsPublic)
-                label.ForeColor = Color.Red;
+            label.ForeColor = GetSettingDefaultColor(setting);
             label.AutoSize = true;
             tip.SetToolTip(label, setting.Summary);
             AddControl(label);
@@ -127,8 +126,7 @@ namespace Project_Nested.Injection
             CheckBox box = new CheckBox();
             box.Location = new Point(X + TABULATION, Y);
             box.Text = setting.TitleWithPrivacy;
-            if (!setting.IsPublic)
-                box.ForeColor = Color.Red;
+            box.ForeColor = GetSettingDefaultColor(setting);
             box.AutoSize = true;
             box.Checked = Convert.ToBoolean(setting.GetValue());
             box.CheckedChanged += (sender, e) =>
@@ -163,8 +161,7 @@ namespace Project_Nested.Injection
             Label label = new Label();
             label.Location = new Point(X + TABULATION, Y);
             label.Text = setting.TitleWithPrivacy;
-            if (!setting.IsPublic)
-                label.ForeColor = Color.Red;
+            label.ForeColor = GetSettingDefaultColor(setting);
             label.AutoSize = true;
             tip.SetToolTip(label, setting.Summary);
             AddControl(label);
@@ -253,6 +250,19 @@ namespace Project_Nested.Injection
 
             // Increment Y
             Y += 29;
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region User interface color
+
+        private Color GetSettingDefaultColor(Setting setting)
+        {
+            if (!setting.IsPublic)
+                return Color.Red;
+            if (setting.IsGlobal)
+                return Color.Blue;
+            return SystemColors.ControlText;
         }
 
         #endregion
