@@ -185,6 +185,7 @@
             // 
             // btnPatreon
             // 
+            this.btnPatreon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnPatreon.Location = new System.Drawing.Point(12, 375);
             this.btnPatreon.Name = "btnPatreon";
             this.btnPatreon.Size = new System.Drawing.Size(75, 23);
@@ -195,6 +196,7 @@
             // 
             // btnCompatibility
             // 
+            this.btnCompatibility.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCompatibility.Location = new System.Drawing.Point(12, 346);
             this.btnCompatibility.Name = "btnCompatibility";
             this.btnCompatibility.Size = new System.Drawing.Size(75, 23);
