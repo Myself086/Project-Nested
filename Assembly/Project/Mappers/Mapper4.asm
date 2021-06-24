@@ -129,6 +129,33 @@ b_1:
 			plp
 			rtl
 		case	iIOPort_sta
+			CoreCall_Begin
+			CoreCall_UseN
+			CoreCall_UseZ
+			CoreCall_Push
+			CoreCall_CopyUpTo	+b_1
+				lock
+
+				// Detect changes
+				eor	$_Mapper4_BankSelect
+
+				// Test high bits
+				bit	#0xc0
+				beq	$+b_else
+					jsr	$=Mapper4__w8000_ai_in
+					bra	$+b_2
+b_else:
+					// Save current value
+					eor	$_Mapper4_BankSelect
+					sta	$_Mapper4_BankSelect
+b_2:
+				unlock
+b_1:
+			CoreCall_IfFreeP	+b_1
+				CoreCall_Remove	1
+b_1:
+			CoreCall_Pull
+			CoreCall_End
 		case	iIOPort_stai
 			php
 			lock
@@ -146,6 +173,10 @@ b_1:
 				// Return
 				plp
 				rtl
+
+Mapper4__w8000_ai_in:
+			// Extra push from partial inline code (TODO: Remove the use of carry)
+			php
 b_1:
 
 			// Bit 7, CHR bank rule
@@ -352,6 +383,8 @@ Mapper4__a001:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+			CoreCall_Begin
+			CoreCall_End
 		case	iIOPort_stai
 			// TODO
 			rtl
@@ -362,12 +395,28 @@ Mapper4__a001:
 Mapper4__c000:
 	iIOPort_InterfaceSwitch		Mapper4__Error
 		case	iIOPort_stx
-			stx	$_Mapper4_IRQ_Latch
-			rtl
+			CoreCall_Begin
+			CoreCall_CopyUpTo	+b_1
+				stx	$_Mapper4_IRQ_Latch
+b_1:
+			CoreCall_End
+
 		case	iIOPort_sty
-			sty	$_Mapper4_IRQ_Latch
+			CoreCall_Begin
+			CoreCall_CopyUpTo	+b_1
+				sty	$_Mapper4_IRQ_Latch
+b_1:
+			CoreCall_End
 			rtl
+
 		case	iIOPort_sta
+			CoreCall_Begin
+			CoreCall_CopyUpTo	+b_1
+				sta	$_Mapper4_IRQ_Latch
+b_1:
+			CoreCall_End
+			rtl
+
 		case	iIOPort_stai
 			sta	$_Mapper4_IRQ_Latch
 			rtl
@@ -380,6 +429,26 @@ Mapper4__c001:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+			CoreCall_Begin
+			CoreCall_UseA8
+			CoreCall_UseN
+			CoreCall_UseV
+			CoreCall_UseZ
+			CoreCall_UseC
+			CoreCall_Push
+			CoreCall_CopyUpTo	+b_1
+				// Calculate next IRQ hit
+				lda	$_Scanline
+				cmp	#0x01
+				adc	$_Mapper4_IRQ_Latch
+				clc
+				adc	$=RomInfo_IrqOffset
+				sta	$_Mapper4_IRQ_Line
+				and	$_Mapper4_IRQ_Enabled
+				sta	$_Scanline_IRQ
+b_1:
+			CoreCall_Pull
+			CoreCall_End
 		case	iIOPort_stai
 			php
 			xba
@@ -412,6 +481,13 @@ Mapper4__e000:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+			CoreCall_Begin
+			CoreCall_CopyUpTo	+b_1
+				stz	$_Scanline_IRQ
+				stz	$_Mapper4_IRQ_Enabled
+b_1:
+			CoreCall_End
+
 		case	iIOPort_stai
 			stz	$_Scanline_IRQ
 			stz	$_Mapper4_IRQ_Enabled
@@ -425,6 +501,20 @@ Mapper4__e001:
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
+			CoreCall_Begin
+			CoreCall_UseA8
+			CoreCall_UseN
+			CoreCall_UseZ
+			CoreCall_Push
+			CoreCall_CopyUpTo	+b_1
+				lda	#0xff
+				sta	$_Mapper4_IRQ_Enabled
+				lda	$_Mapper4_IRQ_Line
+				sta	$_Scanline_IRQ
+b_1:
+			CoreCall_Pull
+			CoreCall_End
+
 		case	iIOPort_stai
 			php
 			xba
