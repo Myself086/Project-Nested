@@ -6,6 +6,7 @@ Dev build:
 - Fixed triangle volume from going quiet sometimes
 - Added more triangle samples for supporting higher frequencies
 - Fixed an error when attempting to import SRM feedback to an unsaved profile
+- Optimized IO emulation with the new inline script
 
 v1.3
 - Added support for read-modify-write to IO ports
