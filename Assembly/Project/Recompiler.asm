@@ -198,6 +198,72 @@ Recompiler__Build_loop1_loop_switch:
 				.data16	_Recompiler__Build_loop1_loop_switch_NesReturn
 				.data16	_Recompiler__Build_loop1_loop_switch_SnesReturn
 				.data16	_Recompiler__Build_loop1_loop_switch_IllegalNop
+				.data16	_Recompiler__Build_loop1_loop_switch_LoadConst
+
+Recompiler__Build_loop1_loop_switch_LoadConst:
+					breakpoint
+					// Is this instruction followed by a conditional branch?
+					tyx
+					ldy	#2
+					lda	[$.readAddr],y
+					and	#0x001f
+					cmp	#0x0010
+					beq	$+b_1
+						txy
+						clc
+						jmp	$_Recompiler__Build_loop1_loop_next
+b_1:
+
+					// Read constant
+					lda	[$.readAddr]
+					and	#0xff00
+					php
+
+					// Change to 8-bit mode and clear upper bits of A
+					smx	#0x20
+					xba
+
+					// Load branch condition
+					lda	[$.readAddr],y
+					lsr	a
+					lsr	a
+					lsr	a
+					lsr	a
+					lsr	a
+
+					// Reverse condition?
+					lsr	a
+					tay					// Table offset
+					pla
+					bcs	$+b_1
+						eor	#0xc3
+b_1:
+					// Test condition
+					and	$_Recompiler__Build_loop1_loop_switch_LoadConst_BranchTable,y
+
+					// Change back to 16-bit mode and clear carry
+					rep	#0x31
+					.mx	0x00
+
+					// Condition met? If not, continue as normal
+					bne	$+b_else
+						txy
+						jmp	$_Recompiler__Build_loop1_loop_next
+b_else:
+						// Condition met, end this block
+						lda	$_Opcode__BytesTable,x
+						adc	$.readAddr
+						sta	$.readAddr
+
+						// "Call" branch case before ending this block
+						pea	$_Recompiler__Build_loop1_next-1
+						jmp	$_Recompiler__Build_loop1_loop_switch_Branch_in
+
+					.mx	0x00
+
+Recompiler__Build_loop1_loop_switch_LoadConst_BranchTable:
+					.data8	0x80, 0, 0, 0x02
+
 
 Recompiler__Build_loop1_loop_switch_IllegalNop:
 					// Are we allowed to recompile it?
@@ -209,6 +275,10 @@ Recompiler__Build_loop1_loop_switch_IllegalNop:
 
 
 Recompiler__Build_loop1_loop_switch_Branch:
+					// "Call" following code, workaround for using this case when breaking off an unconditional branch
+					pea	$_Recompiler__Build_loop1_loop_next-1
+
+Recompiler__Build_loop1_loop_switch_Branch_in:
 					// Add destination
 					sty	$.opcodeX2
 					ldy	#0x0001
@@ -243,7 +313,7 @@ b_1:
 					// Continue to next case
 					ldy	$.opcodeX2
 					clc
-					jmp	$_Recompiler__Build_loop1_loop_next
+					rts
 
 Recompiler__Build_loop1_loop_switch_Jsr:
 					jmp	$_Recompiler__Build_loop1_loop_next
