@@ -2,7 +2,7 @@
 ----------------------------------------------------------------
 	CPU
 
-- Add register&flag assumption for JIT to ignore non conditional branches
+- Add register&flag usage prediction for removing some push-pull
 - Fix original interrupt flag for PHP and PLP
 - Fix branches pointing inside another opcode's operand within the same function
 - Optimize forward branch by removing some branch-jump combo
