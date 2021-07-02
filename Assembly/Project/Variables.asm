@@ -616,11 +616,6 @@ IRQ_VSTACK_START:
 	.def	JMPi_InitialPoolTopValue	0xb18000
 	.def	JMPi_PoolSize				0x001000
 
-	// Structure:
-	//	[0] = 16-bit comparison for the top 24-bit of the original address
-	//	[2] = 24-bit call address
-	//	[5] = 16-bit address for next node
-
 	// ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------
 	// Managed arrays
