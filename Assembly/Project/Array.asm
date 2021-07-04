@@ -191,17 +191,27 @@ Array__InsertIfDifferent__SkipNew:
 	return
 	
 	// ---------------------------------------------------------------------------
-	
+
 	.mx	0x00
 	.func	Array__Find
 	// Entry: X = List Pointer, Y = Compare length
-	// Return: A = 16-bit index of element, or negative (0xf000) if not found
+	// Return: A = 16-bit index of element, or negative (0xffff) if not found, P.n = Set when not found
 Array__Find:
+	lda	#0
+	//bra	$+Array__Find2
+	FakeCall	Array__Find2
+
+	.mx	0x00
+	.func	Array__Find2
+	// Entry: A = Compare start offset, X = List Pointer, Y = Compare length
+	// Return: A = 16-bit index of element, or negative (0xffff) if not found, P.n = Set when not found
+Array__Find2:
 	.local	=pCurrent
 	.local	=pThis
 	.local	_listPointer
 	.local	_inc
 	.local	_cmpLength
+	.local	_offset
 	
 	// Save compare length (optimized into Y register only)
 	//sty	$.cmpLength
@@ -210,18 +220,20 @@ Array__Find:
 	stx	$.listPointer
 	
 	// Keep current and base address (optimized by merging 2x 24-bit copy)
-	lda	$0x0000,x
+	sta	$.offset
+	clc
+	adc	$0x0000,x
 	sta	$.pCurrent
 	lda	$0x0002,x
 	sta	$.pCurrent+2
 
-	// Keep base address
+	// Keep base address + offset
 	lda	$0x0004,x
 	sta	$.pThis+1
-	//lda	$0x0003,x
-	//clc
-	//adc	$.findFrom
-	//sta	$.pThis
+	lda	$.offset
+	clc
+	adc	$.pThis
+	sta	$.pThis
 
 	// Keep increment
 	lda	$0x0009,x
@@ -238,7 +250,7 @@ Array__Find_IncError:
 	asl	a
 	tax
 	jsr	($_Array__Find_calling,x)
-	
+
 	// Is it new?
 	lda	$.pCurrent
 	eor	$.pThis
@@ -246,6 +258,8 @@ Array__Find_IncError:
 
 		ldx	$.listPointer
 		lda	$.pThis
+		sec
+		sbc	$.offset
 		sec
 		sbc	$0x0003,x
 		return
