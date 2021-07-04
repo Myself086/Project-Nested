@@ -8,6 +8,7 @@ Dev build:
 - Fixed an error when attempting to import SRM feedback to an unsaved profile
 - Optimized IO emulation with the new inline script
 - Fixed a memory leak when recompiling unconditional branches
+- Fixed recompiling branch pointing inside another opcode's operand which was often causing games to reset
 
 v1.3
 - Added support for read-modify-write to IO ports

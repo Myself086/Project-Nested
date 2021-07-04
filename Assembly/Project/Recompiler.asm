@@ -125,11 +125,14 @@ b_1:
 	// Add current ROM address to destinations
 	lda	$.romAddr
 	sta	[$.Recompiler_BranchDestList]
+	lda	#0xffff
+	ldy	#4
+	sta	[$.Recompiler_BranchDestList],y
 	lda	#0x0100
-	ldy	#0x0006
+	ldy	#6
 	sta	[$.Recompiler_BranchDestList],y
 	ldx	#_Recompiler_BranchDestList
-	ldy	#0x0002
+	ldy	#2
 	call	Array__InsertIfDifferent
 
 	// Set bank for readAddr
@@ -201,7 +204,6 @@ Recompiler__Build_loop1_loop_switch:
 				.data16	_Recompiler__Build_loop1_loop_switch_LoadConst
 
 Recompiler__Build_loop1_loop_switch_LoadConst:
-					breakpoint
 					// Is this instruction followed by a conditional branch?
 					tyx
 					ldy	#2
@@ -290,8 +292,11 @@ Recompiler__Build_loop1_loop_switch_Branch_in:
 					inc	a
 					inc	a
 					sta	[$.Recompiler_BranchDestList]
+					lda	#0xffff
+					ldy	#4
+					sta	[$.Recompiler_BranchDestList],y
 					ldx	#_Recompiler_BranchDestList
-					ldy	#0x0002
+					ldy	#2
 					call	Array__InsertIfDifferent
 
 					// Merge stack depth
@@ -345,11 +350,13 @@ b_1:
 Recompiler__Build_loop1_loop_switch_Jmp_NoRangeTest:
 
 					// Add to list
-					sty	$.opcodeX2
 					lda	[$.readAddr],y
 					sta	[$.Recompiler_BranchDestList]
+					lda	#0xffff
+					ldy	#4
+					sta	[$.Recompiler_BranchDestList],y
 					ldx	#_Recompiler_BranchDestList
-					ldy	#0x0002
+					ldy	#2
 					call	Array__InsertIfDifferent
 
 					// Merge stack depth
@@ -521,6 +528,9 @@ Recompiler__Build_loop1_exit:
 	// Add dummy destination to mark the end of the array
 	lda	#0
 	sta	[$.Recompiler_BranchDestList]
+	ldy	#4
+	lda	#0xfffe
+	sta	[$.Recompiler_BranchDestList],y
 	ldx	#_Recompiler_BranchDestList
 	call	Array__Insert
 	// Reserve memory
@@ -557,11 +567,10 @@ Recompiler__Build_loop2_loop:
 			cmp	$.readAddr
 			beq	$+Recompiler__Build_loop2_loop_in1
 			bcs	$+Recompiler__Build_loop2_loop_skip2
-				// TODO: Solve branches pointing inside another opcode's operand within the same function
 				bra	$+Recompiler__Build_loop2_loop_skip1
 
 Recompiler__Build_loop2_loop_in1:
-					// Write new address for this branch
+					// Write new address for this label
 					lda	$.writeAddr
 					ldy	#0x0004
 					sta	[$.destRead],y
@@ -572,7 +581,7 @@ Recompiler__Build_loop2_loop_in1:
 					ora	$.stackDepth
 					sta	$.stackDepth
 
-					// Reset block flags, keep starting address for this block
+					// Reset block flags, keep start address for this block
 					stz	$.blockFlags
 					lda	[$.destRead]
 					sta	$.blockStart
@@ -651,6 +660,147 @@ Recompiler__Build_loop2_FindNext_In:
 		jmp	$_Recompiler__Build_loop2
 Recompiler__Build_loop2_Exit:
 
+
+	breakpoint
+	// Reset block flags
+	stz	$.blockFlags
+	stz	$.blockStart
+	// Prepare reading destination list
+	lda	$.Recompiler_BranchDestList+3
+	sta	$.destRead+0
+	lda	$.Recompiler_BranchDestList+4
+	sta	$.destRead+1
+	// Reset stack trace
+	lda	$.stackTraceReset
+	sta	$.stackTrace
+Recompiler__Build_loop2b:
+		// Find unsolved label
+		ldy	#4
+		lda	#0xffff
+		sta	[$.Recompiler_BranchDestList],y
+		tya
+		ldx	#_Recompiler_BranchDestList
+		ldy	#2
+		call	Array__Find2
+		// Exit if none found
+		jmi	$_Recompiler__Build_loop2b_exit
+
+		breakpoint
+
+		// Adjust read pointer
+		clc
+		adc	$.Recompiler_BranchDestList+3
+		sta	$.destRead+0
+
+		// Prepare reading block
+		ldx	$.bankStart+1
+		stx	$.readAddr+1
+		lda	[$.destRead]
+		sta	$.readAddr
+		sta	$.blockStart
+		ldy	#0x0002
+		lda	[$.destRead],y
+		inc	a
+		sta	$.lastReadAddr
+		// Load stack depth
+		ldy	#0x0006
+		lda	[$.destRead],y
+		sta	$.stackDepth
+
+Recompiler__Build_loop2b_loop:
+			// Are we on a branch destination?
+			lda	[$.destRead]
+			beq	$+b_1
+			cmp	$.readAddr
+			beq	$+b_in
+			bcs	$+b_1
+				bra	$+b_2
+b_in:
+					// Is this block already solved?
+					ldy	#4
+					lda	[$.destRead],y
+					inc	a
+					beq	$+b_3
+						// Jump to the already compiled code
+						lda	#0x004c
+						sta	[$.writeAddr]
+						lda	[$.destRead],y
+						ldy	#1
+						sta	[$.writeAddr],y
+
+						// Add to write address
+						lda	#3
+						clc
+						adc	$.writeAddr
+						sta	$.writeAddr
+
+						// Next
+						jmp	$_Recompiler__Build_loop2b
+b_3:
+
+					// Write new address for this label
+					lda	$.writeAddr
+					//ldy	#0x0004
+					sta	[$.destRead],y
+
+					// Merge stack depth
+					ldy	#0x0006
+					lda	[$.destRead],y
+					ora	$.stackDepth
+					sta	$.stackDepth
+
+					// Reset block flags, keep start address for this block
+					stz	$.blockFlags
+					lda	[$.destRead]
+					sta	$.blockStart
+b_2:
+
+				// Increment destRead
+				lda	$.destInc
+				clc
+				adc	$.destRead
+				sta	$.destRead
+
+				// Clear known memory prefix for optimizing memory emulation
+				stz	$.memoryPrefix
+
+				// Clear stack trace (old version of stackDepth)
+				lda	$.stackTraceReset
+				sta	$.stackTrace
+b_1:
+			// Read next byte and clear carry in the process (asl)
+			lda	[$.readAddr]
+			and	#0x00ff
+			asl	a
+			tay
+			sty	$.thisOpcodeX2
+
+			// Read opcode type and execute code for this type
+			ldx	$_Opcode__AddrMode,y
+			jsr	($_Recompiler__Build_OpcodeType,x)
+
+			// Reload opcode
+			rep	#0x31
+			ldy	$.thisOpcodeX2
+
+			// Apply block flags
+			lda	$_Opcode__BlockFlag,y
+			tsb	$.blockFlags
+
+			// Increment readAddr
+			lda	$_Opcode__BytesTable_OneOrMore,y
+			adc	$.readAddr
+			sta	$.readAddr
+
+			// Are we done?
+			cmp	$.lastReadAddr
+			bcc	$-Recompiler__Build_loop2b_loop
+
+		// Next
+		jmp	$_Recompiler__Build_loop2b
+Recompiler__Build_loop2b_exit:
+
+
 	// Fix branches and jumps
 	.local	_srcRead, =srcBank, _srcReplace
 	ldy	$.writeAddr+1
@@ -677,11 +827,17 @@ Recompiler__Build_loop3:
 		bcc	$+b_1
 			unlock
 			trap
-			Exception	"Compiler Error - Bad Branch{}{}{}Branch source not found."
+			Exception	"Compiler Error - Branch Src{}{}{}Branch source not found."
 b_1:
 		tay
 		lda	[$.Recompiler_BranchDestList+3],y
 		sta	[$.srcBank]
+		inc	a
+		bne	$+b_1
+			unlock
+			trap
+			Exception	"Compiler Error - Branch Dest{}{}{}Branch destination not found."
+b_1:
 
 		// Next
 		ldy	$.srcRead

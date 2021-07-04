@@ -629,7 +629,7 @@ IRQ_VSTACK_START:
 	// Branch destination data structure:
 	//	[0] = 16-bit address in currently available banks
 	//	[2] = 16-bit address of the last byte in that range
-	//	[4] = 16-bit address of the recompiled address
+	//	[4] = 16-bit address of the recompiled address (0xffff when invalid)
 	//  [6] = 16-bit stack depth
 	.def	BranchDest_Start			0x7e2800
 	.def	BranchDest_End				0x7e2fff
