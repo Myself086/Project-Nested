@@ -2314,8 +2314,8 @@ b_1:
 	tyx
 
 	// Write original address
-	pla
 	ldy	#1
+	lda	[$.readAddr],y
 	sta	[$.writeAddr],y
 
 	// Add to write address
