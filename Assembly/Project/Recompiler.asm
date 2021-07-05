@@ -2391,7 +2391,7 @@ Recompiler__Build_OpcodeType_Jsr:
 	ldy	#1
 	lda	[$.readAddr],y
 	cmp	$_Recompile_PrgRamTopRange
-	bcs	$+b_1
+	jcs	$_Recompiler__Build_OpcodeType_Jsr_1
 		// Is it in SRAM?
 		and	#0xe000
 		beq	$+b_2
@@ -2401,39 +2401,79 @@ Recompiler__Build_OpcodeType_Jsr:
 			jsr	$_Recompiler__Build_Inline2
 b_2:
 
-		// Call interpreter like this:
-		// phk
-		// per $0x0006
-		// pea $_originalValue
-		// jmp $=Interpreter__Execute
-		lda	#0x624b
-		sta	[$.writeAddr]
-		lda	#0x0006
-		ldy	#2
-		sta	[$.writeAddr],y
-		lda	#0x5cf4
-		ldy	#6
-		sta	[$.writeAddr],y
-		ldy	#4
-		sta	[$.writeAddr],y
-		ldy	#1
-		lda	[$.readAddr],y
-		ldy	#5
-		sta	[$.writeAddr],y
-		lda	#_Interpreter__Execute
-		ldy	#8
-		sta	[$.writeAddr],y
-		lda	#_Interpreter__Execute/0x100
-		iny
-		sta	[$.writeAddr],y
+		// Are we using native returns?
+		lda	$=RomInfo_StackEmulation
+		and	#_RomInfo_StackEmu_NativeReturn
+		beq	$+b_else
+			// Call interpreter like this:
+			// phk
+			// per $0x0006
+			// pea $_originalValue
+			// jmp $=Interpreter__Execute
+			lda	#0x624b
+			sta	[$.writeAddr]
+			lda	#0x0006
+			ldy	#2
+			sta	[$.writeAddr],y
+			lda	#0x5cf4
+			ldy	#6
+			sta	[$.writeAddr],y
+			ldy	#4
+			sta	[$.writeAddr],y
+			ldy	#1
+			lda	[$.readAddr],y
+			ldy	#5
+			sta	[$.writeAddr],y
+			lda	#_Interpreter__Execute
+			ldy	#8
+			sta	[$.writeAddr],y
+			lda	#_Interpreter__Execute/0x100
+			iny
+			sta	[$.writeAddr],y
 
-		// Add to write address
-		lda	#11
-		clc
-		adc	$.writeAddr
-		sta	$.writeAddr
-		rts
-b_1:
+			// Add to write address
+			lda	#11
+			clc
+			adc	$.writeAddr
+			sta	$.writeAddr
+			rts
+b_else:
+			// Call interpreter like this:
+			// pea $_originalReturn
+			// pea $_originalValue
+			// jmp $=Interpreter__Execute
+			lda	#0x5cf4
+			sta	[$.writeAddr]
+			ldy	#5
+			sta	[$.writeAddr],y
+			ldy	#3
+			sta	[$.writeAddr],y
+
+			lda	$.readAddr
+			inc	a
+			inc	a
+			ldy	#1
+			sta	[$.writeAddr],y
+
+			//ldy	#1
+			lda	[$.readAddr],y
+			ldy	#4
+			sta	[$.writeAddr],y
+
+			lda	#_Interpreter__Execute
+			ldy	#7
+			sta	[$.writeAddr],y
+			lda	#_Interpreter__Execute/0x100
+			iny
+			sta	[$.writeAddr],y
+
+			// Add to write address
+			lda	#10
+			clc
+			adc	$.writeAddr
+			sta	$.writeAddr
+			rts
+Recompiler__Build_OpcodeType_Jsr_1:
 
 	clc
 
