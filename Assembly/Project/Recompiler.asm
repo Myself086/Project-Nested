@@ -661,7 +661,6 @@ Recompiler__Build_loop2_FindNext_In:
 Recompiler__Build_loop2_Exit:
 
 
-	breakpoint
 	// Reset block flags
 	stz	$.blockFlags
 	stz	$.blockStart
@@ -684,8 +683,6 @@ Recompiler__Build_loop2b:
 		call	Array__Find2
 		// Exit if none found
 		jmi	$_Recompiler__Build_loop2b_exit
-
-		breakpoint
 
 		// Adjust read pointer
 		clc
