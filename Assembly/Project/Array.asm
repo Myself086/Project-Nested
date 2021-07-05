@@ -1,9 +1,14 @@
 
 	//               0         3      6     9
 	// Array format: =current, =base, =top, _increment
-	
+
 	// ---------------------------------------------------------------------------
-	
+
+Array__Insert_Error:
+		unlock
+		trap
+		Exception	"Array is full{}{}{}Resizing array not available yet."
+
 	.mx	0x00
 	.func	Array__Insert
 	// Entry: X = List Pointer
@@ -25,7 +30,6 @@ Array__Insert:
 	// Error out if nothing can be added on top
 	// This is because the first element out of bound is used for conditional insertion
 	// TODO: Support managed memory
-Array__Insert_Error:
 	bcs	$-Array__Insert_Error
 
 	// Change mode
@@ -44,9 +48,14 @@ Array__Insert_loop1:
 	// Return
 	rep	#0x30
 	return
-	
+
 	// ---------------------------------------------------------------------------
-	
+
+Array__InsertAt_Error:
+		unlock
+		trap
+		Exception	"Array is full{}{}{}Resizing array not available yet."
+
 	.mx	0x00
 	.func	Array__InsertAt
 	// Entry: X = List Pointer, Y = Insert at
@@ -76,9 +85,8 @@ Array__InsertAt:
 	// Error out if nothing can be added on top
 	// This is because the first element out of bound is used for conditional insertion
 	// TODO: Support managed memory
-Array__InsertAt_Error:
 	bcs	$-Array__InsertAt_Error
-	
+
 	// Keep bank number
 	phb
 
@@ -192,6 +200,11 @@ Array__InsertIfDifferent__SkipNew:
 	
 	// ---------------------------------------------------------------------------
 
+Array__Find_IncError:
+		unlock
+		trap
+		Exception	"Find length too large{}{}{}Array.Find attempted to search for a larger sequence of bytes than programmed for."
+
 	.mx	0x00
 	.func	Array__Find
 	// Entry: X = List Pointer, Y = Compare length
@@ -241,7 +254,6 @@ Array__Find2:
 
 	// Error out if cmpLength is too high
 	cpy	#0x0009
-Array__Find_IncError:
 	bcs	$-Array__Find_IncError
 
 	// Which increment? Supports up to 8 at the moment
@@ -475,11 +487,14 @@ Array__Find_loop8_QuickStart:
 	bne	$-Array__Find_loop8_reset
 	// Return
 	rts
-	
+
 	// ---------------------------------------------------------------------------
-	
-	// ---------------------------------------------------------------------------
-	
+
+Array__FindLow_IncError:
+		unlock
+		trap
+		Exception	"Find length too large{}{}{}Array.Find attempted to search for a larger sequence of bytes than programmed for."
+
 	.mx	0x00
 	.func	Array__FindLow
 	// Entry: X = List Pointer, Y = Compare length
@@ -515,7 +530,6 @@ Array__FindLow:
 
 	// Error out if cmpLength is too high
 	cpy	#0x0009
-Array__FindLow_IncError:
 	bcs	$-Array__FindLow_IncError
 
 	// Which increment? Supports up to 8 at the moment
@@ -627,9 +641,14 @@ Array__Insert_loop1:
 	.mx	0x00
 
 	return
-	
+
 	// ---------------------------------------------------------------------------
-	
+
+Array__Sort_Error:
+		unlock
+		trap
+		Exception	"Sort length too large{}{}{}Array.Sort attempted to sort for a larger sequence of bytes than programmed for."
+
 	.mx	0x00
 	.func	Array__SortBase
 	// Entry: X = List Pointer, Y = Compare length
@@ -653,7 +672,6 @@ Array__Sort:
 	sty	$.compareLength
 	// TODO: Support other base length than 2
 	cpy	#2
-Array__Sort_Error:
 	bne	$-Array__Sort_Error
 
 	// Keep pointers
@@ -995,6 +1013,11 @@ Array__Sort_Swap1:
 
 	// ---------------------------------------------------------------------------
 
+Array__DeleteDuplicates_Error:
+		unlock
+		trap
+		Exception	"Delete length too large{}{}{}Array.DeleteDuplicates attempted to search for a larger sequence of bytes than programmed for."
+
 	.mx	0x00
 	.func	Array__DeleteDuplicates
 	// Entry: X = List Pointer
@@ -1022,7 +1045,6 @@ Array__DeleteDuplicates:
 	sty	$.length
 	// Support up to 8 bytes compare
 	cpy	#9
-Array__DeleteDuplicates_Error:
 	bcs	$-Array__DeleteDuplicates_Error
 
 	// Change bank and clear carry
