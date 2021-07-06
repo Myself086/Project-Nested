@@ -2015,8 +2015,9 @@ b_1:
 		// destination - 2 - writeAddr
 		tay
 		lda	[$.Recompiler_BranchDestList+3],y
+		inc	a
 		beq	$+b_1
-			sbc	#1
+			sbc	#2
 			sec								// Fix bug when destination is 0x0000
 			sbc	$.writeAddr
 			cmp	#0xff80
