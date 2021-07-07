@@ -44,12 +44,46 @@ Mapper4__Main:
 
 Mapper4__Error:
 	rtl
-	
+
+	//	-----------------------------------------------------------------------
+
+	.macro	Mapper4__DirectIndexed0		reg, dest0, dest1
+		php
+		xba
+		t{0}a
+		lsr	a
+		xba
+		bcs	$+b_else__
+			plp
+			jmp	$_{1}
+b_else__:
+			plp
+			jmp	$_{2}
+	.endm
+
+	.macro	Mapper4__DirectIndexed1		reg, dest0, dest1
+		php
+		xba
+		t{0}a
+		lsr	a
+		xba
+		bcc	$+b_else__
+			plp
+			jmp	$_{1}
+b_else__:
+			plp
+			jmp	$_{2}
+	.endm
+
 	//	-----------------------------------------------------------------------
 
 	// Bank select
 Mapper4__8000:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed0	x, Mapper4__8000_stai, Mapper4__8001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed0	y, Mapper4__8000_stai, Mapper4__8001_stai
 		case	iIOPort_sty
 			php
 			xba
@@ -157,6 +191,7 @@ b_1:
 			CoreCall_Pull
 			CoreCall_End
 		case	iIOPort_stai
+Mapper4__8000_stai:
 			php
 			lock
 
@@ -232,6 +267,10 @@ b_1:
 	// Bank value
 Mapper4__8001:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed1	x, Mapper4__8000_stai, Mapper4__8001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed1	y, Mapper4__8000_stai, Mapper4__8001_stai
 		case	iIOPort_stx
 			php
 			stx	$_IO_temp
@@ -242,6 +281,7 @@ Mapper4__8001:
 			bra	$+b_in
 		case	iIOPort_sta
 		case	iIOPort_stai
+Mapper4__8001_stai:
 			php
 			sta	$_IO_temp
 b_in:
@@ -342,6 +382,10 @@ Mapper4__8001_Switch_7:
 	// Mirroring
 Mapper4__a000:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed0	x, Mapper4__a000_stai, Mapper4__a001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed0	y, Mapper4__a000_stai, Mapper4__a001_stai
 		case	iIOPort_stx
 			stx	$_IO_temp
 			bra	$+b_in
@@ -350,6 +394,7 @@ Mapper4__a000:
 			bra	$+b_in
 		case	iIOPort_sta
 		case	iIOPort_stai
+Mapper4__a000_stai:
 			sta	$_IO_temp
 b_in:
 			php
@@ -380,12 +425,17 @@ b_in:
 	// SRAM protection
 Mapper4__a001:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed1	x, Mapper4__a000_stai, Mapper4__a001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed1	y, Mapper4__a000_stai, Mapper4__a001_stai
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
 			CoreCall_Begin
 			CoreCall_End
 		case	iIOPort_stai
+Mapper4__a001_stai:
 			// TODO
 			rtl
 
@@ -394,6 +444,10 @@ Mapper4__a001:
 	// IRQ latch
 Mapper4__c000:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed0	x, Mapper4__c000_stai, Mapper4__c001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed0	y, Mapper4__c000_stai, Mapper4__c001_stai
 		case	iIOPort_stx
 			CoreCall_Begin
 			CoreCall_CopyUpTo	+b_1
@@ -418,6 +472,7 @@ b_1:
 			rtl
 
 		case	iIOPort_stai
+Mapper4__c000_stai:
 			sta	$_Mapper4_IRQ_Latch
 			rtl
 
@@ -426,6 +481,10 @@ b_1:
 	// IRQ reload
 Mapper4__c001:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed1	x, Mapper4__c000_stai, Mapper4__c001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed1	y, Mapper4__c000_stai, Mapper4__c001_stai
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
@@ -450,6 +509,7 @@ b_1:
 			CoreCall_Pull
 			CoreCall_End
 		case	iIOPort_stai
+Mapper4__c001_stai:
 			php
 			xba
 
@@ -478,6 +538,10 @@ b_1:
 	// IRQ disable
 Mapper4__e000:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed0	x, Mapper4__e000_stai, Mapper4__e001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed0	y, Mapper4__e000_stai, Mapper4__e001_stai
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
@@ -489,6 +553,7 @@ b_1:
 			CoreCall_End
 
 		case	iIOPort_stai
+Mapper4__e000_stai:
 			stz	$_Scanline_IRQ
 			stz	$_Mapper4_IRQ_Enabled
 			rtl
@@ -498,6 +563,10 @@ b_1:
 	// IRQ enable
 Mapper4__e001:
 	iIOPort_InterfaceSwitch		Mapper4__Error
+		case	iIOPort_stax
+			Mapper4__DirectIndexed1	x, Mapper4__e000_stai, Mapper4__e001_stai
+		case	iIOPort_stay
+			Mapper4__DirectIndexed1	y, Mapper4__e000_stai, Mapper4__e001_stai
 		case	iIOPort_stx
 		case	iIOPort_sty
 		case	iIOPort_sta
@@ -516,6 +585,7 @@ b_1:
 			CoreCall_End
 
 		case	iIOPort_stai
+Mapper4__e001_stai:
 			php
 			xba
 

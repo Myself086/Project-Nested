@@ -11,6 +11,7 @@ Dev build:
 - Fixed recompiling branch pointing inside another opcode's operand which was often causing games to reset
 - Fixed JSR to RAM while using non-native return address
 - Added auto resize to Array module
+- Added direct indexed access for mapper 4 registers
 
 v1.3
 - Added support for read-modify-write to IO ports
