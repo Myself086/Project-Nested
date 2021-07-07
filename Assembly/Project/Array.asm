@@ -4,14 +4,108 @@
 
 	// ---------------------------------------------------------------------------
 
-Array__Insert_Error:
+Array__Resize_Error:
 		unlock
 		trap
-		Exception	"Array is full{}{}{}Resizing array not available yet."
+		Exception	"Array resize fail{}{}{}Array can't be sized down below their current amount of data used."
+
+	.mx	0x00
+	.func	Array__Resize
+	// Entry: X = List Pointer, Y = New size
+	// Return: X = List Pointer
+Array__Resize:
+	.local	_listPointer
+	.local	_bytesUsed
+	.local	_newSize
+	.local	=originalData
+	.local	=newData
+
+	stx	$.listPointer
+	sty	$.newSize
+	lda	$0x0000,x
+	sec
+	sbc	$0x0003,x
+	clc
+	adc	$0x0009,x
+	sta	$.bytesUsed
+
+	// Are we resizing to a smaller size than required for our data?
+	cpy	$.bytesUsed
+	bcc	$-Array__Resize_Error
+
+	// Keep original data pointer
+	lda	$0x0003,x
+	sta	$.originalData+0
+	lda	$0x0004,x
+	sta	$.originalData+1
+
+	// Allocate memory
+	tyx
+	lda	#0x007e
+	call	Memory__Alloc
+	// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
+
+	// Keep local pointer
+	smx	#0x20
+	sta	$.newData+2
+	stx	$.newData+0
+
+	// Set bank number
+	ldy	$.listPointer
+	sta	$0x0008,y
+	sta	$0x0005,y
+	sta	$0x0002,y
+	smx	#0x00
+	// Set base address
+	txa
+	sta	$0x0003,y
+	// Set current address
+	clc
+	adc	$.bytesUsed
+	sec
+	sbc	$0x0009,x
+	sta	$0x0000,y
+	// Set top address
+	lda	$0x0003,y
+	clc
+	adc	$.newSize
+	dec	a
+	sta	$0x0006,y
+
+	// Copy bytes over
+	lda	$.bytesUsed
+	dec	a
+	and	#0xfffe
+	tay
+b_loop:
+		lda	[$.originalData],y
+		sta	[$.newData],y
+		dey
+		dey
+		bpl	$-b_loop
+
+	// TODO: Deallocate old memory
+
+	ldx	$.listPointer
+
+	return
+
+	// ---------------------------------------------------------------------------
 
 	.mx	0x00
 	.func	Array__Insert
 	// Entry: X = List Pointer
+
+Array__Insert_Resize:
+		// Double the size of the array
+		lda	$0x0006,x
+		sec
+		sbc	$0x0003,x
+		inc	a
+		asl	a
+		tay
+		call	Array__Resize
+
 Array__Insert:
 	.local	=p
 
@@ -27,10 +121,8 @@ Array__Insert:
 	adc	$0x0009,x
 	cmp	$0x0006,x
 
-	// Error out if nothing can be added on top
-	// This is because the first element out of bound is used for conditional insertion
-	// TODO: Support managed memory
-	bcs	$-Array__Insert_Error
+	// Is array full?
+	bcs	$-Array__Insert_Resize
 
 	// Change mode
 	sep	#0x20
@@ -51,14 +143,21 @@ Array__Insert_loop1:
 
 	// ---------------------------------------------------------------------------
 
-Array__InsertAt_Error:
-		unlock
-		trap
-		Exception	"Array is full{}{}{}Resizing array not available yet."
-
 	.mx	0x00
 	.func	Array__InsertAt
 	// Entry: X = List Pointer, Y = Insert at
+
+Array__InsertAt_Resize:
+		// Double the size of the array
+		lda	$0x0006,x
+		sec
+		sbc	$0x0003,x
+		inc	a
+		asl	a
+		tay
+		call	Array__Resize
+		bra	$+b_in
+
 Array__InsertAt:
 	.local	=p, _at, _listPointer, _inc, _x, _bytes, _tempElement
 
@@ -69,6 +168,7 @@ Array__InsertAt:
 	sta	$.at
 	stx	$.listPointer
 
+b_in:
 	// Increment
 	lda	$0x0009,x
 	sta	$.inc
@@ -82,10 +182,8 @@ Array__InsertAt:
 	adc	$.inc
 	cmp	$0x0006,x
 
-	// Error out if nothing can be added on top
-	// This is because the first element out of bound is used for conditional insertion
-	// TODO: Support managed memory
-	bcs	$-Array__InsertAt_Error
+	// Is array full?
+	bcs	$-Array__InsertAt_Resize
 
 	// Keep bank number
 	phb

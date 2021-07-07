@@ -10,6 +10,7 @@ Dev build:
 - Fixed a memory leak when recompiling unconditional branches
 - Fixed recompiling branch pointing inside another opcode's operand which was often causing games to reset
 - Fixed JSR to RAM while using non-native return address
+- Added auto resize to Array module
 
 v1.3
 - Added support for read-modify-write to IO ports
