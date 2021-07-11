@@ -525,6 +525,15 @@ IO__r2007_y:
 		trapeq
 		Exception	"Reading CHR RAM{}{}{}CPU reading CHR RAM isn't supported yet."
 
+		// Apply pattern swap
+		tay
+		lda	$_IO_MapperChrBankSwap
+		lsr	a
+		tya
+		bcc	$+b_2
+			eor	#0x10
+b_2:
+
 		// Push bank only for CHR ROM
 		phb
 

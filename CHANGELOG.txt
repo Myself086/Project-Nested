@@ -12,6 +12,7 @@ Dev build:
 - Fixed JSR to RAM while using non-native return address
 - Added auto resize to Array module
 - Added direct indexed access for mapper 4 registers
+- Fixed CPU reading CHR ROM when patterns are swapped by the mapper
 
 v1.3
 - Added support for read-modify-write to IO ports
