@@ -15,6 +15,7 @@ Dev build:
 - Fixed CPU reading CHR ROM when patterns are swapped by the mapper
 - Fixed "Bad call" error when destination is in RAM
 - Fixed SPC code address range, also prevents triangle table from being wiped shortly after power-on
+- Fixed vertical scroll value being off by 1
 
 v1.3
 - Added support for read-modify-write to IO ports
