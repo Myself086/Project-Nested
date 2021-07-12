@@ -29,7 +29,7 @@ Sound__Init_WaitForBBAA:
 		bne	$-Sound__Init_WaitForBBAA
 
 	// Send start address
-	ldy	#_Spc_Code_Start
+	ldy	#0x0400
 	sty	$0x2142
 	// Kick
 	lda	#0x01
@@ -70,7 +70,7 @@ Sound__Init_Transfer_Feedback:
 	// Execute SPC code, ignore carry
 	adc	#0x02
 	ora	#0x01
-	ldy	#_Spc_Code_Start
+	ldy	#0x0400
 	sty	$0x2142
 	stz	$0x2141
 	sta	$0x2140

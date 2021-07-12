@@ -48,9 +48,11 @@ Game "Empty                ", 0x00, 0x00
 
 	// Sound
 Spc_Code_Start:
-	//.offsetfrom		0x0400
+	.fix "Sound"
+	.offsetfrom		0x0400
 	.includeSPC	"Project/Spc700/Spc.asm"
-	//.offsetend
+	.offsetend
+	.fix "Stuff"
 Spc_Code_End:
 
 	.include	"Project/Gui.asm"
