@@ -207,6 +207,8 @@ b_2:
 			sep	#0x30
 			.mx	0x30
 
+			unlock
+
 			stz	$_Memory_NesBank
 
 			// Zero page
