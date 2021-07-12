@@ -184,7 +184,6 @@ b_2:
 			rep	#0x31
 
 			// Skip the regular recompiler
-			breakpoint
 			jmp	$_Recompiler__Build_SkipRecompiler
 b_1:
 
