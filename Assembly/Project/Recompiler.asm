@@ -88,6 +88,8 @@ Recompiler__Build:
 	.local	_opcodeX2
 	.local	_recompileFlags, _stackTrace, _stackTraceReset, _stackDepth
 	.local	=bankStart
+	.local	=writeAddr
+	.local	_thisOpcodeX2
 	// TODO: Replace stackTrace with stackDepth
 
 	// Change bank
@@ -135,16 +137,55 @@ b_1:
 	ldy	#2
 	call	Array__InsertIfDifferent
 
+	// Reserve memory
+	.local	=heapStackIndex
+	lda	#0x007f
+	ldx	#0x2000
+	call	Memory__Alloc
+	xba
+	sta	$.heapStackIndex+1
+	sta	$.writeAddr+1
+	sty	$.heapStackIndex+0
+	stx	$.writeAddr+0
+
 	// Set bank for readAddr
 	lda	$.romAddr
 	bmi	$+Recompiler__Build_RomRange
 		// Is this within recompile range?
 		cmp	$_Recompile_PrgRamTopRange
 		bcs	$+b_1
-			lda	$.romAddr
-			unlock
-			trap
-			Exception	"Compiler Error - Bad Call{}{}{}A call was made to 0x{A:X}, this address is in an unsupported range."
+			// Are we in RAM?
+			cmp	#0x0800
+			bcc	$+b_2
+			cmp	#0x6000
+			bcs	$+b_2
+				// Invalid range
+				lda	$.romAddr
+				unlock
+				trap
+				Exception	"Compiler Error - Bad Call{}{}{}A call was made to 0x{A:X}, this address is in an unsupported range."
+b_2:
+
+			// Set entry point
+			lda	$.writeAddr
+			ldy	#4
+			sta	[$.Recompiler_BranchDestList+3],y
+
+			// Trick which operand is read from recompiling the following jump below
+			lda	#_romAddr-1
+			sta	$.readAddr
+
+			// Write JMP to RAM
+			lda	#_Zero+0x004c*2
+			tay
+			sty	$.thisOpcodeX2
+			ldx	$_Opcode__AddrMode,y
+			jsr	($_Recompiler__Build_OpcodeType,x)
+			rep	#0x31
+
+			// Skip the regular recompiler
+			breakpoint
+			jmp	$_Recompiler__Build_SkipRecompiler
 b_1:
 
 		// SRAM range
@@ -516,7 +557,6 @@ Recompiler__Build_loop1_exit:
 
 	// Prepare reading destination list
 	.local	=destRead, _destInc
-	.local	=writeAddr
 	lda	$.Recompiler_BranchDestList+3
 	sta	$.destRead+0
 	lda	$.Recompiler_BranchDestList+4
@@ -533,16 +573,6 @@ Recompiler__Build_loop1_exit:
 	sta	[$.Recompiler_BranchDestList],y
 	ldx	#_Recompiler_BranchDestList
 	call	Array__Insert
-	// Reserve memory
-	.local	=heapStackIndex
-	lda	#0x007f
-	ldx	#0x2000
-	call	Memory__Alloc
-	xba
-	sta	$.heapStackIndex+1
-	sta	$.writeAddr+1
-	sty	$.heapStackIndex+0
-	stx	$.writeAddr+0
 Recompiler__Build_loop2:
 		//.local	=readAddr
 		.local	_lastReadAddr
@@ -606,7 +636,6 @@ Recompiler__Build_loop2_loop_skip1:
 Recompiler__Build_loop2_loop_skip2:
 
 			// Read next byte and clear carry in the process (asl)
-			.local	_thisOpcodeX2
 			lda	[$.readAddr]
 			and	#0x00ff
 			asl	a
@@ -843,6 +872,7 @@ b_1:
 		bra	$-Recompiler__Build_loop3
 Recompiler__Build_loop3_exit:
 
+Recompiler__Build_SkipRecompiler:
 
 	// Trim memory used
 	.precall	Memory__Trim	=StackPointer, _Length
