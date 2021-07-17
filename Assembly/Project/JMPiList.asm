@@ -244,26 +244,28 @@ b_1:
 	ora	$.newAddr+1
 	bne	$+b_else
 		// Call interpreter like this:
-		//  plp
 		//  pea	...
 		//  jmp Interpreter
-		lda	#0xf428
-		ldy	#_JMPi__Listing_Pull-JMPi__Listing
+
+		// Write opcodes
+		lda	#0x5cf4
+		ldy	#_JMPi__Listing_Pull-JMPi__Listing+0
 		sta	[$.nodeAddr],y
-		lda	$.originalCall
-		iny
-		iny
+		ldy	#_JMPi__Listing_Pull-JMPi__Listing+2
 		sta	[$.nodeAddr],y
 
-		// Change destination
+		// Write original call
+		lda	$.originalCall
+		dey
+		sta	[$.nodeAddr],y
+
+		// Write interpreter's address
 		lda	#_JMPi__Interpreter
-		ldy	#_JMPi__Listing_Destination-JMPi__Listing+1
+		ldy	#_JMPi__Listing_Pull-JMPi__Listing+4
 		sta	[$.nodeAddr],y
 		lda	#_JMPi__Interpreter/0x100
 		iny
 		sta	[$.nodeAddr],y
-
-		//$_Recompile_PrgRamTopRange
 
 		bra	$+b_1
 b_else:
@@ -279,19 +281,18 @@ b_1:
 	return
 
 	// ---------------------------------------------------------------------------
-	
+
 JMPi__Interpreter:
+	sep	#0x30
 	lda	$_IO_Temp
 	jmp	$=Interpreter__Execute
 
 JMPi__Interpreter_FirstIteration:
-	phd
 	php
 	lda	$_IO_Temp16+1
-	sta	$3,s
+	pha
 	lda	$_IO_Temp16+0
-	sta	$2,s
-	plp
+	pha
 	jmp	$=Interpreter__Execute
 
 	// ---------------------------------------------------------------------------

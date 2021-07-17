@@ -533,6 +533,37 @@ Inline__RmwToIO_Call:
 
 	// ---------------------------------------------------------------------------
 
+Inline__JmpToRam:
+	php
+Inline__JmpToRam_OriginalValue:
+	pea $0x50da
+	jmp $=Interpreter__Execute
+
+	.data8	0
+
+Inline__JslToRam:
+	phk
+Inline__JslToRam_Per:
+	per $0xff07
+	php
+Inline__JslToRam_OriginalValue:
+	pea $0x50da
+	jmp $=Interpreter__Execute
+
+	.data8	0
+
+Inline__JsrToRam:
+Inline__JsrToRam_OriginalReturn:
+	pea $0x50da
+	php
+Inline__JsrToRam_OriginalValue:
+	pea $0x50da
+	jmp $=Interpreter__Execute
+
+	.data8	0
+
+	// ---------------------------------------------------------------------------
+
 	.mx	0x30
 
 Inline__PushConstantReturn:

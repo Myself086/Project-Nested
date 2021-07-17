@@ -20,6 +20,9 @@ b_1__:
 
 	// ---------------------------------------------------------------------------
 
+	.misalign	0x100, 0xff
+	.misalign	0x100, 0x00
+
 	// Entry: s1 = 16-bit destination for PC
 Interpreter__Execute:
 	// Change DP
@@ -58,18 +61,20 @@ Interpreter__Execute_SwitchEnd:
 	// Return
 	pea	$0x0000
 	pld
+	plp
 	rtl
 
 
 interpreter__Execute_Switch_Trap:
 	// Opcode not supported
-	lda	$0xdec0de
+	ror	a
+	unlock
 	trap
-	Exception	"Interpreter Failed{}{}{}The interpreter is not fully supported in this version.{}{}This form of emulation is used for code located in WRAM."
+	Exception	"Interpreter Failed{}{}{}The interpreter is not fully supported in this version. It attempted to execute opcode 0x{a:X}.{}{}This form of emulation is used for code located in WRAM."
 
 Interpreter__Execute_Switch:
 	switch	0x100, Interpreter__Execute_Switch_Trap, Interpreter__Execute_Next
-		case	0x4c
+		case	0x4c	// JMP addr -------------------------------------------------------
 			// Read destination
 			Interpreter_ReadPCinc
 			sta	$.addr
@@ -85,7 +90,7 @@ Interpreter__Execute_Switch:
 				ldx	$.x
 				ldy	$.y
 				sta	$_IO_Temp
-				php
+				//php
 				rep	#0x20
 				.mx	0x10
 				lda	$.addr
@@ -104,7 +109,7 @@ b_else:
 				sta	$.pc
 				break
 
-		case	0x6c
+		case	0x6c	// JMP (addr) -----------------------------------------------------
 			// Read indirect address
 			Interpreter_ReadPCinc
 			sta	$.addr
@@ -126,7 +131,7 @@ b_else:
 			ldx	$.x
 			ldy	$.y
 			sta	$_IO_Temp
-			php
+			//php
 			rep	#0x20
 			.mx	0x10
 			lda	$.temp

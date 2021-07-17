@@ -2163,25 +2163,22 @@ Recompiler__Build_OpcodeType_Jmp:
 			jsr	$_Recompiler__Build_Inline2
 b_2:
 
-		// Call interpreter like this:
-		// pea $_originalValue
-		// jmp $=Interpreter__Execute
-		lda	#0x5cf4
-		ldy	#2
-		sta	[$.writeAddr]
-		sta	[$.writeAddr],y
-		dey
+		// Jump to interpreter
+			
+		// Write inlined code
+		ldx	#_Inline__JmpToRam
+		lda	#_Inline__JmpToRam/0x10000
+		jsr	$_Recompiler__Build_InlineNoInc
+		tyx
+
+		// Original value
+		ldy	#1
 		lda	[$.readAddr],y
-		sta	[$.writeAddr],y
-		lda	#_Interpreter__Execute
-		ldy	#4
-		sta	[$.writeAddr],y
-		lda	#_Interpreter__Execute/0x100
-		iny
+		ldy	#_Inline__JmpToRam_OriginalValue-Inline__JmpToRam+1
 		sta	[$.writeAddr],y
 
 		// Add to write address
-		lda	#7
+		txa
 		clc
 		adc	$.writeAddr
 		sta	$.writeAddr
@@ -2435,70 +2432,56 @@ b_2:
 		lda	$=RomInfo_StackEmulation
 		and	#_RomInfo_StackEmu_NativeReturn
 		beq	$+b_else
-			// Call interpreter like this:
-			// phk
-			// per $0x0006
-			// pea $_originalValue
-			// jmp $=Interpreter__Execute
-			lda	#0x624b
-			sta	[$.writeAddr]
-			lda	#0x0006
-			ldy	#2
+			// Natively call interpreter
+			
+			// Write inlined code
+			ldx	#_Inline__JslToRam
+			lda	#_Inline__JslToRam/0x10000
+			jsr	$_Recompiler__Build_InlineNoInc
+			tyx
+
+			// Fix PER
+			ldy	#_Inline__JslToRam_Per-Inline__JslToRam+1
+			lda	#0x00ff
+			and	[$.writeAddr],y
 			sta	[$.writeAddr],y
-			lda	#0x5cf4
-			ldy	#6
-			sta	[$.writeAddr],y
-			ldy	#4
-			sta	[$.writeAddr],y
+
+			// Original value
 			ldy	#1
 			lda	[$.readAddr],y
-			ldy	#5
-			sta	[$.writeAddr],y
-			lda	#_Interpreter__Execute
-			ldy	#8
-			sta	[$.writeAddr],y
-			lda	#_Interpreter__Execute/0x100
-			iny
+			ldy	#_Inline__JslToRam_OriginalValue-Inline__JslToRam+1
 			sta	[$.writeAddr],y
 
 			// Add to write address
-			lda	#11
+			txa
 			clc
 			adc	$.writeAddr
 			sta	$.writeAddr
 			rts
 b_else:
-			// Call interpreter like this:
-			// pea $_originalReturn
-			// pea $_originalValue
-			// jmp $=Interpreter__Execute
-			lda	#0x5cf4
-			sta	[$.writeAddr]
-			ldy	#5
-			sta	[$.writeAddr],y
-			ldy	#3
-			sta	[$.writeAddr],y
+			// Non-natively call interpreter
+			
+			// Write inlined code
+			ldx	#_Inline__JsrToRam
+			lda	#_Inline__JsrToRam/0x10000
+			jsr	$_Recompiler__Build_InlineNoInc
+			tyx
 
+			// Original return
 			lda	$.readAddr
 			inc	a
 			inc	a
+			ldy	#_Inline__JsrToRam_OriginalReturn-Inline__JsrToRam+1
+			sta	[$.writeAddr],y
+
+			// Original value
 			ldy	#1
-			sta	[$.writeAddr],y
-
-			//ldy	#1
 			lda	[$.readAddr],y
-			ldy	#4
-			sta	[$.writeAddr],y
-
-			lda	#_Interpreter__Execute
-			ldy	#7
-			sta	[$.writeAddr],y
-			lda	#_Interpreter__Execute/0x100
-			iny
+			ldy	#_Inline__JsrToRam_OriginalValue-Inline__JsrToRam+1
 			sta	[$.writeAddr],y
 
 			// Add to write address
-			lda	#10
+			txa
 			clc
 			adc	$.writeAddr
 			sta	$.writeAddr
