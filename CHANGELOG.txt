@@ -16,6 +16,7 @@ Dev build:
 - Fixed "Bad call" error when destination is in RAM
 - Fixed SPC code address range, also prevents triangle table from being wiped shortly after power-on
 - Fixed vertical scroll value being off by 1
+- Added more opcodes to the interpreter (but not complete)
 
 v1.3
 - Added support for read-modify-write to IO ports
