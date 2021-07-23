@@ -18,6 +18,7 @@ Dev build:
 - Fixed vertical scroll value being off by 1
 - Added more opcodes to the interpreter (but not complete)
 - Fixed ExHiROM for snes9x
+- Fixed graphical issues when nametable mirror changes
 
 v1.3
 - Added support for read-modify-write to IO ports

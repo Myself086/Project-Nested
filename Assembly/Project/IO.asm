@@ -596,15 +596,19 @@ b_1:
 	bcs	$+IO__r2007_skip20
 		phx
 
+		tax
+		lda	$_NameTable_Remap_Main-0x20,x
+		xba
+		lda	$_IO_PPUADDR
 		rep	#0x11
 		.mx	0x20
+		tax
 
-		ldx	$_IO_PPUADDR
 		lda	$=Nes_Nametables-0x2000,x
 		sta	$_IO_2007r
 
 		// Increment address
-		txa
+		lda	$_IO_PPUADDR
 		adc	$_IO_PPUADDR_INC
 		sta	$_IO_PPUADDR
 
@@ -684,16 +688,22 @@ IO__w2007_In:
 IO__w2007_skip00:
 
 	// Is it name tables?
-	eor	#0x20
-	cmp	#0x10
-	bcs	$+IO__w2007_skip20
+	cmp	#0x30
+	jcs	$_IO__w2007_skip20
 		phx
+
+		tax
+		lda	$_NameTable_Remap_Main-0x20,x
+		xba
+		lda	$_IO_PPUADDR
+		rep	#0x11
+		.mx	0x20
+		tax
 
 		rep	#0x10
 		.mx	0x20
 
 		lda	$_IO_Temp
-		ldx	$_IO_PPUADDR
 		cmp	$=Nes_Nametables-0x2000,x
 		beq	$+IO__w2007_NoChanges_16bit
 		sta	$=Nes_Nametables-0x2000,x
@@ -706,7 +716,7 @@ IO__w2007_skip00:
 		and	#0x03c0
 		eor	#0x03c0
 		bne	$+IO__w2007_skipAttribute
-			txa
+			lda	$_IO_PPUADDR
 			adc	$_IO_PPUADDR_INC
 			sta	$_IO_PPUADDR
 
@@ -727,7 +737,7 @@ IO__w2007_skip00:
 IO__w2007_skipAttribute:
 		.mx	0x00
 
-		txa
+		lda	$_IO_PPUADDR
 		adc	$_IO_PPUADDR_INC
 		sta	$_IO_PPUADDR
 
@@ -750,7 +760,7 @@ IO__w2007_NoChanges_16bit:
 			rep	#0x31
 			.mx	0x00
 
-			txa
+			lda	$_IO_PPUADDR
 			adc	$_IO_PPUADDR_INC
 			sta	$_IO_PPUADDR
 
@@ -785,8 +795,6 @@ IO__w2007_NoChanges:
 IO__w2007_skip20:
 
 	// Is it palette?
-	lda	$_IO_PPUADDR+1
-	and	#0x3f
 	cmp	#0x3f
 	bne	$+IO__w2007_skip3f
 		phx

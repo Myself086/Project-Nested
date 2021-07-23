@@ -398,25 +398,17 @@ Mapper4__a000_stai:
 			sta	$_IO_temp
 b_in:
 			php
-			xba
+			pha
+			phx
 
-			// Start queuing a nametable mirror change
-			lda	#.VramQ_NameTableMirrorChange
-			lock
-			sta	$0x2180
+			// Load mirrors: 2x1, 1x2
+			lda	$_IO_temp
+			and	#0x01
+			inc	a
+			jsr	$=Gfx__NameTableMirrorChange
 
-			// 0 -> 0x21 (vertical mirror)
-			// 1 -> 0x22 (horizontal mirror)
-			lsr	$_IO_temp
-			lda	#0x21
-			adc	#0x00
-			sta	$_IO_BG_MIRRORS
-
-			// Finish queuing...
-			and	#0x03
-			sta	$0x2180
-
-			xba
+			plx
+			pla
 			plp
 			rtl
 

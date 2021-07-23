@@ -147,7 +147,8 @@ b_1:
 
 Mapper1__w8000_DoStuff:
 	php
-	xba
+	pha
+	phx
 
 	// Control (internal, $8000-$9FFF)
 	// Bits: CPPMM
@@ -159,37 +160,26 @@ Mapper1__w8000_DoStuff:
 	lda	$_Mapper1_value
 	sta	$_Mapper1_control
 
-	// BG mirrors (TODO: Fix showing single second screen)
-	phx
-	and	#0x18
-	tax
-	lda	#.VramQ_NameTableMirrorChange
-	lock
-	sta	$0x2180
-	lda	$=Mapper1__w8000_BGmirrorsLUT+0,x
-	sta	$_IO_BG_MIRRORS
+	// Load mirrors: 1x1, 1x1+, 2x1, 1x2
+	lsr	a
+	lsr	a
+	lsr	a
 	and	#0x03
-	//lda	$=Mapper1__w8000_BGmirrorsLUT+1,x
-	sta	$0x2180
-	plx
+	tax
+	lda	$=Mapper1__w8000_BGmirrors,x
+	jsr	$=Gfx__NameTableMirrorChange
 
 	// Reset bits
 	lda	#0xf0
 	sta	$_Mapper1_value
 
-	xba
+	plx
+	pla
 	plp
 	rtl
 
-Mapper1__w8000_BGmirrorsLUT:
-	.data8	0x20
-	.fill	7
-	.data8	0x24
-	.fill	7
-	.data8	0x21
-	.fill	7
-	.data8	0x22
-	.fill	7
+Mapper1__w8000_BGmirrors:
+	.data8	0, 4, 1, 2
 
 	//	-----------------------------------------------------------------------
 

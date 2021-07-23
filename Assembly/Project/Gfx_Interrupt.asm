@@ -81,16 +81,74 @@ Gfx__LoadNameTableRemaps:
 	// Queue a nametable mirror change
 	php
 
-	sep	#0x34
-	.mx	0x30
-	lda	#.VramQ_NameTableMirrorChange
-	sta	$0x2180
+	smx	#0x30
 	lda	$=RomInfo_ScreenMode
-	and	#0x03
-	sta	$0x2180
+	jsr	$=Gfx__NameTableMirrorChange_in
 
 	plp
 	return
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x30
+	// Entry: A = Nametable mirror (1x1, 2x1, 1x2, 2x2, 1x1+)
+	// Return: Y = Unused
+Gfx__NameTableMirrorChange:
+	// Was a change made to the BG mirror?
+	cmp	$_NameTable_ActiveMap
+	bne	$+Gfx__NameTableMirrorChange_in
+		rtl
+Gfx__NameTableMirrorChange_in:
+
+	tax
+
+	// Load SNES BG mirror
+	lda	$=Gfx__NameTableMirrorChange_BGmirror,x
+	sta	$_IO_BG_MIRRORS
+
+	// Load data table offset
+	lda	$=Gfx__NameTableMirrorChange_Indexer,x
+	tax
+
+	// Queue nametable change
+	lock
+	lda	#.VramQ_NameTableMirrorChange
+	sta	$0x2180
+	stx	$0x2180
+
+	rmx	#0x15
+
+	.macro	Gfx__NameTableMirrorChange_mac		offset
+		sta	$_NameTable_Remap_Main+0x0+{0}
+		adc	#0x0202
+		sta	$_NameTable_Remap_Main+0x2+{0}
+	.endm
+
+	lda	$=Gfx__NameTableMirrorChange_Data+0,x
+	Gfx__NameTableMirrorChange_mac		0x0
+	lda	$=Gfx__NameTableMirrorChange_Data+2,x
+	Gfx__NameTableMirrorChange_mac		0x4
+	lda	$=Gfx__NameTableMirrorChange_Data+4,x
+	Gfx__NameTableMirrorChange_mac		0x8
+	lda	$=Gfx__NameTableMirrorChange_Data+6,x
+	Gfx__NameTableMirrorChange_mac		0xc
+
+	sep	#0x20
+
+	rtl
+
+Gfx__NameTableMirrorChange_Indexer:
+	.data8	0, 8, 16, 24, 32
+
+Gfx__NameTableMirrorChange_BGmirror:
+	.data8	0x20, 0x21, 0x22, 0x23, 0x30
+
+Gfx__NameTableMirrorChange_Data:
+	.data16	0x2120, 0x2120, 0x2120, 0x2120	// 1x1
+	.data16	0x2120, 0x2524, 0x2120, 0x2524	// 2x1
+	.data16	0x2120, 0x2120, 0x2524, 0x2524	// 1x2
+	.data16	0x2120, 0x2524, 0x2928, 0x2d2c	// 2x2
+	.data16	0x2524, 0x2524, 0x2524, 0x2524	// 1x1 second screen
 
 	// ---------------------------------------------------------------------------
 
@@ -1016,7 +1074,7 @@ Gfx__VramQueue_VramQ_PpuAddrHigh:
 	jmp	($_Gfx__VramQueue_Switch,x)
 
 Gfx__VramQueue_VramQ_PpuAddrHigh_NameTable:
-	ldy	$_NameTable_Remap-0x20,x
+	ldy	$_NameTable_Remap_Irq-0x20,x
 	sty	$_Vram_Queue_PpuAddr+1
 	lda	$_Vram_Queue_PpuAddr
 
@@ -1127,65 +1185,29 @@ Gfx__VramQueue_VramQ_NameTableMirrorChange:
 	// Keep current PPU address (temporarily write to DMA, 0.33 cycles faster than PHA+PLA)
 	sta	$0x4302
 
-	// Load mask
-	ldx	$0x80
-	ldy	$_Gfx__VramQueue_VramQ_NameTableMirrorChange_MaskLUT,x
-	bpl	$+Gfx__VramQueue_VramQ_NameTableMirrorChange_Vertical
-
 	.macro	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		offset
-		sta	$_NameTable_Remap+0x0+{0}
+		sta	$_NameTable_Remap_Irq+0x0+{0}
 		adc	#0x0202
-		sta	$_NameTable_Remap+0x2+{0}
+		sta	$_NameTable_Remap_Irq+0x2+{0}
 	.endm
 
-	// Top left nametable
-	lda	#0x2120
+	// Load mirror index
+	ldx	$0x80
+
+	// Apply mirror change
+	lda	$_Gfx__NameTableMirrorChange_Data+0,x
 	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0x0
-
-	// Top right nametable
-	lda	#0x2524
-	and	$_Addition,y
+	lda	$_Gfx__NameTableMirrorChange_Data+2,x
 	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0x4
-
-	// Bottom left nametable
-	lda	#0x2928
-	and	$_Addition,y
+	lda	$_Gfx__NameTableMirrorChange_Data+4,x
 	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0x8
-
-	// Bottom right nametable
-	lda	#0x2d2c
-	and	$_Addition,y
+	lda	$_Gfx__NameTableMirrorChange_Data+6,x
 	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0xc
 
 	// Next
 	lda	$0x4302
 	ldx	$0x80
 	jmp	($_Gfx__VramQueue_Switch,x)
-
-Gfx__VramQueue_VramQ_NameTableMirrorChange_Vertical:
-	// Top left nametable
-	lda	#0x2120
-	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0x0
-
-	// Top right nametable
-	lda	#0x2120
-	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0x4
-
-	// Bottom left nametable
-	lda	#0x2524
-	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0x8
-
-	// Bottom right nametable
-	lda	#0x2524
-	Gfx__VramQueue_VramQ_NameTableMirrorChange_mac		0xc
-
-	// Next
-	lda	$0x4302
-	ldx	$0x80
-	jmp	($_Gfx__VramQueue_Switch,x)
-
-Gfx__VramQueue_VramQ_NameTableMirrorChange_MaskLUT:
-	.data8	0xf2, 0xf6, 0x0a, 0xfe
 
 
 	.macro	Gfx__VramQueue_VramQ_DebugRow_mac	row

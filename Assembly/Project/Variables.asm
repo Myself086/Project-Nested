@@ -234,14 +234,21 @@ Indirect_Sbc_Action:
 
 
 	.addr	0x0ac7, 0x0adf
-	// 0/25
+	// 17/25
+
+	// 16 bytes of nametable remap from NES to SNES (must be at least 0x20 bytes deep into the page to avoid page crossing penalty)
+NameTable_Remap_Main:
+	.fill	16
+
+NameTable_ActiveMap:
+	.fill	8
 
 
 	.addr	0x0ae7, 0x0afd
 	// 16/23
 
 	// 16 bytes of nametable remap from NES to SNES (must be at least 0x20 bytes deep into the page to avoid page crossing penalty)
-NameTable_Remap:
+NameTable_Remap_Irq:
 	.fill	16
 
 
