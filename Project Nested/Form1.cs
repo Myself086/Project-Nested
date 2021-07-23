@@ -136,28 +136,7 @@ namespace Project_Nested
                 //try
 #endif
                 {
-                    injector = new Injector(File.ReadAllBytes(fileDialog.FileName));
-                    if (injector.IsLoaded(true))
-                    {
-                        injector.KnownCallCountChanged += Injector_KnownCallCountChanged;
-
-                        filename = fileDialog.FileName;
-
-                        if (SelectProfile(ConvertPathToTitle(filename), true))
-                            LoadProfile(profileSelected.Title);
-
-                        ShowRomInfo();
-
-                        EnableGUI(true);
-
-                        // Add file name to form name
-                        this.Text = $"{formTitle} - {ConvertPathToTitle(filename)}";
-
-                        CreateSettingsGUI();
-
-                        // Reset scroll position
-                        //vScrollBar1.Value = 0;
-                    }
+                    LoadNesFile(fileDialog.FileName);
                 }
 #if !DEBUG
                 /*catch (Exception ex)
@@ -165,6 +144,32 @@ namespace Project_Nested
                     MessageBox.Show(ex, "Error!");
                 }*/
 #endif
+            }
+        }
+
+        private void LoadNesFile(string filename)
+        {
+            injector = new Injector(File.ReadAllBytes(filename));
+            if (injector.IsLoaded(true))
+            {
+                injector.KnownCallCountChanged += Injector_KnownCallCountChanged;
+
+                this.filename = filename;
+
+                if (SelectProfile(ConvertPathToTitle(filename), true))
+                    LoadProfile(profileSelected.Title);
+
+                ShowRomInfo();
+
+                EnableGUI(true);
+
+                // Add file name to form name
+                this.Text = $"{formTitle} - {ConvertPathToTitle(filename)}";
+
+                CreateSettingsGUI();
+
+                // Reset scroll position
+                //vScrollBar1.Value = 0;
             }
         }
 
@@ -201,6 +206,15 @@ namespace Project_Nested
             {
                 Clipboard.Clear();
                 Clipboard.SetText(injector.GetAllSettings());
+            }
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                // Reload NES and SNES files
+                LoadNesFile(this.filename);
             }
         }
 
