@@ -480,10 +480,6 @@ namespace Project_Nested.Injection
             if (!TruncateRom.Value)
                 finalRomSize = finalRomSize.RoundToPowerOf2();
 
-            // Resize ROM
-            if (finalRomSize < finalData.Length)
-                Array.Resize(ref finalData, finalRomSize);
-
             // Write ROM size into the header (1024 << n)
             {
                 Int32 i = finalRomSize / 1024;
@@ -493,8 +489,17 @@ namespace Project_Nested.Injection
                     i /= 2;
                     n++;
                 }
-                finalData.Write8(0xffd7, n);
+                finalData.Write8(0x00ffd7, n);
+                finalData.Write8(0x40ffd7, n);
             }
+
+            // Resize ROM
+            if (finalRomSize < finalData.Length)
+                Array.Resize(ref finalData, finalRomSize);
+
+            // Erase clone header for ExHiROM
+            if (finalRomSize > 0x400000)
+                finalData.WriteArray(0x00ffc0, new byte[0x40], 0x40);
 
             // Calculate checksum
             {
