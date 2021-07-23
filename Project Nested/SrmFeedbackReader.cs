@@ -31,6 +31,7 @@ namespace Project_Nested
                 injector = new Injector(null);
 
             // Find header
+            if (injector.IsLoaded(true))
             {
                 var title = injector.ReadEmulatorTitleBytes();
 
@@ -52,9 +53,9 @@ namespace Project_Nested
                 this.profileName = ReadOffset("FeedbackProfileName");
                 this.entryPoints = ReadOffset("FeedbackEntryPoints");
                 this.links = ReadOffset("FeedbackLinks");
-            }
 
-            this.data = data;
+                this.data = data;
+            }
         }
 
         #endregion

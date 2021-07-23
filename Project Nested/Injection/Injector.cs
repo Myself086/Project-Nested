@@ -24,10 +24,6 @@ namespace Project_Nested.Injection
 
         Int32 finalRomSize;
 
-        // Emulator ROM, can be edited without cloning but not recommended
-        static readonly byte[] NestedEmulator = File.ReadAllBytes(
-            Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Project_Nested.smc");
-
         #endregion
         // --------------------------------------------------------------------
         #region ROM settings
@@ -101,7 +97,16 @@ namespace Project_Nested.Injection
         public Injector(byte[] data)
         {
             // Load emulator
-            this.OutData = NestedEmulator;
+            try
+            {
+                this.OutData = File.ReadAllBytes(
+                    Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Project_Nested.smc");
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
             Array.Resize(ref this.OutData, 0x800000);
             finalRomSize = OutData.Length;
 
@@ -611,6 +616,18 @@ namespace Project_Nested.Injection
             if ((SrcData[6] & 0x08) != 0)
                 return 0x03;
             return (byte)(((SrcData[6] & 0x01) + 1) ^ 0x03);
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Validation error
+
+        public bool IsLoaded(bool showWarning)
+        {
+            bool rtn = OutData != null;
+            if (!rtn & showWarning)
+                System.Windows.Forms.MessageBox.Show("Project_Nested.smc could not be loaded, please make sure it is present in the same folder.", "Error!");
+            return rtn;
         }
 
         #endregion

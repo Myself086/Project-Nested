@@ -137,24 +137,27 @@ namespace Project_Nested
 #endif
                 {
                     injector = new Injector(File.ReadAllBytes(fileDialog.FileName));
-                    injector.KnownCallCountChanged += Injector_KnownCallCountChanged;
+                    if (injector.IsLoaded(true))
+                    {
+                        injector.KnownCallCountChanged += Injector_KnownCallCountChanged;
 
-                    filename = fileDialog.FileName;
+                        filename = fileDialog.FileName;
 
-                    if (SelectProfile(ConvertPathToTitle(filename), true))
-                        LoadProfile(profileSelected.Title);
+                        if (SelectProfile(ConvertPathToTitle(filename), true))
+                            LoadProfile(profileSelected.Title);
 
-                    ShowRomInfo();
+                        ShowRomInfo();
 
-                    EnableGUI(true);
+                        EnableGUI(true);
 
-                    // Add file name to form name
-                    this.Text = $"{formTitle} - {ConvertPathToTitle(filename)}";
+                        // Add file name to form name
+                        this.Text = $"{formTitle} - {ConvertPathToTitle(filename)}";
 
-                    CreateSettingsGUI();
+                        CreateSettingsGUI();
 
-                    // Reset scroll position
-                    //vScrollBar1.Value = 0;
+                        // Reset scroll position
+                        //vScrollBar1.Value = 0;
+                    }
                 }
 #if !DEBUG
                 /*catch (Exception ex)
