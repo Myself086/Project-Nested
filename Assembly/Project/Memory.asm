@@ -182,11 +182,11 @@ Memory__Trim:
 		bne	$+Memory__Trim_SkipDelete
 		// Is this memory range at the top of the stack?
 		lda	$_Memory_HeapStack
-		clc
-		adc	#4
 		cmp	$.StackPointer
 		bne	$+Memory__Trim_SkipDelete
 			// Remove from stack and return
+			clc
+			adc	#4
 			sta	$_Memory_HeapStack
 			plb
 			return
