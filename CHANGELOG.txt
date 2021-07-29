@@ -19,6 +19,7 @@ Dev build:
 - Added more opcodes to the interpreter (but not complete)
 - Fixed ExHiROM for snes9x
 - Fixed graphical issues when nametable mirror changes
+- Fixed reading mappers 17-255
 
 v1.3
 - Added support for read-modify-write to IO ports

@@ -578,12 +578,12 @@ namespace Project_Nested.Injection
             // Read mapper bits 0-3
             Int32 mapper = (SrcData[6] >> 4);
 
+            // Read mapper bits 4-7
+            mapper |= (SrcData[6] >> 4) << 4;
+
             // Verify byte 7 compatibility
             if ((SrcData[7] & 0x0c) != 0x08)
                 return mapper;
-
-            // Read mapper bits 4-7
-            mapper |= (SrcData[6] >> 4) << 4;
 
             // Read mapper bits 8-11
             mapper |= (SrcData[8] & 0x0f) << 8;
