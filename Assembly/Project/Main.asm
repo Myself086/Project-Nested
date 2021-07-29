@@ -301,6 +301,9 @@ b_loop:
 	lda	#0x04
 	sta	$0x212C
 
+	// Late format SRAM in case something needs to be reported to the user
+	call	Memory__FormatSram
+
 	// Prepare indirect IO JMP
 	lda	#0x5c
 	sta	$_InterpretIO_Action_JMP

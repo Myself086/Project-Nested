@@ -80,7 +80,7 @@ b_1:
 	.mx	0x00
 	.func	Recompiler__Build		_romAddr, _compileType
 	// Compile type flags
-	.def	Recompiler_CompileType_MoveToRom	0x0001
+	.def	Recompiler_CompileType_MoveToCart	0x0001
 	// Return: A = Index for function list, X = HeapStack pointer, Y = HeapStack pointer bank
 Recompiler__Build:
 	.local	=destListReadP
@@ -885,10 +885,17 @@ Recompiler__Build_SkipRecompiler:
 	sta	$.Param_Length
 	call
 
-	// Are we copying to ROM?
-	lda	#_Recompiler_CompileType_MoveToRom
-	and	$.compileType
-	bne	$+Recompiler__Build_CopyToRom
+	// Try allocating memory on the cart
+	.local	_length, =rtnHeapStack
+	lda	$.writeAddr
+	sec
+	sbc	[$.heapStackIndex]
+	sta	$.length
+	tax
+	lda	#0xffff
+	call	Memory__TryAlloc
+	ora	#0
+	bpl	$+Recompiler__Build_CopyToCart
 		// Find this function's starting address
 		lda	$.romAddr
 		sta	[$.Recompiler_BranchDestList]
@@ -925,16 +932,8 @@ Recompiler__Build_SkipRecompiler:
 		ldy	$.heapStackIndex+2
 		return
 
-Recompiler__Build_CopyToRom:
-	.local	_length, =rtnHeapStack
-	// Allocate memory in ROM
-	lda	$.writeAddr
-	sec
-	sbc	[$.heapStackIndex]
-	sta	$.length
-	tax
-	lda	#0xffff
-	call	Memory__Alloc
+Recompiler__Build_CopyToCart:
+	// Continue copying to cart
 	sta	$.rtnHeapStack+2
 	sty	$.rtnHeapStack
 
@@ -947,7 +946,11 @@ Recompiler__Build_CopyToRom:
 	lda	[$.heapStackIndex]
 	sta	$.readAddr
 
-	// Copy bytes over to ROM
+	// Copy bytes over to cart
+	.local	4 copyCode
+	lda	#0x6054
+	sta	$.copyCode+0
+	sta	$.copyCode+2
 	// Load banks
 	phb
 	sep	#0x20
@@ -957,49 +960,46 @@ Recompiler__Build_CopyToRom:
 	lda	$.writeAddr+2
 	rep	#0x20
 	.mx	0x00
-	sta	$_Recompiler__Build_CopyToRom_Mvn+1
+	sta	$.copyCode+1
 	// Load length
 	lda	$.length
 	// Load source and destination addresses
 	ldx	$.readAddr
 	ldy	$.writeAddr
 	// Copy
-Recompiler__Build_CopyToRom_Mvn:
-	.data8	0x54, 0xff, 0xff
+	jsr	$_copyCode
 	// Restore bank
 	plb
+	.unlocal	4 copyCode
 
 	// Look for JMP and replace their destination, keep carry clear during this loop
 	ldy	#0
-Recompiler__Build_CopyToRom_Loop:
-		// Load next opcode
-		lda	[$.readAddr],y
-		and	#0x00ff
-		asl	a
-		tax
-
-		// Is it a short JMP?
-		eor	#_Zero+0x4c*2
-		bne	$+Recompiler__Build_CopyToRom_Loop_Next
-			// Fix JMP destination address
-			iny
-			lda	[$.readAddr],y
-			sec
-			sbc	$.readAddr
-			clc
-			adc	$.writeAddr
-			sta	[$.writeAddr],y
-			dey
-			clc
-Recompiler__Build_CopyToRom_Loop_Next:
-		// Next opcode
-		tya
-		adc	$_Opcode__BytesTable65816,x
+	tya
+	sta	[$.Recompiler_BranchSrcList+0]
+	// Load next JMP
+	lda	[$.Recompiler_BranchSrcList+3],y
+	beq	$+b_1
+b_loop:
+		// Fix JMP destination address
+		sec
+		sbc	$.readAddr
+		tyx
 		tay
+		lda	[$.readAddr],y
+		sec
+		sbc	$.readAddr
+		clc
+		adc	$.writeAddr
+		sta	[$.writeAddr],y
 
-Recompiler__Build_CopyToRom_Loop_Next2:
-		cpy	$.length
-		bcc	$-Recompiler__Build_CopyToRom_Loop
+		// Next
+		txa
+		clc
+		adc	$.Recompiler_BranchSrcList+9
+		tay
+		lda	[$.Recompiler_BranchSrcList+3],y
+		bne	$-b_loop
+b_1:
 
 	// Delete memory used
 	.precall	Memory__Trim	=StackPointer, _Length
@@ -1806,7 +1806,7 @@ Recompiler__Build_OpcodeType_LdaConst_PushReturn:
 	cmp	#6
 	bcc	$-Recompiler__Build_OpcodeType_Const
 		// Are we compiling into ROM?
-		lda	#_Recompiler_CompileType_MoveToRom
+		lda	#_Recompiler_CompileType_MoveToCart
 		and	$.compileType
 		bne	$+b_1
 			// Write code
@@ -2491,7 +2491,7 @@ Recompiler__Build_OpcodeType_Jsr_1:
 	clc
 
 	// Are we compiling into ROM?
-	lda	#_Recompiler_CompileType_MoveToRom
+	lda	#_Recompiler_CompileType_MoveToCart
 	and	$.compileType
 	bne	$+Recompiler__Build_OpcodeType_Jsr_Static
 		// Call interpreter like this:

@@ -193,6 +193,9 @@ namespace Project_Nested.Emulation
             }
             // SRam
             SRAMlowerbound = mempointer << 13;
+            int sramSize = 0x400 << HeaderGetSRAMsize();
+            if (sramSize > 0x10000)
+                sramSize = 0x10000;
             switch (HeaderGetSRAMsize())
             {
                 case 1:
@@ -226,9 +229,15 @@ namespace Project_Nested.Emulation
                     CopySegment(0x70e000, 0x706000);
                     SRAMupperbound = ((mempointer) << 13) - 1;
                     break;
+                case 10:
+                case 9:
+                case 8:
+                case 7:
                 case 6:     // 0x10000
-                    AddSegment(0x700000, 0x70ffff, 0);
-                    SRAMupperbound = ((mempointer) << 13) - 1;
+                    {
+                        AddSegment(0x700000, 0x700000 + sramSize - 1, 0);
+                        SRAMupperbound = ((mempointer) << 13) - 1;
+                    }
                     break;
                 default:
                     SRAMupperbound = ((mempointer) << 13) - 1;
@@ -237,7 +246,7 @@ namespace Project_Nested.Emulation
             // HiROM sram
             if (SRAMupperbound > SRAMlowerbound)
             {
-                Int32 sramMirrors = ((0x400 << HeaderGetSRAMsize()) / 0x2000) - 1;
+                Int32 sramMirrors = (sramSize / 0x2000) - 1;
                 if (sramMirrors == -1)
                     sramMirrors = 0;
                 Int32 u = 0;

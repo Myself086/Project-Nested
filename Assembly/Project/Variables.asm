@@ -201,7 +201,7 @@ IRQ_SnesPointer:
 
 
 	.addr	0x0a87, 0x0a9f
-	// 18/25
+	// 20/25
 
 	// Data copied from APU's memory
 Sound_DebugAPU:
@@ -227,6 +227,11 @@ Indirect_Cmp_Action:
 	.fill	2
 Indirect_Sbc_Action:
 	.fill	2
+
+	// Pointer+1 to list of banks that can be used as extra heap
+Memory__CartBanks:
+	.fill	2
+	.def	Memory__CartBanks_CONSTBANK		0x7f0000
 
 
 	.addr	0x0aa7, 0x0abf

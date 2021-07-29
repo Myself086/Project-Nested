@@ -37,27 +37,7 @@ StaticRec__Main:
 	call	Main__InitMemory
 
 	// Format ROM
-	lda	$=RomInfo_StaticRecBanks
-	sta	$.DP_ZeroBank
-	stz	$.DP_Zero
-StaticRec__Main_LoopFormat:
-		// Write bottom and top addresses
-		lda	#0x0000
-		ldy	#_Memory_Bottom-0x8000
-		sta	[$.DP_Zero],y
-		ldy	#_Memory_Top-0x8000
-		sta	[$.DP_Zero],y
-		lda	#_Memory_HeapStack-0x8000-4
-		ldy	#_Memory_HeapStack-0x8000
-		sta	[$.DP_Zero],y
-
-		// Next bank
-		inc	$.DP_ZeroBank
-		lda	$.DP_ZeroBank
-		xba
-		cmp	$.DP_ZeroBank
-		bcc	$-StaticRec__Main_LoopFormat
-		beq	$-StaticRec__Main_LoopFormat
+	call	Memory__FormatRom
 
 	// Are we using native stack? If not, turn off every other stack options
 	lda	$=RomInfo_StackEmulation
@@ -141,7 +121,7 @@ b_in:
 				cmp	#0x8000
 				bcc	$+StaticRec__Main_Loop_Next
 				sta	$.Param_romAddr
-				lda	#_Recompiler_CompileType_MoveToRom
+				lda	#_Recompiler_CompileType_MoveToCart
 				sta	$.Param_compileType
 				call
 

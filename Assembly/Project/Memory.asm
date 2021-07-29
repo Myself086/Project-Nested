@@ -5,29 +5,31 @@
 	// ---------------------------------------------------------------------------
 
 	.mx	0x00
-	.func	Memory__Alloc
+	.func	Memory__TryAlloc
 	// Entry: A = Bank number, X = Length
-	// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
-Memory__Alloc:
+	// Return: A = Bank number (positive), X = Memory address, Y = HeapStack pointer
+	// Return2: A = Negative, X = Length
+Memory__TryAlloc:
 	phb
 
-	.local	_length, _bank, _addr
+	.local	_length
+	.local	_bank, _addr
 
 	stx	$.length
 
-	// Which bank? Only allowing 0x7e-0x7f or 0xc0-0xff (ROM range defined in RomInfo)
+	// Which bank? Only allowing 0x7e-0x7f or cart banks.
 	and	#0x00ff
 	sta	$.bank
 	eor	#0x007e
 	lsr	a
-	bne	$+Memory__Alloc_Rom
+	bne	$+b_cart
 
-Memory__Alloc_LoopBank:
+b_loop:
 		// Can we allocate enough memory in this bank?
 		lda	$.bank
 		ldx	$.length
 		call	Memory__CanAlloc
-		bcs	$+Memory__Alloc_LoopBank_end
+		bcs	$+b_1
 
 		// Can we allocate enough memory in the other bank?
 		lda	$.bank
@@ -35,13 +37,11 @@ Memory__Alloc_LoopBank:
 		sta	$.bank
 		ldx	$.length
 		call	Memory__CanAlloc
-		bcs	$+Memory__Alloc_LoopBank_end
+		bcs	$+b_1
 
-		// Out of memory
-		unlock
-		trap
-		Exception	"Out of Memory{}{}{}Memory.Alloc attempted to allocate 0x{X:X} bytes but WRAM is full.{}{}Try following step 5 on the exe's main window. This will reduce memory usage and improve performance."
-Memory__Alloc_LoopBank_end:
+		// WRAM banks are full
+		bra	$+b_oom
+b_1:
 
 	// Change bank and set carry
 	sep	#0x21
@@ -75,34 +75,47 @@ Memory__Alloc_LoopBank_end:
 	plb
 	return
 
+	.unlocal	_bank, _addr
 
-Memory__Alloc_Rom:
-	// ROM range
-	lda	$=RomInfo_StaticRecBanks
-	sta	$.bank
-Memory__Alloc_LoopRomBanks:
-		// Can we allocate enough memory in this bank?
-		lda	$.bank
+
+b_oom:	// Out Of Memory, not Out Of Mana
+	lda	#0xffff
+	ldx	$.length
+	plb
+	return
+
+
+b_cart:
+	// Cart range (ROM or SRAM)
+	ldx	$_Memory__CartBanks
+	beq	$-b_oom
+	.local	_bankCount, =listP
+	lda	$=Memory__CartBanks_CONSTBANK-1,x
+	and	#0x00ff
+	beq	$-b_oom
+	sta	$.bankCount
+	ldy	#_Memory__CartBanks_CONSTBANK/0x100
+	sty	$.listP+1
+	stx	$.listP
+b_loop:
+		// Can we allocte enough memory in this bank?
+		lda	[$.listP]
+		and	#0x00ff
 		ldx	$.length
-		call	Memory__CanAllocRom
-		bcs	$+Memory__Alloc_LoopRomBanks_end
-			inc	$.bank
-			lda	$.bank
-			xba
-			cmp	$.bank
-			bcc	$-Memory__Alloc_LoopRomBanks
-			beq	$-Memory__Alloc_LoopRomBanks
-				ldx	$.length
-				unlock
-				trap
-				// TODO: Throw exception on the exe
-Memory__Alloc_LoopRomBanks_end:
+		call	Memory__CanAllocCart
+		bcs	$+b_1
+			inc	$.listP
+			dec	$.bankCount
+			bne	$-b_loop
+			bra	$-b_oom
+b_1:
 
 	// Change bank and clear carry
-	sep	#0x20
-	lda	$.bank
+	sep	#0x30
+	lda	[$.listP]
+	tay
 	pha
-	rep	#0x21
+	rep	#0x31
 	plb
 
 	// Add memory to the top of the heap
@@ -112,7 +125,7 @@ Memory__Alloc_LoopRomBanks_end:
 	sta	$_Memory_Top-0x8000
 
 	// Return
-	lda	$.bank
+	tya
 	plb
 	return
 	
@@ -142,6 +155,24 @@ b_trap:
 	unlock
 	trap
 	Exception	"Out Of Bank Memory{}{}{}Memory.AllocInBank attempted to allocate 0x{X:X} bytes of memory in bank 0x{a:X} but it was full.{}{}This error should not be happening under normal circumstances."
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
+	.func	Memory__Alloc
+	// Entry: A = Bank number, X = Length
+	// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
+Memory__Alloc:
+	call	Memory__TryAlloc
+	ora	#0
+	bmi	$+b_trap
+
+	return
+
+b_trap:
+	unlock
+	trap
+	Exception	"Out of Memory{}{}{}Memory.Alloc attempted to allocate 0x{X:X} bytes but RAM is full.{}{}Try following step 5 on the exe's main window. This will reduce memory usage and improve performance."
 
 	// ---------------------------------------------------------------------------
 
@@ -239,10 +270,10 @@ Memory__CanAlloc:
 	// ---------------------------------------------------------------------------
 
 	.mx	0x00
-	.func	Memory__CanAllocRom
+	.func	Memory__CanAllocCart
 	// Entry: A = Bank number, X = Length
 	// Return: Carry = true when memory can be allocated
-Memory__CanAllocRom:
+Memory__CanAllocCart:
 	phb
 	// Change bank and set carry for later
 	sep	#0x21
@@ -253,7 +284,7 @@ Memory__CanAllocRom:
 	.local	_temp
 	stx	$.temp
 
-	// Get total space between Top and HeapStack, -0x10 for write overflow
+	// Get total space between Top and HeapStack, -0x10 for stack allocation
 	lda	$_Memory_HeapStack-0x8000
 	sbc	$_Memory_Top-0x8000
 	sbc	#0x0010
@@ -327,5 +358,224 @@ b_trap:
 	unlock
 	trap
 	Exception	"Zero Memory Failed{}{}{}Memory.Zero attempted to clear the wrong array."
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
+	.func	Memory__FormatSram
+Memory__FormatSram:
+	php
+	rep	#0x30
+
+	// Is SRAM present at bank b1?
+	lda	$0xb07ffe		// First test for mirror
+	tay
+	lda	$0xb17ffe
+	tax
+	eor	#0x55aa
+	sta	$0xb17ffe		// Change last bytes of bank b1
+	cmp	$0xb17ffe
+	beq	$+b_1
+		txa
+		sta	$0xb17ffe		// Restore last bytes of bank b1
+		unlock
+		trap
+		Exception	"SRAM error 0{}{}{}SRAM is missing."
+b_1:
+
+	// Test for minimum SRAM requirement: 16kb
+	tya
+	eor	$0xb07ffe		// Second test for mirror
+	beq	$+b_1
+b_error:
+		txa
+		sta	$0xb17ffe		// Restore last bytes of bank b1
+		unlock
+		trap
+		Exception	"SRAM error 1{}{}{}SRAM must be at least 16kb in size. Make sure that your SNES emulator or SNES flash cart is up to date."
+b_1:
+
+	// Test SRAM size
+	.local	_bankCount
+	lda	#2
+	sta	$.bankCount
+	// Write unique value to test banks, both bytes must be different to account for open bus
+	lda	#8
+	sta	$0xa17ffe
+	dec	a
+	sta	$0xb97ffe
+	dec	a
+	sta	$0xb57ffe
+	dec	a
+	sta	$0xb37ffe
+	dec	a
+	sta	$0xb17ffe
+	// Look for valid banks
+	inc	a
+	cmp	$0xb37ffe
+	bne	$+b_1
+		asl	$.bankCount
+		inc	a
+		cmp	$0xb57ffe
+		bne	$+b_1
+			asl	$.bankCount
+			inc	a
+			cmp	$0xb97ffe
+			bne	$+b_1
+				asl	$.bankCount
+				inc	a
+				cmp	$0xa17ffe
+				bne	$+b_1
+					asl	$.bankCount
+b_1:
+
+	// Restore last bytes of bank b1
+	txa
+	sta	$0xb17ffe
+
+	// Allocate some memory for a list of banks
+	ldx	$.bankCount
+	dex
+	cpx	#2
+	bcs	$+b_1
+		ldx	#1
+b_1:
+	lda	#_Memory__CartBanks_CONSTBANK/0x10000
+	call	Memory__AllocInBank
+	// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
+	.local	=list
+	xba
+	sta	$.list+1
+	stx	$.list
+	inx
+	stx	$_Memory__CartBanks
+	// Write length
+	lda	$.bankCount
+	dec	a
+	dec	a
+	smx	#0x20
+	sta	[$.list]
+
+	// Copy expected valid bank numbers
+	inc16dp	list
+	tax
+	dex
+	bmi	$+b_1
+b_loop:
+		lda	$=Memory__FormatSram_BankOrder,x
+		txy
+		sta	[$.list],y
+		dex
+		bpl	$-b_loop
+b_1:
+
+	smx	#0x00
+
+	// Format SRAM
+	ldx	$.bankCount
+	dex
+	dex
+	dex
+	bmi	$+b_1
+b_loop:
+		// Change bank
+		lda	$=Memory__FormatSram_BankOrder,x
+		sta	$.DP_ZeroBank
+
+		// Write bottom and top addresses
+		lda	#0x6000
+		ldy	#_Memory_Bottom-0x8000
+		sta	[$.DP_Zero],y
+		ldy	#_Memory_Top-0x8000
+		sta	[$.DP_Zero],y
+		lda	#_Memory_HeapStack-0x8000-4
+		ldy	#_Memory_HeapStack-0x8000
+		sta	[$.DP_Zero],y
+
+		// Next
+		dex
+		bpl	$-b_loop
+b_1:
+
+	plp
+	return
+
+Memory__FormatSram_BankOrder:
+	.data8	0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf
+	.data8	0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
+	.func	Memory__FormatRom
+Memory__FormatRom:
+	.local	_thisBank, _lastBank, _bankCount
+	lda	$=RomInfo_StaticRecBanks
+	ora	#0x4040
+	smx	#0x20
+	sta	$.thisBank
+	stz	$.thisBank+1
+	xba
+	sta	$.lastBank
+	stz	$.lastBank+1
+	smx	#0x00
+	stz	$.bankCount
+
+	// Allocate memory for our bank list
+	ldx	#0x0090
+	lda	#_Memory__CartBanks_CONSTBANK/0x10000
+	call	Memory__AllocInBank
+	// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
+	.local	=list
+	xba
+	sta	$.list+1
+	inx
+	stx	$.list
+	stx	$_Memory__CartBanks
+
+	stz	$.DP_Zero
+
+b_loop:
+		// Set bank and add it to list
+		lda	$.thisBank
+		sta	$.DP_ZeroBank
+		ldy	$.bankCount
+		sta	[$.list],y
+		iny
+		sty	$.bankCount
+
+		// Write bottom and top addresses
+		lda	#0x0000
+		ldy	#_Memory_Bottom-0x8000
+		sta	[$.DP_Zero],y
+		ldy	#_Memory_Top-0x8000
+		sta	[$.DP_Zero],y
+		lda	#_Memory_HeapStack-0x8000-4
+		ldy	#_Memory_HeapStack-0x8000
+		sta	[$.DP_Zero],y
+
+b_loop_next:
+		// Are we done?
+		lda	$.thisBank
+		cmp	$.lastBank
+		beq	$+b_loop_exit
+		// Next bank
+		inc	a
+		ora	#0x0040
+		sta	$.thisBank
+		eor	#0x007e
+		lsr	a
+		beq	$-b_loop_next	// Skip banks 0x7e and 0x7f
+		bra	$-b_loop
+b_loop_exit:
+
+	// Set number of banks
+	dec	$.list
+	smx	#0x20
+	lda	$.bankCount
+	sta	[$.list]
+	smx	#0x00
+
+	return
 
 	// ---------------------------------------------------------------------------

@@ -14,8 +14,8 @@ Rom_Title:
 	// ROM size 8mb
 	[80ffd7] = 0x0d
 
-	// SRAM size 16kb
-	[80ffd8] = 0x04
+	// SRAM size 256kb
+	[80ffd8] = 0x08
 
 	// CPU execution vectors
 	.addr	0x80ffe4

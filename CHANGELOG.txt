@@ -20,6 +20,7 @@ Dev build:
 - Fixed ExHiROM for snes9x
 - Fixed graphical issues when nametable mirror changes
 - Fixed reading mappers 17-255
+- Added support for 256kb SRAM, mostly used as extra WRAM
 
 v1.3
 - Added support for read-modify-write to IO ports
