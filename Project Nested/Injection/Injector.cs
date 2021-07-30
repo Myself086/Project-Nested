@@ -142,7 +142,7 @@ namespace Project_Nested.Injection
 
             void WriteBanks(int prgSize, int chrSize, PrgBankMirrorMode mirrorMode, byte[] startingBanks)
             {
-                int prgBanksTotal = prgBanks * (PRG_BANK_SIZE / prgSize);
+                int prgBanksTotal = prgBanks * PRG_BANK_SIZE / prgSize;
 
                 // Apply user patches
                 foreach (var item in patches)
