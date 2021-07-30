@@ -222,28 +222,28 @@ Gui__FrameUpdate_Recall:
 b_1:
 
 	// Has memory usage changed?
-	Gui__GetRamUsage
+	call	Gui__GetRamUsed
 	cmp	$.Debug_LastMemoryUsage
 	beq	$+b_1
 		sta	$.Debug_LastMemoryUsage
+		.local	_used, _total
+		sta	$.used
 
-		// Calculate RAM%
-		call	Gui__CalcRamPercent
-		.local	_temp
-		sta	$.temp
+		// Calculate RAM total
+		call	Gui__GetRamTotal
+		sta	$.total
 
 		Gui__Color			0
 		Gui__Locate			0, 21
-		Gui__WriteText		Gui__Text_RamPercent
+		Gui__WriteText		Gui__Text_RamFraction
 
-		Gui__Locate			7, 21
-		Gui__WriteNumber	$.temp
+		Gui__Locate			6, 21
+		Gui__WriteNumber	$.used
 
-		// Shift dot to the left
-		Gui__Locate			7, 21
-		Gui__SwapTiles
+		Gui__Locate			10, 21
+		Gui__WriteNumber	$.total
 
-		.unlocal	_temp
+		.unlocal	_used, _total
 b_1:
 
 	Gui__SleepAt	16, Gui__FrameUpdate_Recall
@@ -422,6 +422,120 @@ b_1__:
 	// ---------------------------------------------------------------------------
 
 	.macro	Gui__GetRamUsage
+		.local	4 count__, _index__
+		.local	_temp__
+
+		// Calculate WRAM bank 7e
+		lda	$=Memory_Top+0x7e0000
+		sec
+		sbc	$=Memory_HeapStack+0x7e0000
+		sta	$.temp__
+
+		// Calculate WRAM bank 7f
+		lda	$=Memory_Top+0x7f0000
+		sec
+		sbc	$=Memory_HeapStack+0x7f0000
+
+		// Add results from both WRAM banks
+		clc
+		adc	$.temp__
+		sta	$.count__
+		lda	#0
+		rol	a
+		sta	$.count__+2
+
+		// Calculate SRAM
+		phb
+		ldx	$_Memory__CartBanks
+		beq	$+b_1__
+		lda	$=Memory__CartBanks_CONSTBANK-1,x
+		and	#0x00ff
+		dec	a
+		sta	$.index__
+		bmi	$+b_1__
+b_loop__:
+			// Next pair of banks
+			lda	$=Memory__CartBanks_CONSTBANK,x
+			inx
+			inx
+			pha
+
+			// First bank in the pair
+			plb
+			lda	$_Memory_Top-0x8000
+			sec
+			sbc	$_Memory_HeapStack-0x8000
+			sec
+			sbc	#0xe000
+			clc
+			adc	$.count__
+			sta	$.count__
+			bcc	$+b_2__
+				inc	$.count__+2
+b_2__:
+			// Next
+			dec	$.index__
+			bmi	$+b_1b__
+
+			// Secon bank in the pair
+			plb
+			lda	$_Memory_Top-0x8000
+			sec
+			sbc	$_Memory_HeapStack-0x8000
+			sec
+			sbc	#0xe000
+			clc
+			adc	$.count__
+			sta	$.count__
+			bcc	$+b_2__
+				inc	$.count__+2
+b_2__:
+			// Next
+			dec	$.index__
+			bpl	$-b_loop__
+			bra	$+b_1__
+b_1b__:
+		plb
+b_1__:
+		plb
+		// Return KB only
+		lda	$.count__+1
+		lsr	a
+		lsr	a
+		//.unlocal	4 count__, _index__
+	.endm
+
+	.mx	0x00
+	.func	Gui__GetRamUsed
+Gui__GetRamUsed:
+	Gui__GetRamUsage		Memory_HeapStack
+	return
+
+	.mx	0x00
+	.func	Gui__GetRamTotal
+Gui__GetRamTotal:
+	lda	#0
+	ldx	$_Memory__CartBanks
+	beq	$+b_1
+		// Count SRAM banks available
+		lda	$=Memory__CartBanks_CONSTBANK-1,x
+		and	#0x00ff
+		beq	$+b_1
+			asl	a
+			asl	a
+			asl	a
+b_1:			// Assume every branch pointing to b_1 has register A containing 0
+	// Add WRAM size
+	clc
+	adc	#128
+
+	return
+
+	// ---------------------------------------------------------------------------
+
+.false
+{
+	.macro	Gui__GetRamUsage
 		.local	_temp__
 		// Calculate top
 		lda	$=Memory_HeapStack+0x7e0000
@@ -439,8 +553,6 @@ b_1__:
 		// Bottom - Top
 		.unlocal	_temp__
 	.endm
-
-	// ---------------------------------------------------------------------------
 
 	.mx	0x00
 	.func	Gui__CalcRamPercent
@@ -507,6 +619,7 @@ b_1:
 	//lda	$.high
 
 	return
+}
 
 	// ---------------------------------------------------------------------------
 
@@ -751,9 +864,9 @@ Gui__SwapTiles:
 Gui__Text_CpuPercent:
 	.string0	"CPU:  00.%"
 
-Gui__Text_RamPercent:
-	.string0	"RAM:  00.%"
-	
+Gui__Text_RamFraction:
+	.string0	"RAM:  0/  0 KB"
+
 Gui__Text_Error:
 	.string0	"Error!"
 
