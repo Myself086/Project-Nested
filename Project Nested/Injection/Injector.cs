@@ -185,6 +185,10 @@ namespace Project_Nested.Injection
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
                     SetInitialBooleans(StaticRange_c0, StaticRange_e0);
                     break;
+                case 3:
+                    WriteBanks(0x4000, 0x2000, PrgBankMirrorMode.None, new byte[] { 0, 0, 0, 0 });
+                    SetInitialBooleans(StaticRange_80, StaticRange_a0, StaticRange_c0, StaticRange_e0);
+                    break;
                 case 4:
                     WriteBanks(0x2000, 0x400, PrgBankMirrorMode.Cascade, new byte[] { 0, 1, 0xfe, 0xff });
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;

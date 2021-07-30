@@ -76,6 +76,7 @@ ExceptionData:
 	.include	"Project/OpcodeTables.asm"
 	.include	"Project/Mappers/Mapper1.asm"
 	.include	"Project/Mappers/Mapper2.asm"
+	.include	"Project/Mappers/Mapper3.asm"
 	.include	"Project/Mappers/Mapper4.asm"
 
 	// Memory management
