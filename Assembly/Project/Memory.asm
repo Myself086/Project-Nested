@@ -365,7 +365,20 @@ b_trap:
 	.func	Memory__FormatSram
 Memory__FormatSram:
 	php
+
+	// Are we on EmulSNES? If so, leave
+	sep	#0x20
+	.mx	0x20
+	lda	$0x4210
+	eor	$0x4210
+	and	#0x0f
+	beq	$+Sound__Init_In
+		plp
+		return
+Sound__Init_In:
+
 	rep	#0x30
+	.mx	0x00
 
 	// Is SRAM present at bank b1?
 	lda	$0xb07ffe		// First test for mirror
