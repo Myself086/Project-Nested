@@ -146,9 +146,13 @@ Interpreter__Execute_SwitchEnd:
 interpreter__Execute_Switch_Trap:
 	// Opcode not supported
 	ror	a
+	rep	#0x30
+	.mx	0x00
 	unlock
 	trap
-	Exception	"Interpreter Failed{}{}{}The interpreter is not fully supported in this version. It attempted to execute opcode 0x{a:X}.{}{}This form of emulation is used for code located in WRAM."
+	Exception	"Interpreter Failed{}{}{}The interpreter is not fully supported in this version. It attempted to execute opcode 0x{a:X} at address 0x{X:X}.{}{}This form of emulation is used for code located in WRAM."
+
+	.mx	0x30
 
 Interpreter__Execute_Switch:
 	switch	0x100, Interpreter__Execute_Switch_Trap, Interpreter__Execute_Next
