@@ -194,6 +194,10 @@ namespace Project_Nested.Injection
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
                     SetInitialBooleans(StaticRange_e0);
                     break;
+                case 7:
+                    WriteBanks(0x8000, 0x2000, PrgBankMirrorMode.DirectMirror, new byte[] { 0, 0, 0, 0 });
+                    this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
+                    break;
                 default:
                     mapperSupported = false;
                     break;

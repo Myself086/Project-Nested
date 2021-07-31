@@ -78,6 +78,7 @@ ExceptionData:
 	.include	"Project/Mappers/Mapper2.asm"
 	.include	"Project/Mappers/Mapper3.asm"
 	.include	"Project/Mappers/Mapper4.asm"
+	.include	"Project/Mappers/Mapper7.asm"
 
 	// Memory management
 	.include	"Project/Array.asm"
