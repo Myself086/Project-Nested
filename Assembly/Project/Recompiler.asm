@@ -1463,10 +1463,15 @@ b_1:
 		sta	[$.writeAddr],y
 
 		// Are we in either SRAM or ROM range?
-		cmp	#0x6000
+		cmp	#0x5f01
 		bcc	$+Recompiler__Build_OpcodeType_LdaAbsY_Regular
 			// ROM and SRAM range
 			pha
+			// Page 0x5f?
+			cmp	#0x6000
+			bcs	$+b_2
+				lda	#0x6000
+b_2:
 			xba
 			and	#0x00e0
 			tay
@@ -1585,10 +1590,12 @@ b_1:
 	// Are we in IO range?
 	ldy	#0x0001
 	lda	[$.readAddr],y
-	and	#0xe000
-	beq	$+b_1
-	cmp	#0x6000
-	beq	$+b_1
+	bmi	$+b_in
+	cmp	#0x2000
+	bcc	$+b_1
+	cmp	#0x5f01			// Accessing PRG RAM via page crossing
+	bcs	$+b_1
+b_in:
 		// Interprete IO port
 		lda	[$.readAddr],y
 		jmp	$_Recompiler__Build_OpcodeType_Abs_IO
@@ -1608,10 +1615,15 @@ Recompiler__Build_OpcodeType_StaAbs_HighRange:
 	beq	$+b_1
 		// Are we in either SRAM or ROM range?
 		lda	[$.readAddr],y
-		cmp	#0x6000
+		cmp	#0x5f01
 		bcc	$+b_1
 			// ROM and SRAM range
 			pha
+			// Page 0x5f?
+			cmp	#0x6000
+			bcs	$+b_2
+				lda	#0x6000
+b_2:
 			xba
 			and	#0x00e0
 			tay
