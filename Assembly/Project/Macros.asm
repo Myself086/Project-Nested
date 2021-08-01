@@ -375,6 +375,7 @@ b_skip__:
 	CoreCall_DEFINE		CoreCall_Copy			".data16 {0},{1}"	// Copies code from address {0} to {1}-1
 	CoreCall_DEFINE		CoreCall_CopyUpTo		".data8 {0}"		// Copies {0} bytes then resume instructions after the last byte
 	CoreCall_DEFINE		CoreCall_Remove			".data8 {0}"		// Remove {0} bytes
+	CoreCall_DEFINE		CoreCall_WriteOriginal	""					// Writes original instruction
 
 	.def	CoreCallFlag_PushA		0x0001
 	.def	CoreCallFlag_PushX		0x0002

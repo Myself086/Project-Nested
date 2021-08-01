@@ -3414,6 +3414,23 @@ b_exit:
 		sta	$.writeAddr
 		break
 
+	case	CoreCall_WriteOriginal
+		// Write original opcode
+		ldy	#2
+		lda	[$.readAddr]
+		sta	[$.writeAddr]
+		lda	[$.readAddr],y
+		sta	[$.writeAddr],y
+
+		// Add to write address
+		ldy	$.thisOpcodeX2
+		lda	$_Opcode__BytesTable_OneOrMore,y
+		clc
+		adc	$.writeAddr
+		sta	$.writeAddr
+
+		break
+
 	.unlocal	_pushFlags, _freeRegs, =src
 
 	// ---------------------------------------------------------------------------
