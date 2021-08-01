@@ -3427,215 +3427,66 @@ Recompiler__GetIOAccess:
 	lda	#_IO__BANK
 	sta	$.DP_ZeroBank
 
-	// Is it 0x2000?
-	cpx	#0x2000
-	bne	$+Recompiler__GetIOAccess_Skip2000
-		ldx	#_Recompiler__GetIOAccess_2000
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2000:
+	.macro	Recompiler__GetIOAccess_Compare		value, opcode, destination
+		cmp	#_Zero+{0}
+		{1}	$+b_skip__
+			ldx	#_Zero+{2}
+			jmp	$_Recompiler__GetIOAccess_Return
+b_skip__:
+	.endm
 
-	// Is it 0x2001?
-	cpx	#0x2001
-	bne	$+Recompiler__GetIOAccess_Skip2001
-		ldx	#_Recompiler__GetIOAccess_2001
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2001:
+	// 2000-3fff
+	txa
+	cmp	#0x4000
+	bcs	$+b_1
+		and	#0xe007
+		Recompiler__GetIOAccess_Compare		0x2000, bne, Recompiler__GetIOAccess_2000
+		Recompiler__GetIOAccess_Compare		0x2001, bne, Recompiler__GetIOAccess_2001
+		Recompiler__GetIOAccess_Compare		0x2002, bne, Recompiler__GetIOAccess_2002
+		Recompiler__GetIOAccess_Compare		0x2003, bne, Recompiler__GetIOAccess_2003
+		Recompiler__GetIOAccess_Compare		0x2004, bne, Recompiler__GetIOAccess_2004
+		Recompiler__GetIOAccess_Compare		0x2005, bne, Recompiler__GetIOAccess_2005
+		Recompiler__GetIOAccess_Compare		0x2006, bne, Recompiler__GetIOAccess_2006
+		Recompiler__GetIOAccess_Compare		0x2007, bne, Recompiler__GetIOAccess_2007
+		txa
+b_1:
 
-	// Is it 0x2002?
-	cpx	#0x2002
-	bne	$+Recompiler__GetIOAccess_Skip2002
-		ldx	#_Recompiler__GetIOAccess_2002
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2002:
+	// 4000-4017
+	cmp	#0x4018
+	jcs	$_b_skip4000
+		cmp	#0x4008
+		bcs	$+b_1
+			Recompiler__GetIOAccess_Compare		0x4000, bne, Recompiler__GetIOAccess_4000
+			Recompiler__GetIOAccess_Compare		0x4001, bne, Recompiler__GetIOAccess_4001
+			Recompiler__GetIOAccess_Compare		0x4002, bne, Recompiler__GetIOAccess_4002
+			Recompiler__GetIOAccess_Compare		0x4003, bne, Recompiler__GetIOAccess_4003
+			Recompiler__GetIOAccess_Compare		0x4004, bne, Recompiler__GetIOAccess_4004
+			Recompiler__GetIOAccess_Compare		0x4005, bne, Recompiler__GetIOAccess_4005
+			Recompiler__GetIOAccess_Compare		0x4006, bne, Recompiler__GetIOAccess_4006
+			Recompiler__GetIOAccess_Compare		0x4007, bne, Recompiler__GetIOAccess_4007
+b_1:
 
-	// Is it 0x2003?
-	cpx	#0x2003
-	bne	$+Recompiler__GetIOAccess_Skip2003
-		ldx	#_Recompiler__GetIOAccess_2003
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2003:
+		cmp	#0x4010
+		bcs	$+b_1
+			Recompiler__GetIOAccess_Compare		0x4008, bne, Recompiler__GetIOAccess_4008
+			Recompiler__GetIOAccess_Compare		0x4009, bne, Recompiler__GetIOAccess_4009
+			Recompiler__GetIOAccess_Compare		0x400a, bne, Recompiler__GetIOAccess_400a
+			Recompiler__GetIOAccess_Compare		0x400b, bne, Recompiler__GetIOAccess_400b
+			Recompiler__GetIOAccess_Compare		0x400c, bne, Recompiler__GetIOAccess_400c
+			Recompiler__GetIOAccess_Compare		0x400d, bne, Recompiler__GetIOAccess_400d
+			Recompiler__GetIOAccess_Compare		0x400e, bne, Recompiler__GetIOAccess_400e
+			Recompiler__GetIOAccess_Compare		0x400f, bne, Recompiler__GetIOAccess_400f
+b_1:
 
-	// Is it 0x2004?
-	cpx	#0x2004
-	bne	$+Recompiler__GetIOAccess_Skip2004
-		ldx	#_Recompiler__GetIOAccess_2004
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2004:
-
-	// Is it 0x2005?
-	cpx	#0x2005
-	bne	$+Recompiler__GetIOAccess_Skip2005
-		ldx	#_Recompiler__GetIOAccess_2005
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2005:
-
-	// Is it 0x2006?
-	cpx	#0x2006
-	bne	$+Recompiler__GetIOAccess_Skip2006
-		ldx	#_Recompiler__GetIOAccess_2006
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2006:
-
-	// Is it 0x2007?
-	cpx	#0x2007
-	bne	$+Recompiler__GetIOAccess_Skip2007
-		ldx	#_Recompiler__GetIOAccess_2007
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip2007:
-
-	// Is it 0x4000?
-	cpx	#0x4000
-	bne	$+Recompiler__GetIOAccess_Skip4000
-		ldx	#_Recompiler__GetIOAccess_4000
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4000:
-
-	// Is it 0x4001?
-	cpx	#0x4001
-	bne	$+Recompiler__GetIOAccess_Skip4001
-		ldx	#_Recompiler__GetIOAccess_4001
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4001:
-
-	// Is it 0x4002?
-	cpx	#0x4002
-	bne	$+Recompiler__GetIOAccess_Skip4002
-		ldx	#_Recompiler__GetIOAccess_4002
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4002:
-
-	// Is it 0x4003?
-	cpx	#0x4003
-	bne	$+Recompiler__GetIOAccess_Skip4003
-		ldx	#_Recompiler__GetIOAccess_4003
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4003:
-
-	// Is it 0x4004?
-	cpx	#0x4004
-	bne	$+Recompiler__GetIOAccess_Skip4004
-		ldx	#_Recompiler__GetIOAccess_4004
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4004:
-
-	// Is it 0x4005?
-	cpx	#0x4005
-	bne	$+Recompiler__GetIOAccess_Skip4005
-		ldx	#_Recompiler__GetIOAccess_4005
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4005:
-
-	// Is it 0x4006?
-	cpx	#0x4006
-	bne	$+Recompiler__GetIOAccess_Skip4006
-		ldx	#_Recompiler__GetIOAccess_4006
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4006:
-
-	// Is it 0x4007?
-	cpx	#0x4007
-	bne	$+Recompiler__GetIOAccess_Skip4007
-		ldx	#_Recompiler__GetIOAccess_4007
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4007:
-
-	// Is it 0x4008?
-	cpx	#0x4008
-	bne	$+Recompiler__GetIOAccess_Skip4008
-		ldx	#_Recompiler__GetIOAccess_4008
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4008:
-
-	// Is it 0x4009?
-	cpx	#0x4009
-	bne	$+Recompiler__GetIOAccess_Skip4009
-		ldx	#_Recompiler__GetIOAccess_4009
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4009:
-
-	// Is it 0x400a?
-	cpx	#0x400a
-	bne	$+Recompiler__GetIOAccess_Skip400a
-		ldx	#_Recompiler__GetIOAccess_400a
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip400a:
-
-	// Is it 0x400b?
-	cpx	#0x400b
-	bne	$+Recompiler__GetIOAccess_Skip400b
-		ldx	#_Recompiler__GetIOAccess_400b
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip400b:
-
-	// Is it 0x400c?
-	cpx	#0x400c
-	bne	$+Recompiler__GetIOAccess_Skip400c
-		ldx	#_Recompiler__GetIOAccess_400c
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip400c:
-
-	// Is it 0x400d?
-	cpx	#0x400d
-	bne	$+Recompiler__GetIOAccess_Skip400d
-		ldx	#_Recompiler__GetIOAccess_400d
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip400d:
-
-	// Is it 0x400e?
-	cpx	#0x400e
-	bne	$+Recompiler__GetIOAccess_Skip400e
-		ldx	#_Recompiler__GetIOAccess_400e
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip400e:
-
-	// Is it 0x400f?
-	cpx	#0x400f
-	bne	$+Recompiler__GetIOAccess_Skip400f
-		ldx	#_Recompiler__GetIOAccess_400f
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip400f:
-
-	// Is it 0x4010?
-	cpx	#0x4010
-	bne	$+Recompiler__GetIOAccess_Skip4010
-		ldx	#_Recompiler__GetIOAccess_4010
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4010:
-
-	// Is it 0x4011?
-	cpx	#0x4011
-	bne	$+Recompiler__GetIOAccess_Skip4011
-		ldx	#_Recompiler__GetIOAccess_4011
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4011:
-
-	// Is it 0x4012?
-	cpx	#0x4012
-	bne	$+Recompiler__GetIOAccess_Skip4012
-		ldx	#_Recompiler__GetIOAccess_4012
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4012:
-
-	// Is it 0x4013?
-	cpx	#0x4013
-	bne	$+Recompiler__GetIOAccess_Skip4013
-		ldx	#_Recompiler__GetIOAccess_4013
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4013:
-
-	// Is it 0x4014?
-	cpx	#0x4014
-	bne	$+Recompiler__GetIOAccess_Skip4014
-		ldx	#_Recompiler__GetIOAccess_4014
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4014:
-
-	// Is it 0x4015?
-	cpx	#0x4015
-	bne	$+Recompiler__GetIOAccess_Skip4015
-		ldx	#_Recompiler__GetIOAccess_4015
-		jmp	$_Recompiler__GetIOAccess_Return
-Recompiler__GetIOAccess_Skip4015:
+		Recompiler__GetIOAccess_Compare		0x4010, bne, Recompiler__GetIOAccess_4010
+		Recompiler__GetIOAccess_Compare		0x4011, bne, Recompiler__GetIOAccess_4011
+		Recompiler__GetIOAccess_Compare		0x4012, bne, Recompiler__GetIOAccess_4012
+		Recompiler__GetIOAccess_Compare		0x4013, bne, Recompiler__GetIOAccess_4013
+		Recompiler__GetIOAccess_Compare		0x4014, bne, Recompiler__GetIOAccess_4014
+		Recompiler__GetIOAccess_Compare		0x4015, bne, Recompiler__GetIOAccess_4015
+		//Recompiler__GetIOAccess_Compare		0x4016, bne, Recompiler__GetIOAccess_4016
+		//Recompiler__GetIOAccess_Compare		0x4017, bne, Recompiler__GetIOAccess_4017
+b_skip4000:
 
 	// Do we have a mapper?
 	txa
