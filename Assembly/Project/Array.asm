@@ -63,7 +63,7 @@ Array__Resize:
 	clc
 	adc	$.bytesUsed
 	sec
-	sbc	$0x0009,x
+	sbc	$0x0009,y
 	sta	$0x0000,y
 	// Set top address
 	lda	$0x0003,y
