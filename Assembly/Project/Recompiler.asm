@@ -172,6 +172,7 @@ b_2:
 			sta	[$.Recompiler_BranchDestList+3],y
 
 			// Trick which operand is read from recompiling the following jump below
+			stz	$.readAddr+1
 			lda	#_romAddr-1
 			sta	$.readAddr
 
