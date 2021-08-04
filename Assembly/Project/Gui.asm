@@ -502,6 +502,9 @@ b_1__:
 		lda	$.count__+1
 		lsr	a
 		lsr	a
+		// Add non-heap SRAM bank sizes
+		clc
+		adc	#16
 		//.unlocal	4 count__, _index__
 	.endm
 
@@ -525,9 +528,9 @@ Gui__GetRamTotal:
 			asl	a
 			asl	a
 b_1:			// Assume every branch pointing to b_1 has register A containing 0
-	// Add WRAM size
+	// Add WRAM size and non-heap SRAM bank sizes
 	clc
-	adc	#128
+	adc	#_Zero+128+16
 
 	return
 
