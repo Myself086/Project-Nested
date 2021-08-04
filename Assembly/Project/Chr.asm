@@ -52,6 +52,35 @@ Chr__Initialize:
 	lda	$=RomInfo_ChrBankLut
 	ora	$=RomInfo_ChrBankLut+0x100
 	bne	$+b_1
+		// Are we cloning CHR RAM?
+		lda	$=RomInfo_ChrRamClone-1
+		bpl	$+b_2
+			// Allocate memory for the CHR RAM clone
+			lda	#_ChrRam_CONSTBANK/0x10000
+			ldx	#0x2000
+			call	Memory__AllocInBank
+			// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
+			txa
+			smx	#0x20
+			ora	#0
+			trapne
+			xba
+			sta	$_ChrRam_Page
+
+			// Copy code to RAM
+			ldx	#6
+b_loop:
+				lda	$=IO__r2007_ChrRamReadCode,x
+				sta	$_ChrRam_Read,x
+				lda	$=IO__r2007_ChrRamWriteCode,x
+				sta	$_ChrRam_Write,x
+
+				// Next
+				dex
+				bpl	$-b_loop
+
+			smx	#0x00
+b_2:
 		return
 b_1:
 

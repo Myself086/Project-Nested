@@ -496,6 +496,18 @@ IO__w2006_SR2AND38:
 	.fill	0x20, 0x38
 
 
+IO__r2007_ChrRamReadCode:
+	// This code is copied to RAM at "ChrRam_Read"
+	lda	$=ChrRam_CONSTBANK
+	jmp	$_IO__r2007_ChrRamCallBack
+
+IO__r2007_ChrRamWriteCode:
+	// This code is copied to RAM at "ChrRam_Write"
+	sta	$=ChrRam_CONSTBANK
+	pla
+	plp
+	rtl
+
 IO__r2007_a:
 IO__r2007_a_i:
 IO__r2007_x:
@@ -518,12 +530,43 @@ IO__r2007_y:
 	cmp	#0x20
 	bcs	$+b_1
 		phx
-		phy
 
 		// Is this game using CHR RAM?
 		ldx	$_CHR_0_PageLength
-		trapeq
-		Exception	"Reading CHR RAM{}{}{}CPU reading CHR RAM isn't supported yet."
+		bne	$+b_2
+			// Read from CHR RAM clone
+			lda	$_ChrRam_Page
+			trapeq
+			Exception	"Reading CHR RAM{}{}{}CPU attempted to read CHR RAM.{}{}CHR RAM clone must be turned on for this game."
+
+			// Calculate destination address, assume carry clear from BCS
+			//clc
+			adc	$_IO_PPUADDR+1
+			sta	$_ChrRam_Read+2
+			lda	$_IO_PPUADDR+0
+			sta	$_ChrRam_Read+1
+
+			// Increment PPU address, assume carry clear because ADC shouldn't wrap the bank
+			//clc
+			adc	$_IO_PPUADDR_INC
+			sta	$_IO_PPUADDR+0
+			bcc	$+b_3
+				inc	$_IO_PPUADDR+1
+b_3:
+
+			// Call
+			plx
+			jmp	$_ChrRam_Read
+IO__r2007_ChrRamCallBack:
+			// "Return" value
+			sta	$_IO_2007r
+
+			pla
+			plp
+			rtl
+b_2:
+
+		phy
 
 		// Apply pattern swap
 		tay
@@ -674,12 +717,38 @@ IO__w2007_In:
 	// Is it CHR banks?
 	cmp	#0x20
 	bcs	$+IO__w2007_skip00
-		// Write to CHR banks (TODO: Check if it is CHR RAM)
+		// Is this game using CHR RAM?
+		lda	$_CHR_0_PageLength
+		bne	$+IO__w2007_skip00
+
+		// Write to CHR banks
 		lda	#.VramQ_Tile
 		lock
 		sta	$0x2180
 		lda	$_IO_Temp
 		sta	$0x2180
+
+		// Write to CHR RAM clone
+		lda	$_ChrRam_Page
+		beq	$+b_2
+			// Calculate destination address, assume carry clear from BCS
+			//clc
+			adc	$_IO_PPUADDR+1
+			sta	$_ChrRam_Write+2
+			lda	$_IO_PPUADDR+0
+			sta	$_ChrRam_Write+1
+
+			// Increment PPU address, assume carry clear because ADC shouldn't wrap the bank
+			//clc
+			adc	$_IO_PPUADDR_INC
+			sta	$_IO_PPUADDR+0
+			bcc	$+b_3
+				inc	$_IO_PPUADDR+1
+b_3:
+
+			// Call
+			jmp	$_ChrRam_Write
+b_2:
 
 		pla
 		plp

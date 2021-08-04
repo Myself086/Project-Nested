@@ -129,6 +129,10 @@ RomInfo_StackEmulation:
 RomInfo_VramQBufferSize:
 	.data16	0x1000
 
+	// Negative when using CHR RAM clone
+RomInfo_ChrRamClone:
+	.data8	0
+
 RomInfo_CpuSettings:
 	.data16	0x0000
 	.def	RomInfo_Cpu_RecompilePrgRam				0x0001
@@ -353,6 +357,12 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Limit how many sprites can be rendered per scanline to 8."
 		RomInfo_SummaryMac	"However, sprite priority had to be backward to achieve this effect."
 		RomInfo_DefineMac	"public bool SpriteLimit : Sprite limit per scanline.", RomInfo_SpriteLimit, 0x80
+
+		RomInfo_SummaryMac	"Allows reading CHR RAM."
+		RomInfo_SummaryMac	"Comes at a cost of performance and 8kb of RAM."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"This option is ignored for games using CHR ROM."
+		RomInfo_DefineMac	"public bool ChrRamClone : Clone CHR RAM", RomInfo_ChrRamClone, 0x80
 
 		RomInfo_SummaryMac	"Determines how many bytes can be queued for graphical update."
 		RomInfo_SummaryMac	"The queue is interpreted and emptied every vblank."

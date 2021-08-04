@@ -187,7 +187,7 @@ Mapper_x2:
 
 
 	.addr	0x0a67, 0x0a7f
-	// 10/25
+	// 25/25
 	
 NMI_NesBank:
 	.fill	2
@@ -198,6 +198,17 @@ IRQ_NesBank:
 	.fill	2
 IRQ_SnesPointer:
 	.fill	3
+
+	// Code for reading CHR RAM
+ChrRam_Read:
+	.fill	7
+	// Code for writing CHR RAM
+ChrRam_Write:
+	.fill	7
+	// Page in bank 0x7e
+ChrRam_Page:
+	.fill	1
+	.def	ChrRam_CONSTBANK		0x7e0000
 
 
 	.addr	0x0a87, 0x0a9f

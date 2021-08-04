@@ -23,6 +23,7 @@ Dev build:
 - Added support for 256kb SRAM, mostly used as extra WRAM
 - Added mappers: 3, 7
 - Fixed directly page crossing $5f to $60
+- Added option to support reading CHR RAM, comes at a cost of performance when writing
 
 v1.3
 - Added support for read-modify-write to IO ports
