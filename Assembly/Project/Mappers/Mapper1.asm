@@ -241,7 +241,6 @@ b_1:
 	rol	a
 
 Mapper1__wa000_DoStuff:
-	phx
 	xba
 
 	// CHR bank 0 (internal, $A000-$BFFF)
@@ -250,27 +249,20 @@ Mapper1__wa000_DoStuff:
 
 	// Load bits
 	lda	$_Mapper1_value
+	lsr	a
+	lsr	a
+	lsr	a
 
-	// Are we loading the same CHR bank?
-	cmp	$_Mapper1_chrbank0
-	beq	$+b_1
-		lsr	a
-		lsr	a
-		lsr	a
-
-		// Is CHR in 8kb mode?
-		bit	$_Mapper1_control
-		bmi	$+b_2
-			// 8kb mode
-			ora	#0x01
-			sta	$_Mapper1_chrbank1
-			sta	$_CHR_1_NesBank
-			and	#0xfe
+	// Is CHR in 8kb mode?
+	bit	$_Mapper1_control
+	bmi	$+b_2
+		// 8kb mode
+		ora	#0x01
+		sta	$_CHR_1_NesBank
+		and	#0xfe
 b_2:
-		// This 4kb
-		sta	$_Mapper1_chrbank0
-		sta	$_CHR_0_NesBank
-b_1:
+	// This 4kb
+	sta	$_CHR_0_NesBank
 
 	// Reset bits
 	lda	#0xf0
@@ -278,7 +270,6 @@ b_1:
 
 	// Return
 	xba
-	plx
 	rtl
 
 	//	-----------------------------------------------------------------------
@@ -341,36 +332,25 @@ b_1:
 	rol	a
 
 Mapper1__wc000_DoStuff:
-	phx
 	xba
 
-	// CHR bank 1 (internal, $A000-$BFFF)
+	// CHR bank 1 (internal, $C000-$DFFF)
 	// Bits: CCCCC
-	// C = Select 4 KB or 8 KB CHR bank at PPU $0000 (low bit ignored in 8 KB mode)
+	// C = Select 4 KB CHR bank at PPU $1000 (ignored in 8 KB mode)
 
 	// Load bits
 	lda	$_Mapper1_value
+	lsr	a
+	lsr	a
+	lsr	a
 
-	// Are we loading the same CHR bank?
-	cmp	$_Mapper1_chrbank1
-	beq	$+Mapper1__wc000_Return
-
-	// Are we loading the same CHR bank?
-	cmp	$_Mapper1_chrbank0
-	beq	$+b_1
-		lsr	a
-		lsr	a
-		lsr	a
-
-		// Is CHR in 8kb mode?
-		bit	$_Mapper1_control
-		bpl	$+b_2
-			// 4kb mode
-			sta	$_Mapper1_chrbank0
-			sta	$_CHR_1_NesBank
+	// Is CHR in 8kb mode?
+	bit	$_Mapper1_control
+	bpl	$+b_2
+		// 4kb mode
+		sta	$_CHR_1_NesBank
 b_2:
-		// Nothing in 8kb mode
-b_1:
+	// Nothing in 8kb mode
 
 	// Reset bits
 	lda	#0xf0
@@ -378,7 +358,6 @@ b_1:
 
 	// Return
 	xba
-	plx
 	rtl
 
 	//	-----------------------------------------------------------------------
