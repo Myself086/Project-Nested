@@ -43,7 +43,8 @@ StaticRec__Main:
 	lda	$=RomInfo_StackEmulation
 	and	#_RomInfo_StackEmu_NativeReturn
 	bne	$+b_1
-		//lda	#0
+		lda	$=RomInfo_StackEmulation
+		and	#_RomInfo_StackEmu_NATIVE_MASK
 		sta	$=RomInfo_StackEmulation
 b_1:
 

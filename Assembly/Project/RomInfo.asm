@@ -126,6 +126,7 @@ RomInfo_StackEmulation:
 	.def	RomInfo_StackEmu_StackUnderflow			0x0002
 	.def	RomInfo_StackEmu_NativeReturn			0x0004
 	.def	RomInfo_StackEmu_NativeReturnInterrupt	0x0100
+	.def	RomInfo_StackEmu_NATIVE_MASK			0xff00
 
 RomInfo_VramQBufferSize:
 	.data16	0x1000
