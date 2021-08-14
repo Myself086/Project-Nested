@@ -246,11 +246,10 @@ Memory__CartBanks:
 
 
 	.addr	0x0aa7, 0x0abf
-	// 0/25
 
 
 	.addr	0x0ac7, 0x0adf
-	// 17/25
+	// 24/25
 
 	// 16 bytes of nametable remap from NES to SNES (must be at least 0x20 bytes deep into the page to avoid page crossing penalty)
 NameTable_Remap_Main:
