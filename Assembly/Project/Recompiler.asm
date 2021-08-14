@@ -2685,6 +2685,38 @@ Recompiler__Build_OpcodeType_Jsl:
 
 
 Recompiler__Build_OpcodeType_Txs:
+	// Test interrupt reset range?
+	lda	$=RomInfo_StackResetRange
+	xba
+	cmp	$=RomInfo_StackResetRange
+	beq	$+b_in
+	bcs	$+b_1
+b_in:
+		ldx	#_Inline__Txs_WithRangeTest
+		lda	#_Inline__Txs_WithRangeTest/0x10000
+		jsr	$_Recompiler__Build_InlineNoInc
+
+		// Add to write address
+		tya
+		clc
+		adc	$.writeAddr
+		tax
+
+		// Fix top and bottom
+		lda	$=RomInfo_StackResetRange
+		smx	#0x20
+		ldy	#_Inline__Txs_WithRangeTest_Bottom-Inline__Txs_WithRangeTest+1
+		sta	[$.writeAddr],y
+		xba
+		ldy	#_Inline__Txs_WithRangeTest_Top-Inline__Txs_WithRangeTest+1
+		sta	[$.writeAddr],y
+
+		stx	$.writeAddr
+		rts
+
+		.mx	0x00
+b_1:
+
 	ldx	#_Inline__Txs
 	lda	#_Inline__Txs/0x10000
 	jmp	$_Recompiler__Build_Inline

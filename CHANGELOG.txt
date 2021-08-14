@@ -25,6 +25,7 @@ Dev build:
 - Fixed directly page crossing $5f to $60
 - Added option to support reading CHR RAM, comes at a cost of performance when writing
 - Added option to emulate RTI more accurately
+- Added option to ignore waiting for interrupt to end when stack pointer is reset by the game
 
 v1.3
 - Added support for read-modify-write to IO ports

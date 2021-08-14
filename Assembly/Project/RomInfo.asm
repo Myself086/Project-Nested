@@ -128,6 +128,9 @@ RomInfo_StackEmulation:
 	.def	RomInfo_StackEmu_NativeReturnInterrupt	0x0100
 	.def	RomInfo_StackEmu_NATIVE_MASK			0xff00
 
+RomInfo_StackResetRange:
+	.data8	0xff, 0x00
+
 RomInfo_VramQBufferSize:
 	.data16	0x1000
 
@@ -296,6 +299,13 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Has no effect on performance but may make or break games."
 		RomInfo_DefineMac	"public bool StackEmulation.StackUnderflow : Stack emulation, Stack underflow detection", RomInfo_StackEmulation, RomInfo_StackEmu_StackUnderflow
+
+		RomInfo_SummaryMac	"Ignores waiting for interrupt to end when stack pointer is set by TXS to a range specified here."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Only active when the lowest number is on the left side."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"This option may prevent some games from hanging."
+		RomInfo_DefineMac	"public hex byte[2] StackEmulation.StackResetRange : Reset interrupt on stack reset.", RomInfo_StackResetRange, 0
 
 	RomInfo_DefineMac	"public void Tab_Banks : Bank and range related rules.", 0, 0
 

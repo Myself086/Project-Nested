@@ -18,7 +18,29 @@ Inline__Txs:
 	sep	#0x30
 
 	.data8	0
-	
+
+	.mx	0x10
+Inline__Txs_WithRangeTest:
+	rep	#0x10
+	stx	$_IO_Temp16
+	inc	$_IO_Temp16+1
+	ldx	$_IO_Temp16
+	txs
+	sep	#0x30
+	php
+Inline__Txs_WithRangeTest_Bottom:
+	cpx	#0xf0
+	bcc	$+b_1
+Inline__Txs_WithRangeTest_Top:
+		cpx	#0xf7
+		beq	$+b_in
+		bcs	$+b_1
+b_in:
+			stz	$_NmiReturn_Busy
+b_1:
+	plp
+	.data8	0
+
 	// ---------------------------------------------------------------------------
 
 	.mx	0x30
