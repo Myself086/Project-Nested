@@ -88,8 +88,6 @@ RomInfo_NmiMode:
 	.def	RomInfo_NmiMode_DetectIdling		0x0001
 	.def	RomInfo_NmiMode_AtSnesNmi			0x0002
 	.def	RomInfo_NmiMode_NoReturn			0x0004
-	.def	RomInfo_NmiMode_InfiniteJmp			0x0008
-	// TODO: Replace InfiniteJmp with DetectIdling
 
 RomInfo_Optimize:
 	.data16	0x0000
