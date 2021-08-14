@@ -279,8 +279,6 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Use native return addresses instead of originals. Greatly improves performance."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Turn this option OFF to test whether the game has stack emulation issues."
-		RomInfo_SummaryMac	""
-		RomInfo_SummaryMac	"Disabling this option disables other stack options."
 		RomInfo_DefineMac	"public bool StackEmulation.NativeReturn : Stack emulation, Native return address", RomInfo_StackEmulation, RomInfo_StackEmu_NativeReturn
 
 		RomInfo_SummaryMac	"Use native return address for interrupts instead of originals."
@@ -291,11 +289,15 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Take a more lazy approach when solving double return."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Has no effect on performance but may make or break games."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"This option is ignored when 'Native return address' is turned off."
 		RomInfo_DefineMac	"public bool StackEmulation.LazyDoubleReturn : Stack emulation, Lazy double return", RomInfo_StackEmulation, RomInfo_StackEmu_LazyDoubleReturn
 
 		RomInfo_SummaryMac	"Detects when a return address is used as data pointer."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Has no effect on performance but may make or break games."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"This option is ignored when 'Native return address' is turned off."
 		RomInfo_DefineMac	"public bool StackEmulation.StackUnderflow : Stack emulation, Stack underflow detection", RomInfo_StackEmulation, RomInfo_StackEmu_StackUnderflow
 
 		RomInfo_SummaryMac	"Ignores waiting for interrupt to end when stack pointer is set by TXS to a range specified here."
