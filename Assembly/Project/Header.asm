@@ -2,6 +2,7 @@
 	// ROM title
 	.addr	0x80ffc0
 Rom_Title:
+	.def	Rom_Title	Rom_Title&0x7fffff
 	// Must be 20 characters long for the feedback string
 	.string	"Nested Emulator      "
 
