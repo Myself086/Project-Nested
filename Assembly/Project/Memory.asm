@@ -393,7 +393,7 @@ Sound__Init_In:
 		sta	$0xb17ffe		// Restore last bytes of bank b1
 		unlock
 		trap
-		Exception	"SRAM error 0{}{}{}SRAM is missing."
+		Exception	"SRAM is missing{}{}{}SRAM must be at least 16kb in size. Make sure that your SNES emulator or SNES flash cart device is up to date."
 b_1:
 
 	// Test for minimum SRAM requirement: 16kb
@@ -405,7 +405,7 @@ b_error:
 		sta	$0xb17ffe		// Restore last bytes of bank b1
 		unlock
 		trap
-		Exception	"SRAM error 1{}{}{}SRAM must be at least 16kb in size. Make sure that your SNES emulator or SNES flash cart is up to date."
+		Exception	"SRAM too small{}{}{}SRAM must be at least 16kb in size. Make sure that your SNES emulator or SNES flash cart device is up to date."
 b_1:
 
 	// Test SRAM size
