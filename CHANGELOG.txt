@@ -24,6 +24,7 @@ Dev build:
 - Added mappers: 3, 7
 - Fixed directly page crossing $5f to $60
 - Added option to support reading CHR RAM, comes at a cost of performance when writing
+- Added option to emulate RTI more accurately
 
 v1.3
 - Added support for read-modify-write to IO ports

@@ -2643,28 +2643,25 @@ Recompiler__Build_OpcodeType_Rti:
 	lda	#_Opcode_F_HasReturn
 	tsb	$.recompileFlags
 
-	// Are we using RTL or long RTI emulation?
-	lda	$=RomInfo_NmiMode
-	and	#_RomInfo_NmiMode_InfiniteJmp
-	bne	$+Recompiler__Build_OpcodeType_Rti_Emulate
-		// Write RTL
+	// Are we using native return from interrupt?
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturnInterrupt
+	beq	$+b_1
+		// Write PLP+RTL
 		lda	#0x6b28
 		sta	[$.writeAddr]
 		inc	$.writeAddr
 		inc	$.writeAddr
 		rts
 
-Recompiler__Build_OpcodeType_Rti_Emulate:
-	// Call interpreter like this:
-	// jmp $=Interpret
-	lda	#_Interpret__BANK*0x100+0x5c
-	ldy	#0x0002
+b_1:
+	// Write JMP to interpreted RTI
+	lda	#_JMPiU__FromRti*0x100+0x5c
 	sta	[$.writeAddr]
+	lda	#_JMPiU__FromRti/0x100
+	ldy	#2
 	sta	[$.writeAddr],y
-	lda	#_Interpret__Rti
-	dey
-	sta	[$.writeAddr],y
-	
+
 	// Add to write address
 	lda	#0x0004
 	adc	$.writeAddr

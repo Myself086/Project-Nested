@@ -342,14 +342,19 @@ Start__Irq_Return:
 
 Start__Irq_NesNmi:
 	.local	_stack
-	.local	.keepNesBank
-	.local	_keepIOTemp16
-	.local	.keepIOTemp
-	.local	_keepJMPiU
+	//.local	.keepNesBank
+	//.local	_keepIOTemp16
+	//.local	.keepIOTemp
+	//.local	_keepJMPiU
 
 	// Is NMI enabled?
 	bit	$_IO_2000-1
 	bpl	$-Start__Irq_Return
+
+	// Is NMI emulation busy?
+	lda	#0x8000
+	tsb	$_NmiReturn_Busy-1
+	bne	$-Start__Irq_Return
 
 	// Use main thread's DP if not in use, otherwise skip this frame
 	lda	$1,s
@@ -361,16 +366,16 @@ Start__Irq_NesNmi:
 	sep	#0x30
 	.mx	0x30
 	lda	$_Memory_NesBank
-	sta	$_keepNesBank
+	sta	$_NmiReturn_NesBank
 	stz	$_Memory_NesBank
 	lda	$_IO_Temp
-	sta	$_keepIOTemp
+	sta	$_NmiReturn_IOTemp
 	rep	#0x30
 	.mx	0x00
 	lda	$_IO_Temp16
-	sta	$_keepIOTemp16
+	sta	$_NmiReturn_IOTemp16
 	lda	$_JMPiU_Action
-	sta	$_keepJMPiU
+	sta	$_NmiReturn_JMPiU
 
 	// Next frame
 	call	Interpret__Wait4Vblank
@@ -379,44 +384,79 @@ Start__Irq_NesNmi:
 	lda	$_Program_Bank_3+2
 	cmp	$_NMI_NesBank
 	beq	$+b_1
-		sta	$_NMI_NesBank
-		sep	#0x30
-		.mx	0x30
-		phb
-		pha
-		plb
-		rep	#0x30
-		.mx	0x00
-		.precall	Recompiler__CallFunction		_originalFunction
-		lda	$0xfffa
-		sta	$.Param_originalFunction
-		call
-		plb
-
-		// Write destination address
-		lda	[$.Recompiler_FunctionList+3],y
-		sta	$_NMI_SnesPointer
-		iny
-		lda	[$.Recompiler_FunctionList+3],y
-		sta	$_NMI_SnesPointer+1
+		jsr	$_Start__Irq_NewNesNmi
 b_1:
 
-	// Fix registers and call
-	tsc
-	sta	$_stack
-	lda	#0
-	tcd
+	// Are we using native return from interrupt?
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturnInterrupt
+	beq	$+Start__Irq_NesNmi_NonNative
+
+		// Fix registers and call
+		tsc
+		sta	$_stack
+		lda	#0
+		tcd
+		lda	$_s
+		tcs
+		sep	#0x30
+		// Push fake return (Final Fantasy 1 fix)
+		phk
+		pea	$_Start__Irq_NesNmi_FakeReturn-1
+		// Push return
+		phk
+		pea	$_Start__Irq_NesNmi_Return-1
+		php
+		jmp	[$_NMI_SnesPointer]
+
+Start__Irq_NesNmi_NonNative:
+	// Pull from interrupt stack and copy some registers
+	pld
+	tdc
+	sta	$_NmiReturn_DP
+	ply
+	sty	$_NmiReturn_Y
+	plx
+	stx	$_NmiReturn_X
+
+	// Restore stack pointer
 	lda	$_s
 	tcs
+
+	// Copy return
+	lda	$3,s
+	sta	$_NmiReturn_ReturnAddress
+	lda	$4,s
+	sta	$_NmiReturn_ReturnAddress+1
+
+	// Change return to pseudo non-native
+	lda	#_NmiReturn_FakeNesAddress
+	sta	$4,s
+
+	// Copy A
+	lda	$_a
+	sta	$_NmiReturn_A
+
+	// Copy DB and P
+	lda	$1,s
+	sta	$_NmiReturn_DB
+	plb
+	plp
+	// Fix P
 	sep	#0x30
-	// Push fake return (Final Fantasy 1 fix)
-	phk
-	pea	$_Start__Irq_NesNmi_FakeReturn-1
-	// Push return
-	phk
-	pea	$_Start__Irq_NesNmi_Return-1
-	php
+	.mx	0x30
+	xba
+	ora	#0x30
+	and	#0xf3
+	sta	$1,s
+
+	// Fix A
+	lda	$_a
+
+	// Call NMI
+	unlock
 	jmp	[$_NMI_SnesPointer]
+
 
 	.mx	0x30
 Start__Irq_NesNmi_Return:
@@ -424,16 +464,18 @@ Start__Irq_NesNmi_Return:
 	phk
 	plb
 
+	stz	$_NmiReturn_Busy
+
 	// Restore necessary variables
-	lda	$_keepNesBank
+	lda	$_NmiReturn_NesBank
 	sta	$_Memory_NesBank
-	lda	$_keepIOTemp
+	lda	$_NmiReturn_IOTemp
 	sta	$_IO_Temp
 	.mx	0x00
 	rep	#0x30
-	lda	$_keepIOTemp16
+	lda	$_NmiReturn_IOTemp16
 	sta	$_IO_Temp16
-	lda	$_keepJMPiU
+	lda	$_NmiReturn_JMPiU
 	sta	$_JMPiU_Action
 
 	// Fix stack and go to proper return
@@ -441,22 +483,25 @@ Start__Irq_NesNmi_Return:
 	tcs
 	Start__Irq_Return
 
+
 	.mx	0x30
 Start__Irq_NesNmi_FakeReturn:
 	// Fix DB
 	phk
 	plb
 
+	stz	$_NmiReturn_Busy
+
 	// Restore necessary variables
-	lda	$_keepNesBank
+	lda	$_NmiReturn_NesBank
 	sta	$_Memory_NesBank
-	lda	$_keepIOTemp
+	lda	$_NmiReturn_IOTemp
 	sta	$_IO_Temp
 	.mx	0x00
 	rep	#0x30
-	lda	$_keepIOTemp16
+	lda	$_NmiReturn_IOTemp16
 	sta	$_IO_Temp16
-	lda	$_keepJMPiU
+	lda	$_NmiReturn_JMPiU
 	sta	$_JMPiU_Action
 
 	// Fix stack
@@ -489,6 +534,72 @@ Start__Irq_NesNmi_FakeReturn:
 
 	plp
 	rtl
+
+
+Start__Irq_NesNmi_NonNativeReturn:
+	// Get return address (part 1)
+	.mx	0x00
+	sep	#0x30
+	lda	$_NmiReturn_ReturnAddress+2
+	pha
+
+	// Restore necessary variables
+	lda	$_NmiReturn_NesBank
+	sta	$_Memory_NesBank
+	lda	$_NmiReturn_IOTemp
+	sta	$_IO_Temp
+	.mx	0x00
+	rep	#0x30
+	lda	$_NmiReturn_IOTemp16
+	sta	$_IO_Temp16
+	lda	$_NmiReturn_JMPiU
+	sta	$_JMPiU_Action
+
+	// Interrupt no longer in process
+	stz	$_IRQ_InterruptInProcess
+
+	// Get return address (part 2)
+	lda	$_NmiReturn_ReturnAddress+0
+	pha
+
+	// Restore registers
+	lda	$_NmiReturn_DP
+	tcd
+	lda	$_NmiReturn_DB	// DB+P
+	pha
+	plb
+
+	ldy	$_NmiReturn_Y
+	ldx	$_NmiReturn_X
+	lda	$_NmiReturn_A
+
+	stz	$_NmiReturn_Busy
+	rti
+
+
+Start__Irq_NewNesNmi:
+	sta	$_NMI_NesBank
+	sep	#0x30
+	.mx	0x30
+	phb
+	pha
+	plb
+	rep	#0x30
+	.mx	0x00
+	.precall	Recompiler__CallFunction		_originalFunction
+	lda	$0xfffa
+	sta	$.Param_originalFunction
+	call
+	plb
+
+	// Write destination address
+	lda	[$.Recompiler_FunctionList+3],y
+	sta	$_NMI_SnesPointer
+	iny
+	lda	[$.Recompiler_FunctionList+3],y
+	sta	$_NMI_SnesPointer+1
+
+	rts
 
 	// ------------------------------------------------------------------------
 

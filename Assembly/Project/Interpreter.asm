@@ -274,14 +274,36 @@ b_else:
 			pha
 			break
 		case	0x40	// RTI ------------------------------------------------------------
+			// Are we using native return from interrupt?
+			lda	$=RomInfo_StackEmulation+1
+			and	#.RomInfo_StackEmu_NativeReturnInterrupt/0x100
+			beq	$+b_1
+				// Native RTI
+
+				// Fix registers
+				lda	$.a
+				ldx	$.x
+				ldy	$.y
+				// Fix DP
+				pea	$0x0000
+				pld
+				// Return
+				plp
+				plp
+				rtl
+b_1:
+			// Non-native RTI
+
 			// Fix registers
 			lda	$.a
 			ldx	$.x
 			ldy	$.y
+			// Fix DP
+			pea	$0x0000
+			pld
 			// Return
 			plp
-			plp
-			rtl
+			jmp	$=JMPiU__FromRti
 		case	0x8d	// STA addr -------------------------------------------------------
 			Interpreter_StoreAddr		a, 0
 			break

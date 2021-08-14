@@ -1407,6 +1407,49 @@ b_1:
 		sta	$_NMI_SnesPointer+1
 b_1:
 
+	// Are we using native return from interrupt?
+	lda	$=RomInfo_StackEmulation
+	and	#_RomInfo_StackEmu_NativeReturnInterrupt
+	bne	$+b_1
+		// Fix stack   1   2   3   4   5   6   7
+		//  Before:    y,  x,  a,  p, r0, r1, r2	(r = native return)
+		//  After:                     p, R0, R1	(R = non-native return)
+
+		// Fix return (part 1)
+		lda	$6,s
+		sta	$_NmiReturn_ReturnAddress2+1
+		lda	#_NmiReturn_FakeNesAddress2
+		sta	$6,s
+
+		// Change DP
+		lda	#0x0000
+		tcd
+
+		// Change to 8-bit mode
+		sep	#0x30
+
+		// Fix return (part 2)
+		lda	$5,s
+		inc	a
+		sta	$_NmiReturn_ReturnAddress2+0
+		bne	$+b_2
+			// Fix page number
+			inc	$_NmiReturn_ReturnAddress2+1
+b_2:
+		lda	$4,s
+		sta	$5,s
+
+		// Pull registers
+		ply
+		plx
+		pla
+
+		// Call NMI
+		stz	$_Vblank_Busy
+		plp
+		jmp	[$_NMI_SnesPointer]
+b_1:
+
 	// Call NMI
 	lda	#0x0000
 	tcd

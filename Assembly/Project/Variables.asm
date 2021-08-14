@@ -246,6 +246,34 @@ Memory__CartBanks:
 
 
 	.addr	0x0aa7, 0x0abf
+	// 23/25
+
+NmiReturn_Busy:		// Negative when data below is in use, must be followed by any NmiReturn data due to 16-bit STZ
+	.fill	1
+NmiReturn_NesBank:
+	.fill	1
+NmiReturn_IOTemp16:
+	.fill	2
+NmiReturn_IOTemp:
+	.fill	1
+NmiReturn_JMPiU:
+	.fill	2
+NmiReturn_ReturnAddress:
+	.fill	3
+NmiReturn_ReturnAddress2:
+	.fill	3
+NmiReturn_A:
+	.fill	2
+NmiReturn_X:
+	.fill	2
+NmiReturn_Y:
+	.fill	2
+NmiReturn_DB:		// DB must be above P, they are copied together
+	.fill	1
+NmiReturn_P:
+	.fill	1
+NmiReturn_DP:
+	.fill	2
 
 
 	.addr	0x0ac7, 0x0adf

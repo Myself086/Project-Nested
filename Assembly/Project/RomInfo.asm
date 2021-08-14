@@ -121,10 +121,11 @@ RomInfo_DebugOverlay:
 
 	// 16 bits of "Stack emulation" flags
 RomInfo_StackEmulation:
-	.data16	0x000f
+	.data16	0x010f
 	.def	RomInfo_StackEmu_LazyDoubleReturn		0x0001
 	.def	RomInfo_StackEmu_StackUnderflow			0x0002
 	.def	RomInfo_StackEmu_NativeReturn			0x0004
+	.def	RomInfo_StackEmu_NativeReturnInterrupt	0x0100
 
 RomInfo_VramQBufferSize:
 	.data16	0x1000
@@ -279,6 +280,11 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Disabling this option disables other stack options."
 		RomInfo_DefineMac	"public bool StackEmulation.NativeReturn : Stack emulation, Native return address", RomInfo_StackEmulation, RomInfo_StackEmu_NativeReturn
+
+		RomInfo_SummaryMac	"Use native return address for interrupts instead of originals."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Turning this option OFF will provide better accuracy but not 100%."
+		RomInfo_DefineMac	"public bool StackEmulation.NativeReturnInterrupt : Stack emulation, Native return from interrupt", RomInfo_StackEmulation, RomInfo_StackEmu_NativeReturnInterrupt
 
 		RomInfo_SummaryMac	"Take a more lazy approach when solving double return."
 		RomInfo_SummaryMac	""

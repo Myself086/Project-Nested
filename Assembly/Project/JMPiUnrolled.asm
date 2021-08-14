@@ -171,10 +171,23 @@ this__:
 	.endm
 	.repeat	0x800, "JMPiU_Mac"
 
+	// ---------------------------------------------------------------------------
 
-	// Override indirect JMP to 0x2000
-this:
-	.addr	this&0xff0000|0x0020, this&0xff0000|0x0020|0x1f
+JMPiU__Bank:
+	.def	JMPiU__Bank		JMPiU__Bank&0xff0000
+
+	.macro	JMPiU__Override		address
+		.def	lo__	Zero+{0}&0xff
+		.def	hi__	Zero+{0}/0x100
+		.def	this__	lo__*0x100+hi__+JMPiU__Bank
+		.addr	this__&0xffffe0, this__|0x1f
+	.endm
+
+	// ---------------------------------------------------------------------------
+
+	// Interpreted RTS
+
+	JMPiU__Override		0x2000
 	trap
 	// NOTE: RTS into 0x20xx executes the operand of LDA $2,s which happens to be COP, an unused software interrupt
 JMPiU__FromStack:
@@ -193,5 +206,56 @@ JMPiU__FromStack:
 	lda	$_IO_Temp16+1
 	plp
 	rts
+
+	// ---------------------------------------------------------------------------
+
+	// Interpreted RTI
+
+	JMPiU__Override		0x2001
+	.data8	0
+JMPiU__FromRti:
+	sta	$_IO_Temp
+	rep	#0x20
+	.mx	0x10
+	lda	$2,s
+	sta	$_IO_Temp16
+	and	#0xe0ff
+	xba
+	sta	$_JMPiU_Action
+	ora	#_JMPiU_StackPullOffset-1
+	sta	$2,s
+	lda	$_IO_Temp16+1
+	plp
+	sep	#0x30
+	rep	#0x0c
+	rts
+
+	// ---------------------------------------------------------------------------
+
+	// Return from NMI at vblank
+	.def	NmiReturn_FakeNesAddress	0x2008
+
+	JMPiU__Override		NmiReturn_FakeNesAddress
+	.fill	JMPiU_StackPullOffset
+	jmp	$=Start__Irq_NesNmi_NonNativeReturn
+
+	// ---------------------------------------------------------------------------
+
+	// Return from IRQ
+	.def	IrqReturn_FakeNesAddress	0x2009
+
+	JMPiU__Override		IrqReturn_FakeNesAddress
+	.fill	JMPiU_StackPullOffset
+	jmp	$=Hdma__UpdateScrolling_ReturnFromIRQ
+
+	// ---------------------------------------------------------------------------
+
+	// Return from NMI auto detect
+	.def	NmiReturn_FakeNesAddress2	0x200a
+
+	JMPiU__Override		NmiReturn_FakeNesAddress2
+	.fill	JMPiU_StackPullOffset
+	lda	$_IO_Temp
+	jmp	[$_NmiReturn_ReturnAddress2]
 
 	// ---------------------------------------------------------------------------

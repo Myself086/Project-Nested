@@ -215,7 +215,19 @@ b_2:
 			pea	$0x0000
 			pld
 
-			// Call IRQ, the following data must be in stack: Fake P, Return, _, _
+			// Are we using native return from interrupt?
+			lda	$=RomInfo_StackEmulation+1
+			and	#.RomInfo_StackEmu_NativeReturnInterrupt/0x100
+			bne	$+b_2
+				// Call IRQ, the following data must be in stack: Fake P, Non-native Return, _
+				// "Fake P" contains break flag cleared to distinguish IRQ from BRK
+				pea	$_IrqReturn_FakeNesAddress
+				lda	#0
+				pha
+				jmp	[$_IRQ_SnesPointer]
+b_2:
+
+			// Call IRQ, the following data must be in stack: Fake P, Native Return, _, _
 			// "Fake P" contains break flag cleared to distinguish IRQ from BRK
 			pea	$_Hdma__UpdateScrolling_ReturnFromIRQ/0x100
 			pea	$_Hdma__UpdateScrolling_ReturnFromIRQ*0x100
