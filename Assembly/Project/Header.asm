@@ -3,9 +3,10 @@
 	.addr	0x80ffc0
 Rom_Title:
 	.def	Rom_Title	Rom_Title&0x7fffff
-	// Must be 20 characters long for the feedback string
+	// Rom title is also used to identify feedback data
 	.string	"Nested Emulator      "
 
+	.def	Rom_Version	0x00ffdb
 	// Version number in RomInfo.asm
 	//[80ffdB] = 
 

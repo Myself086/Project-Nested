@@ -41,7 +41,7 @@ namespace Project_Nested
             public string Title { get; private set; }
             public string FilePath { get; private set; }
 
-            public const int LENGTH_LIMIT = 32;
+            public const int LENGTH_LIMIT = 128;
 
             public bool IsValid
             {

@@ -656,11 +656,22 @@ IRQ_VSTACK_START:
 	// ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------
 	// SRAM feedback for statically recompiling known calls
-	
-	.def	Feedback_Start				0xb16000
-	.def	Feedback_ProfileName		0xb16014
-	.def	Feedback_EmptyPointer		0xb16040
-	.def	Feedback_ArrayTop			0xb16fff
+
+	.addr	0xb16000, 0xb16fff
+Feedback_Start:
+	DefineGlobalVariable	Feedback_EmulatorName		21
+	DefineGlobalVariable	Feedback_EmulatorVersion	1
+	DefineGlobalVariable	Feedback_ProfileName		128
+	DefineGlobalVariable	Feedback_Calls_Write		2
+	DefineGlobalVariable	Feedback_Calls_Top			2
+Feedback_Calls_LowerBound:
+	.def	Feedback_Calls_UpperBound					0xb16fff
+
+	// OLD
+	//.def	Feedback_Start				0xb16000
+	//.def	Feedback_ProfileName		0xb16014
+	//.def	Feedback_EmptyPointer		0xb16040
+	//.def	Feedback_ArrayTop			0xb16fff
 
 	// Incremental step constant
 	.def	Feedback_Inc				0x0003

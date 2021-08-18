@@ -16,8 +16,18 @@ Feedback__Init:
 	sta	$.destination+1
 
 	// Copy SNES ROM title (emulator's name)
-	ldy	#20
+	ldy	#_Feedback_EmulatorName_LENGTH
 	jsr	$_Feedback__Init_Copy
+	sta	$.compare
+
+	// Copy SNES ROM version (emulator version)
+	lda	#_Rom_Version
+	sta	$.source
+	lda	#_Rom_Version/0x100
+	sta	$.source+1
+	ldy	#_Feedback_EmulatorVersion_LENGTH
+	jsr	$_Feedback__Init_Copy
+	ora	$.compare
 	sta	$.compare
 
 	// Copy NES ROM title
@@ -25,61 +35,40 @@ Feedback__Init:
 	sta	$.source
 	lda	#_RomInfo_GameName/0x100
 	sta	$.source+1
-	ldy	#40
+	ldy	#_Feedback_ProfileName_LENGTH
 	jsr	$_Feedback__Init_Copy
 	ora	$.compare
 
 	// Was feedback header correct?
-	beq	$+Feedback__Init_SkipResetFeedback
+	beq	$+b_1
 		// Erase feedback address and return
-		lda	#_Feedback_EmptyPointer+2
-		sta	$=Feedback_EmptyPointer
+		lda	#_Feedback_Calls_LowerBound
+		sta	$=Feedback_Calls_Write
+		sta	$=Feedback_Calls_Top
 		return
-Feedback__Init_SkipResetFeedback:
+b_1:
 
-	// Is cache pointer correct?
-	lda	$=Feedback_EmptyPointer
+	// Is feedback write pointer correct?
+	lda	$=Feedback_Calls_Write
 	sec
 	sbc	#0x6000
 	cmp	#0x2000
-	bcc	$+Feedback__Init_SkipResetFeedback2
+	bcc	$+b_1
 		// Erase feedback address and return
-		lda	#_Feedback_EmptyPointer+2
-		sta	$=Feedback_EmptyPointer
-		return
-Feedback__Init_SkipResetFeedback2:
+		lda	#_Feedback_Calls_LowerBound
+		sta	$=Feedback_Calls_Write
+b_1:
 
-	// TODO: Fix Array__DeleteDuplicates
-	return
-
-	// Define an array list for sorting feedback
-	.local	=list, =listBase, =listTop, _listInc
-
-	// Set bank number
-	lda	#_Feedback_EmptyPointer/0x100
-	sta	$.list+1
-	sta	$.listBase+1
-	sta	$.listTop+1
-
-	// Set address range
-	lda	$=Feedback_EmptyPointer
-	sta	$.list
-	lda	#_Feedback_EmptyPointer+2
-	sta	$.listBase
-	lda	#_Feedback_ArrayTop
-	sta	$.listTop
-
-	// Set incremental step
-	lda	#_Feedback_Inc
-	sta	$.listInc
-
-	// Delete duplicates
-	ldx	#_list
-	call	Array__DeleteDuplicates
-
-	// Save pointer to SRAM
-	lda	$.list
-	sta	$=Feedback_EmptyPointer
+	// Is feedback top pointer correct?
+	lda	$=Feedback_Calls_Top
+	sec
+	sbc	#0x6000
+	cmp	#0x2000
+	bcc	$+b_1
+		// Erase feedback address and return
+		lda	$=Feedback_Calls_Write
+		sta	$=Feedback_Calls_Top
+b_1:
 
 	return
 
@@ -97,11 +86,18 @@ Feedback__Init_Copy:
 	adc	$.destination
 	tax
 
-	// Is Y odd? If so, add one
+	// Is Y odd? If so, process one individual byte
 	tya
 	lsr	a
 	bcc	$+Feedback__Init_Copy_SkipOdd
-		iny
+		dey
+		smx	#0x20
+		lda	[$.source],y
+		eor	[$.destination],y
+		tsb	$.cmp
+		eor	[$.destination],y
+		sta	[$.destination],y
+		smx	#0x00
 Feedback__Init_Copy_SkipOdd:
 
 	bra	$+Feedback__Init_Copy_Loop_Entry
@@ -129,9 +125,9 @@ Feedback__Init_Copy_Loop_Entry:
 Feedback__Add:
 	// Set up destination address for writing
 	.local	=pointer
-	lda	#_Feedback_EmptyPointer/0x100
+	lda	#_Feedback_Calls_Write/0x100
 	sta	$.pointer+1
-	lda	$=Feedback_EmptyPointer
+	lda	$=Feedback_Calls_Write
 	beq	$+Feedback__Add_Return
 	sta	$.pointer
 
@@ -140,20 +136,31 @@ Feedback__Add:
 	adc	#_Feedback_Inc
 
 	// Are we past the top?
-	cmp	#_Feedback_ArrayTop+1
-	bcs	$+Feedback__Add_Return
+	cmp	#_Feedback_Calls_UpperBound+1
+	bcc	$+b_1
+		// Wrap feedback
+		lda	#_Feedback_Calls_LowerBound
+b_1:
 
-		// Write address back
-		sta	$=Feedback_EmptyPointer
+	// Write address back
+	sta	$=Feedback_Calls_Write
 
-		// Write upper bytes and free Y in the process
-		tya
-		ldy	#0x0002
-		sta	[$.pointer],y
+	// Adjust top address
+	cmp	$=Feedback_Calls_Top
+	bcc	$+b_1
+		sta	$=Feedback_Calls_Top
+b_1:
 
-		// Write lower bytes
-		txa
-		sta	[$.pointer]
+	// Write lower bytes
+	txa
+	sta	[$.pointer]
+
+	// Write upper bytes and free Y in the process
+	tya
+	smx	#0x30
+	ldy	#2
+	sta	[$.pointer],y
+	smx	#0x00
 
 Feedback__Add_Return:
 	return

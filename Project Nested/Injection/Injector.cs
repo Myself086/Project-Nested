@@ -63,8 +63,6 @@ namespace Project_Nested.Injection
         SettingWrapper<byte> ScreenMode => new SettingWrapper<byte>(settings, "ScreenMode");
 
         public SettingWrapper<string> GameName => new SettingWrapper<string>(settings, "GameName");
-        SettingWrapper<int> GameCheckSum => new SettingWrapper<int>(settings, "GameCheckSum");
-        SettingWrapper<int> GameCRC32 => new SettingWrapper<int>(settings, "GameCRC32");
         public SettingWrapper<string> EmulatorName => new SettingWrapper<string>(settings, "EmulatorName");
 
         SettingWrapper<byte> AotCompileBanks => new SettingWrapper<byte>(settings, "AotCompileBanks");
@@ -449,17 +447,25 @@ namespace Project_Nested.Injection
                 {
                     var writeAddr = 0x2000;
                     // Copy SNES ROM title (emulator's name)
-                    sram.WriteString(writeAddr + 0, EmulatorName.Value, 20, '\0');
+                    var header = SrmFeedbackReader.ExpectedHeader(this);
+                    sram.WriteArray(writeAddr + GetSetting("Feedback.EmulatorName").ReadInt(), header, header.Length);
                     // Copy NES ROM title
-                    sram.WriteString(writeAddr + 20, GameName.Value, 32, '\0');
-                    // TODO: CheckSum and CRC32 (may cause problems with randomizers)
-                    sram.Write32(writeAddr + 52, GameCheckSum.Value);
-                    sram.Write32(writeAddr + 56, GameCRC32.Value);
+                    sram.WriteString(writeAddr + GetSetting("Feedback.ProfileName").ReadInt(), GameName.Value, 128, '\0');
                     // Copy known calls
-                    var callsPointer = (GetSetting("FeedbackEntryPoints").ReadInt() & 0x1fff) + writeAddr;
-                    sram.Write16(callsPointer, (callsPointer & 0x1fff) + 0x6000 + (calls.Count * 3) + 2);
-                    for (int i = 0; i < calls.Count; i++)
-                        sram.Write24(callsPointer + i * 3 + 2, calls[i]);
+                    var callsPointer = (writeAddr + GetSetting("Feedback.EntryPoints.Top").ReadInt());
+                    var callsTable = (writeAddr + GetSetting("Feedback.EntryPoints.LowerBound").ReadInt());
+                    var callsCount = calls.Count;
+                    {
+                        // Prevent overflow
+                        var max = ((writeAddr + GetSetting("Feedback.EntryPoints.UpperBound").ReadInt()) - callsTable) / 3;
+                        callsCount = callsCount < max ?
+                                     callsCount : max;
+                    }
+                    // Write top address
+                    sram.Write16(callsPointer, (callsTable & 0x1fff) + 0x6000 + (callsCount * 3));
+                    // Write calls table
+                    for (int i = 0; i < callsCount; i++)
+                        sram.Write24(callsTable + i * 3, calls[i]);
                 }
 
                 // Call compiler
@@ -575,6 +581,11 @@ namespace Project_Nested.Injection
         public byte[] ReadEmulatorTitleBytes()
         {
             return OutData.ReadArray(0xffc0, 21);
+        }
+
+        public byte ReadEmulatorVersionByte()
+        {
+            return OutData.Read8(0xffdb);
         }
 
         #endregion

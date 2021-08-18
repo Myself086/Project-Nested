@@ -126,9 +126,9 @@
             this.comboGameProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.comboGameProfile.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboGameProfile.FormattingEnabled = true;
-            this.comboGameProfile.Location = new System.Drawing.Point(279, 92);
+            this.comboGameProfile.Location = new System.Drawing.Point(174, 92);
             this.comboGameProfile.Name = "comboGameProfile";
-            this.comboGameProfile.Size = new System.Drawing.Size(121, 21);
+            this.comboGameProfile.Size = new System.Drawing.Size(226, 21);
             this.comboGameProfile.TabIndex = 6;
             this.comboGameProfile.SelectedIndexChanged += new System.EventHandler(this.comboGameProfile_SelectedIndexChanged);
             // 
@@ -136,7 +136,7 @@
             // 
             this.lblGameProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblGameProfile.AutoSize = true;
-            this.lblGameProfile.Location = new System.Drawing.Point(204, 95);
+            this.lblGameProfile.Location = new System.Drawing.Point(99, 95);
             this.lblGameProfile.Name = "lblGameProfile";
             this.lblGameProfile.Size = new System.Drawing.Size(69, 13);
             this.lblGameProfile.TabIndex = 7;

@@ -63,9 +63,9 @@ b_1:
 StaticRec__Main_Loop2:
 		// Define starting pointer for feedback addresses
 		.local	=pointer
-		lda	#_Feedback_EmptyPointer/0x100
+		lda	#_Feedback_Calls_LowerBound/0x100
 		sta	$.pointer+1
-		lda	#_Feedback_EmptyPointer+2
+		lda	#_Feedback_Calls_LowerBound
 		sta	$.pointer
 
 		// Start new call table
@@ -171,7 +171,7 @@ StaticRec__Main_Loop_Next:
 			clc
 			adc	$.pointer
 			sta	$.pointer
-			cmp	$=Feedback_EmptyPointer
+			cmp	$=Feedback_Calls_Top
 			bcs	$+StaticRec__Main_Loop_End
 			jmp	$_StaticRec__Main_Loop
 StaticRec__Main_Loop_End:

@@ -26,6 +26,9 @@ Dev build:
 - Added option to support reading CHR RAM, comes at a cost of performance when writing
 - Added option to emulate RTI more accurately
 - Added option to ignore waiting for interrupt to end when stack pointer is reset by the game
+- Reworked SRM feedback data structure, will not be compatible with previous versions
+- Raised the maximum amount of characters for profile name (128 instead of 32)
+- Removed SRM feedback bottleneck
 
 v1.3
 - Added support for read-modify-write to IO ports

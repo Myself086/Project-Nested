@@ -68,15 +68,9 @@ RomInfo_DebugCalls:
 RomInfo_ScreenMode:
 	.data8	0x01
 
-	// 32 bytes string for game name
-	// 4 bytes for Checksum
-	// 4 bytes for CRC32
+	// String for game name
 RomInfo_GameName:
-	.fill	32, 0
-RomInfo_GameCheckSum:
-	.fill	4, 0
-RomInfo_GameCRC32:
-	.fill	4, 0
+	.fill	128, 0
 
 	// ROM banks range reserved for allocating statically recompiled code
 RomInfo_StaticRecBanks:
@@ -198,11 +192,13 @@ RomInfo_Description:
 
 	RomInfo_DefineMac	"private void Tab_Feedback : SRM Feedback data structure.", 0, 0
 
-		RomInfo_DefineMac	"private void* FeedbackProfileName", Feedback_ProfileName-Feedback_Start, 0
+		RomInfo_DefineMac	"private void* Feedback.EmulatorName", Feedback_EmulatorName-Feedback_Start, 0
+		RomInfo_DefineMac	"private void* Feedback.ProfileName", Feedback_ProfileName-Feedback_Start, 0
+		RomInfo_DefineMac	"private void* Feedback.EntryPoints.LowerBound", Feedback_Calls_LowerBound-Feedback_Start, 0
+		RomInfo_DefineMac	"private void* Feedback.EntryPoints.UpperBound", Feedback_Calls_UpperBound-Feedback_Start, 0
+		RomInfo_DefineMac	"private void* Feedback.EntryPoints.Top", Feedback_Calls_Top-Feedback_Start, 0
 
-		RomInfo_DefineMac	"private void* FeedbackEntryPoints", Feedback_EmptyPointer-Feedback_Start, 0
-
-		//RomInfo_DefineMac	"private void* FeedbackLinks", 0, 0
+		//RomInfo_DefineMac	"private void* Feedback.Links", 0, 0
 
 	RomInfo_DefineMac	"public void Tab_MemoryEmulation : Memory emulation accuracy settings.", 0, 0
 
@@ -331,9 +327,7 @@ RomInfo_Description:
 	RomInfo_DefineMac	"private void Tab_Profile : Profile description, do not edit manually.", 0, 0
 
 		RomInfo_SummaryMac	"Used to identify which profile match this game."
-		RomInfo_DefineMac	"private char[32] GameName : Game name", RomInfo_GameName, 0
-		RomInfo_DefineMac	"private int GameCheckSum : Game CheckSum", RomInfo_GameCheckSum, 0
-		RomInfo_DefineMac	"private int GameCRC32 : Game CRC32", RomInfo_GameCRC32, 0
+		RomInfo_DefineMac	"private char[128] GameName : Game name", RomInfo_GameName, 0
 
 		RomInfo_DefineMac	"private char[20] EmulatorName : Emulator name", Rom_Title, 0
 

@@ -18,7 +18,9 @@ namespace Project_Nested
         // Base offset for the SRM header
         int header;
         int? profileName;
-        int? entryPoints;
+        int? entryPointsLowerBound;
+        int? entryPointsUpperBound;
+        int? entryPointsTop;
         int? links;
 
         #endregion
@@ -33,10 +35,10 @@ namespace Project_Nested
             // Find header
             if (injector.IsLoaded(true))
             {
-                var title = injector.ReadEmulatorTitleBytes();
+                var title = ExpectedHeader(injector);
 
                 // Get header offset
-                this.header = data.FindSequence(title, 16);
+                this.header = data.FindSequence(title, title.Length);
 
                 if (this.header < 0)
                 {
@@ -50,12 +52,28 @@ namespace Project_Nested
                         return temp.ReadInt() + this.header;
                     return null;
                 }
-                this.profileName = ReadOffset("FeedbackProfileName");
-                this.entryPoints = ReadOffset("FeedbackEntryPoints");
-                this.links = ReadOffset("FeedbackLinks");
+                this.profileName = ReadOffset("Feedback.ProfileName");
+                this.entryPointsLowerBound = ReadOffset("Feedback.EntryPoints.LowerBound");
+                this.entryPointsUpperBound = ReadOffset("Feedback.EntryPoints.UpperBound");
+                this.entryPointsTop = ReadOffset("Feedback.EntryPoints.Top");
+                this.links = ReadOffset("Feedback.Links");
 
                 this.data = data;
             }
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Sram header
+
+        public static byte[] ExpectedHeader(Injector injector)
+        {
+            var title = new List<byte>();
+
+            title.AddRange(injector.ReadEmulatorTitleBytes());
+            title.Add(injector.ReadEmulatorVersionByte());
+
+            return title.ToArray();
         }
 
         #endregion
@@ -81,16 +99,17 @@ namespace Project_Nested
 
         public List<int> GetFunctionEntryPoints()
         {
-            if (this.entryPoints == null)
+            if (this.entryPointsLowerBound == null || this.entryPointsUpperBound == null || this.entryPointsTop == null)
                 return null;
 
             List<int> list = new List<int>();
 
             {
-                // Get end address (last element +1)
-                int end = Read16BitAddress(this.entryPoints.Value);
+                // Get bottom/top address
+                int bottom = this.entryPointsLowerBound.Value;
+                int top = Read16BitAddress(this.entryPointsTop.Value);
 
-                for (int i = this.entryPoints.Value + 2; i < end; i += 3)
+                for (int i = bottom; i < top; i += 3)
                 {
                     list.Add(data.Read24(i));
                 }
