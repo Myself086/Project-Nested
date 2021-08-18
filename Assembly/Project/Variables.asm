@@ -41,6 +41,14 @@
 	// IMPORTANT FOR FUTURE COMPATIBILITY: Anything from pages 0A to 1F is subject to change.
 
 	// ---------------------------------------------------------------------------
+
+	.macro	DefineGlobalVariable	name, length
+{0}:
+		.def	{0}_LENGTH	{1}
+		.fill	{0}_LENGTH
+	.endm
+
+	// ---------------------------------------------------------------------------
 	// Pointers and various variables
 
 	// Structure (4 bytes): 24-bit address for accessing each 8kb bank, 8-bit unused
