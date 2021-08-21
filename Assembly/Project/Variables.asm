@@ -107,16 +107,6 @@ IO_2001:
 IO_2000_EarlyValue:
 	.fill	2
 
-//IO_2002:
-//	.fill	1
-IO_2003:
-	.fill	1
-IO_2004:
-	.fill	1
-IO_2005:
-	.fill	1
-IO_2006:
-	.fill	1
 IO_2007r:
 	.fill	1
 
