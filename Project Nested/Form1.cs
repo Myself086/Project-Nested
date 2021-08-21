@@ -26,6 +26,7 @@ namespace Project_Nested
 
         string filename;
 
+        string globalSettingsFilename = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "GlobalSettings.config";
         string profilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Profiles" + Path.DirectorySeparatorChar;
 
         string profileLoaded;
@@ -136,6 +137,8 @@ namespace Project_Nested
                 //try
 #endif
                 {
+                    SaveGlobalSettings();
+
                     LoadNesFile(fileDialog.FileName);
                 }
 #if !DEBUG
@@ -158,6 +161,7 @@ namespace Project_Nested
 
                 if (SelectProfile(ConvertPathToTitle(filename), true))
                     LoadProfile(profileSelected.Title);
+                LoadGlobalSettings();
 
                 ShowRomInfo();
 
@@ -191,6 +195,8 @@ namespace Project_Nested
                 injector.GameName.SetValue(profileLoaded != null ? profileLoaded : string.Empty);
                 byte[] data = injector.ApplyPostChanges();
                 File.WriteAllBytes(filename + ".smc", data);
+
+                SaveGlobalSettings();
             }
 #if !DEBUG
             /*catch (Exception ex)
@@ -363,6 +369,26 @@ namespace Project_Nested
             {
                 var data = injector.GetAllSettings();
                 File.WriteAllText(profilePath + title + ".txt", data);
+
+                SaveGlobalSettings();
+            }
+        }
+
+        private void LoadGlobalSettings()
+        {
+            if (injector != null)
+            {
+                if (File.Exists(globalSettingsFilename))
+                    injector.SetAllSettings(File.ReadAllLines(globalSettingsFilename));
+            }
+        }
+
+        private void SaveGlobalSettings()
+        {
+            if (injector != null)
+            {
+                var data = injector.GetAllGlobalSettings();
+                File.WriteAllText(globalSettingsFilename, data);
             }
         }
 

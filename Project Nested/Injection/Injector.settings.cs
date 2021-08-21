@@ -91,6 +91,17 @@ namespace Project_Nested.Injection
             return sb.ToString();
         }
 
+        public string GetAllGlobalSettings()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var item in settings)
+                if (item.Value.IsPublic && item.Value.IsGlobal && item.Value.type != SettingType.Void)
+                    sb.AppendLine(item.Value.ToString());
+
+            return sb.ToString();
+        }
+
         public int[] GetAllKnownCalls()
         {
             return calls.ToArray();

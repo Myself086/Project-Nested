@@ -172,6 +172,8 @@ RomInfo_Description:
 
 	RomInfo_DefineMac	"private void Tab_Warning : Settings in RED are for debugging purposes ONLY.", 0, 0
 
+	RomInfo_DefineMac	"global public void Tab_Global : Settings in BLUE are global across all games.", 0, 0
+
 	RomInfo_DefineMac	"private void Tab_Mapping : Memory mapping.", 0, 0
 
 		RomInfo_DefineMac	"private short MapperNum", RomInfo_Mapper, 0
