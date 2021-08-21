@@ -366,17 +366,6 @@ b_trap:
 Memory__FormatSram:
 	php
 
-	// Are we on EmulSNES? If so, leave
-	sep	#0x20
-	.mx	0x20
-	lda	$0x4210
-	eor	$0x4210
-	and	#0x0f
-	beq	$+Sound__Init_In
-		plp
-		return
-Sound__Init_In:
-
 	rep	#0x30
 	.mx	0x00
 
@@ -389,24 +378,25 @@ Sound__Init_In:
 	sta	$0xb17ffe		// Change last bytes of bank b1
 	cmp	$0xb17ffe
 	beq	$+b_1
-		txa
-		sta	$0xb17ffe		// Restore last bytes of bank b1
 		unlock
 		trap
-		Exception	"SRAM is missing{}{}{}SRAM must be at least 16kb in size. Make sure that your SNES emulator or SNES flash cart device is up to date."
+		Exception	"SRAM is missing{}{}{}SRAM on your SNES emulator or flash cart device was not found.{}{}You can adjust the amount of SRAM on the exe's main window. Some SRAM sizes are not supported by some SNES emulators or devices."
 b_1:
 
-	// Test for minimum SRAM requirement: 16kb
+	// Test for minimum SRAM requirement for feedback: 16kb
 	tya
 	eor	$0xb07ffe		// Second test for mirror
-	beq	$+b_1
-b_error:
-		txa
-		sta	$0xb17ffe		// Restore last bytes of bank b1
-		unlock
-		trap
-		Exception	"SRAM too small{}{}{}SRAM must be at least 16kb in size. Make sure that your SNES emulator or SNES flash cart device is up to date."
+	smx	#0x20
+	beq	$+b_else
+		// Deactivate SRM feedback
+		lda	#0
+		bra	$+b_1
+b_else:
+		// Activate SRM feedback
+		lda	#0x80
 b_1:
+	sta	$_Feedback_Active
+	smx	#0x00
 
 	// Test SRAM size
 	.local	_bankCount
@@ -510,12 +500,50 @@ b_loop:
 		bpl	$-b_loop
 b_1:
 
+	// Calculate SRAM size in kilobytes
+	lda	$.bankCount
+	cmp	#3
+	bcs	$+b_else
+		// Between 0 and 8 kilobytes
+		lda	$=Rom_SramSize
+		and	#0x00ff
+		cmp	#5
+		bcc	$+b_else2
+			// Size 5 or greater but assume 8 or 16 kilobytes
+			lda	#16
+			// Is feedback active?
+			bit	$_Feedback_Active-1
+			bmi	$+b_3
+				lsr	a
+b_3:
+			tay
+			bra	$+b_1
+b_else2:
+			// Size 0 to 3
+			tax
+			lda	$=Memory__FormatSram_SizeKb,x
+			and	#0x00ff
+			tay
+			bra	$+b_1
+b_else:
+		// 16+ kilobytes
+		asl	a
+		asl	a
+		asl	a
+		ldy	#16
+b_1:
+	sta	$_Sram_SizeTotalKb
+	sty	$_Sram_SizeNonDynamicKb
+
 	plp
 	return
 
 Memory__FormatSram_BankOrder:
 	.data8	0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf
 	.data8	0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf
+
+Memory__FormatSram_SizeKb:
+	.data8	0, 2, 4, 8, 16
 
 	// ---------------------------------------------------------------------------
 
@@ -587,6 +615,10 @@ b_loop_exit:
 	smx	#0x20
 	lda	$.bankCount
 	sta	[$.list]
+
+	// Activate SRM feedback (not necessary here but just in case this becomes an issue)
+	lda	#0x80
+	sta	$_Feedback_Active
 	smx	#0x00
 
 	return

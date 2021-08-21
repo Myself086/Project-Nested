@@ -504,7 +504,7 @@ b_1__:
 		lsr	a
 		// Add non-heap SRAM bank sizes
 		clc
-		adc	#16
+		adc	$_Sram_SizeNonDynamicKb
 		//.unlocal	4 count__, _index__
 	.endm
 
@@ -517,20 +517,9 @@ Gui__GetRamUsed:
 	.mx	0x00
 	.func	Gui__GetRamTotal
 Gui__GetRamTotal:
-	lda	#0
-	ldx	$_Memory__CartBanks
-	beq	$+b_1
-		// Count SRAM banks available
-		lda	$=Memory__CartBanks_CONSTBANK-1,x
-		and	#0x00ff
-		beq	$+b_1
-			asl	a
-			asl	a
-			asl	a
-b_1:			// Assume every branch pointing to b_1 has register A containing 0
-	// Add WRAM size and non-heap SRAM bank sizes
+	lda	#_Zero+128
 	clc
-	adc	#_Zero+128+16
+	adc	$_Sram_SizeTotalKb
 
 	return
 

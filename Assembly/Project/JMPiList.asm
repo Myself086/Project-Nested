@@ -24,14 +24,27 @@ JMPi__Listing_End:
 	.mx	0x00
 	.func	JMPi__Init
 JMPi__Init:
-	// Reset pointers
-	lda	#_JMPi_EmptyPointer/0x100
-	sta	$=JMPi_EmptyPointer+1
-	sta	$=JMPi_CurrentPoolTop+1
-	lda	#_JMPi_EmptyPointer+6
-	sta	$=JMPi_EmptyPointer
-	lda	#_JMPi_InitialPoolTopValue
-	sta	$=JMPi_CurrentPoolTop
+	php
+	rep	#0x30
+
+	// Is feedback active?
+	lda	$_Feedback_Active-1
+	bpl	$+b_else
+		// Use feedback bank
+		lda	#_JMPi_InitialPoolBottomValue/0x100
+		sta	$_JMPi_EmptyPointer+1
+		sta	$_JMPi_CurrentPoolTop+1
+		lda	#_JMPi_InitialPoolBottomValue
+		sta	$_JMPi_EmptyPointer
+		lda	#_JMPi_InitialPoolTopValue
+		sta	$_JMPi_CurrentPoolTop
+		bra	$+b_1
+b_else:
+		// Wait for new pool to be generated
+		stz	$_JMPi_EmptyPointer
+		stz	$_JMPi_EmptyPointer+1
+		stz	$_JMPi_CurrentPoolTop
+b_1:
 
 	// Reset pointers to the linker
 	ldx	#0x02fd
@@ -45,6 +58,7 @@ b_loop:
 		dex
 		bpl	$-b_loop
 
+	plp
 	return
 
 	// ---------------------------------------------------------------------------

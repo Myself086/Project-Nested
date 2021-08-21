@@ -196,7 +196,7 @@ namespace Project_Nested.Emulation
             int sramSize = 0x400 << HeaderGetSRAMsize();
             if (sramSize > 0x10000)
                 sramSize = 0x10000;
-            switch (HeaderGetSRAMsize())
+            switch (8) //(HeaderGetSRAMsize())
             {
                 case 1:
                 case 2:

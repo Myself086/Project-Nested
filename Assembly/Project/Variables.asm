@@ -78,7 +78,7 @@
 
 
 	.addr	0x0a07, 0x0a1f
-	// 22/25
+	// 25/25
 
 	// Unused
 StackPointer_6502:
@@ -118,6 +118,10 @@ IO_4014_SpriteSize:
 
 IO_BG_MIRRORS:
 	.fill	2
+
+	DefineGlobalVariable	Feedback_Active			1		// Negative when active
+	DefineGlobalVariable	Sram_SizeTotalKb		2		// Total amount of SRAM in kilobytes
+	DefineGlobalVariable	Sram_SizeNonDynamicKb	2		// Amount of SRAM used for non-dynamic memory allocation
 
 
 	.addr	0x0a27, 0x0a3f
@@ -291,6 +295,13 @@ NameTable_ActiveMap:
 	// 16 bytes of nametable remap from NES to SNES (must be at least 0x20 bytes deep into the page to avoid page crossing penalty)
 NameTable_Remap_Irq:
 	.fill	16
+
+	// Indirect JMP list, initially in SRAM if available
+	DefineGlobalVariable	JMPi_EmptyPointer			3
+	DefineGlobalVariable	JMPi_CurrentPoolTop			3
+	.def	JMPi_InitialPoolBottomValue	0xb17000
+	.def	JMPi_InitialPoolTopValue	0xb18000
+	.def	JMPi_PoolSize				0x001000
 
 
 	.def	Breakpoint					0x7e0afe
@@ -657,23 +668,8 @@ Feedback_Start:
 Feedback_Calls_LowerBound:
 	.def	Feedback_Calls_UpperBound					0xb16fff
 
-	// OLD
-	//.def	Feedback_Start				0xb16000
-	//.def	Feedback_ProfileName		0xb16014
-	//.def	Feedback_EmptyPointer		0xb16040
-	//.def	Feedback_ArrayTop			0xb16fff
-
 	// Incremental step constant
 	.def	Feedback_Inc				0x0003
-
-	// ---------------------------------------------------------------------------
-	// ---------------------------------------------------------------------------
-	// Indirect JMP list, initially in SRAM
-
-	.def	JMPi_EmptyPointer			0xb17000
-	.def	JMPi_CurrentPoolTop			0xb17003
-	.def	JMPi_InitialPoolTopValue	0xb18000
-	.def	JMPi_PoolSize				0x001000
 
 	// ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------

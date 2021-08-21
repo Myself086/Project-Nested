@@ -7,6 +7,16 @@ Feedback__Init:
 	.local	=source, =destination
 	.local	_compare
 
+	php
+	rep	#0x30
+
+	// Is feedback active?
+	lda	$_Feedback_Active-1
+	bmi	$+b_in
+		plp
+		return
+b_in:
+
 	// Load source and destination
 	lda	#_Rom_Title
 	sta	$.source
@@ -45,6 +55,7 @@ Feedback__Init:
 		lda	#_Feedback_Calls_LowerBound
 		sta	$=Feedback_Calls_Write
 		sta	$=Feedback_Calls_Top
+		plp
 		return
 b_1:
 
@@ -70,6 +81,7 @@ b_1:
 		sta	$=Feedback_Calls_Top
 b_1:
 
+	plp
 	return
 
 
@@ -123,6 +135,12 @@ Feedback__Init_Copy_Loop_Entry:
 	.func	Feedback__Add
 	// Entry: X = Address, Y = Bank number
 Feedback__Add:
+	// Is feedback active?
+	lda	$_Feedback_Active-1
+	bmi	$+b_in
+		return
+b_in:
+
 	// Set up destination address for writing
 	.local	=pointer
 	lda	#_Feedback_Calls_Write/0x100

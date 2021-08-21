@@ -247,7 +247,22 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Truncates the ROM size to the size that it's supposed to be instead of a power of 2"
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Intended for devices that are unable to load 8mb."
-		RomInfo_DefineMac	"public bool Cartridge.TruncateRom : Truncate ROM", RomInfo_CartFlags, RomInfo_CartFlags_TruncateRom
+		RomInfo_DefineMac	"global public bool Cartridge.TruncateRom : Truncate ROM", RomInfo_CartFlags, RomInfo_CartFlags_TruncateRom
+
+		RomInfo_SummaryMac	"Anything above 3 won't be supported by every SNES emulator or flash cart device."
+		RomInfo_SummaryMac	"1 = 2kb *"
+		RomInfo_SummaryMac	"2 = 4kb *"
+		RomInfo_SummaryMac	"3 = 8kb *"
+		RomInfo_SummaryMac	"4 = 16kb"
+		RomInfo_SummaryMac	"5 = 32kb"
+		RomInfo_SummaryMac	"6 = 64kb"
+		RomInfo_SummaryMac	"7 = 128kb"
+		RomInfo_SummaryMac	"8 = 256kb"
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"* Sizes below 16kb can't be loaded back into the exe."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Anything above 16kb is used as extra memory for code so that 'Out of Memory' errors are less likely to happen."
+		RomInfo_DefineMac	"global public byte Cartridge.SramSize : Sram size", Rom_SramSize, 0
 
 	RomInfo_DefineMac	"public void Tab_Cpu : CPU related rules.", 0, 0
 

@@ -29,6 +29,7 @@ Dev build:
 - Reworked SRM feedback data structure, will not be compatible with previous versions
 - Raised the maximum amount of characters for profile name (128 instead of 32)
 - Removed SRM feedback bottleneck
+- Added option to resize SRAM
 
 v1.3
 - Added support for read-modify-write to IO ports

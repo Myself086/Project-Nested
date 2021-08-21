@@ -16,6 +16,7 @@ Rom_Title:
 	// ROM size 8mb
 	[80ffd7] = 0x0d
 
+	.def	Rom_SramSize	0x00ffd8
 	// SRAM size 256kb
 	[80ffd8] = 0x08
 

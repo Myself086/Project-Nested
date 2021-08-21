@@ -238,8 +238,6 @@ b_loop:
 	tcd
 
 	call	Main__InitMemory
-	call	Feedback__Init
-	call	JMPi__Init
 	call	StaticRec__InitMemory
 	call	Main__InitEmulation
 	call	Gfx__Restart
@@ -303,6 +301,8 @@ b_loop:
 
 	// Late format SRAM in case something needs to be reported to the user
 	call	Memory__FormatSram
+	call	Feedback__Init
+	call	JMPi__Init
 
 	// Prepare indirect IO JMP
 	lda	#0x5c
