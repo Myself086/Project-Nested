@@ -380,7 +380,7 @@ Memory__FormatSram:
 	beq	$+b_1
 		unlock
 		trap
-		Exception	"SRAM is missing{}{}{}SRAM on your SNES emulator or flash cart device was not found.{}{}You can adjust the amount of SRAM on the exe's main window. Some SRAM sizes are not supported by some SNES emulators or devices."
+		Exception	"SRAM is missing{}{}{}SRAM on your SNES emulator or flash cart device was not found. Make sure your SNES emulator or device is up to date.{}{}You can adjust the amount of SRAM on the exe's main window. Some SRAM sizes are not supported by some SNES emulators or devices."
 b_1:
 
 	// Test for minimum SRAM requirement for feedback: 16kb
