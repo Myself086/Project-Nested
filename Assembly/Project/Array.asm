@@ -147,6 +147,8 @@ Array__Insert_loop1:
 	.func	Array__InsertAt
 	// Entry: X = List Pointer, Y = Insert at
 
+	.local	_at, _listPointer
+
 Array__InsertAt_Resize:
 		// Double the size of the array
 		lda	$0x0006,x
@@ -156,19 +158,28 @@ Array__InsertAt_Resize:
 		asl	a
 		tay
 		call	Array__Resize
+		// Return: X = List Pointer
 		bra	$+b_in
 
 Array__InsertAt:
-	.local	=p, _at, _listPointer, _inc, _x, _bytes, _tempElement
 
 	// Save some params
-	tya
-	clc
-	adc	$0x0003,x
-	sta	$.at
+	sty	$.at
 	stx	$.listPointer
 
 b_in:
+	.local	=p, _inc, _x, _bytes, _tempElement
+
+	.local	.dummy, 4 move
+	// NOTE: 'dummy' is for writing the first byte of 'move' in 16-bit mode
+
+	// Prepare move instruction
+	lda	$0x0002,x
+	and	#0x00ff
+	ora	#0x6b00
+	sta	$.move+1
+	sta	$.move+2
+
 	// Increment
 	lda	$0x0009,x
 	sta	$.inc
@@ -177,18 +188,17 @@ b_in:
 	adc	$0x0000,x
 	sta	$.p
 
-	// Can we increment two more times?
-	adc	$.inc
+	// Can we increment it?
 	adc	$.inc
 	cmp	$0x0006,x
 
 	// Is array full?
 	bcs	$-Array__InsertAt_Resize
 
-	// Keep bank number
-	phb
-
 	// Move new bytes up by one element, assume carry clear from last compare
+	lda	#0x5400		// Mvn
+	sta	$.move-1
+	// Prepare move registers
 	lda	$0x0000,x
 	tax
 	adc	$.inc
@@ -196,15 +206,21 @@ b_in:
 	sty	$.tempElement
 	lda	$.inc
 	dec	a
-	// Mvn
-	.data8	0x54, 0x7e, 0x7e
+	// Move
+	phb
+	jsr	$=move
+	plb
 
 	// Move bytes
+	lda	#0x4400		// Mvp
+	sta	$.move-1
 	// How many bytes to move?
 	ldx	$.listPointer
 	lda	$0x0000,x
 	sec
 	sbc	$.at
+	sec
+	sbc	$0x0003,x
 	sta	$.bytes
 	// Destination and source
 	lda	$.p
@@ -213,20 +229,30 @@ b_in:
 	sec
 	sbc	$.inc
 	tax
-	// Mvp
 	lda	$.bytes
 	dec	a
-	.data8	0x44, 0x7e, 0x7e
+	// Move
+	phb
+	jsr	$=move
+	plb
 
 	// Move new element
+	lda	#0x5400		// Mvn
+	sta	$.move-1
+	// Destination
+	ldx	$.listPointer
+	lda	$.at
+	clc
+	adc	$0x0003,x
+	tay
 	// Source
 	ldx	$.tempElement
-	// Destination
-	ldy	$.at
-	// Mvn and plb
+	// Byte count
 	lda	$.inc
 	dec	a
-	.data8	0x54, 0x7e, 0x7e
+	// Move
+	phb
+	jsr	$=move
 	plb
 
 	// Copy new current pointer
@@ -244,9 +270,9 @@ b_in:
 	sta	$.p+2
 	lda	#0x00
 Array__InsertAt_loop1:
-	dey
-	sta	[$.p],y
-	bne	$-Array__InsertAt_loop1
+		dey
+		sta	[$.p],y
+		bne	$-Array__InsertAt_loop1
 
 	// Return
 	rep	#0x30
