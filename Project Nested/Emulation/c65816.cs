@@ -578,6 +578,15 @@ namespace Project_Nested.Emulation
                 Opcode[op].CallOpcode(mem);
             }
         }
+
+        public bool Execute(byte[] romData)
+        {
+            memory.WriteROM(romData);
+            var rtn = Execute();
+            memory.ReadROM(romData);
+            return rtn;
+        }
+
         public bool Execute()
         {
             UInt16 op;
@@ -586,8 +595,9 @@ namespace Project_Nested.Emulation
             int lastPC = -1;
 
             setflag_p(0);       // Reset the Pause flag
+            setflag_w(0);       // Reset the Wait flag
 
-//#if !DEBUG
+            //#if !DEBUG
             try
             //#endif
             {

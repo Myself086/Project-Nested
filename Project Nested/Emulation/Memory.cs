@@ -71,6 +71,12 @@ namespace Project_Nested.Emulation
             return mem.ReadArray(ROMlowerbound, ROMupperbound - ROMlowerbound + 1);
         }
 
+        public void ReadROM(byte[] data)
+        {
+            var data2 = mem.ReadArray(ROMlowerbound, ROMupperbound - ROMlowerbound + 1);
+            Array.Copy(data2, data, data.Length);
+        }
+
         // --------------------------------------------------------------------
 
         void ResetSegments()
@@ -306,6 +312,23 @@ namespace Project_Nested.Emulation
             return (Int16)(DebugReadOneByte(memaddr + 0) + (DebugReadOneByte(memaddr + 1) << 8));
         }
 
+        public Int32 DebugReadThreeByte(Int32 memaddr)
+        {
+            return (Int32)
+                (DebugReadOneByte(memaddr + 0) +
+                (DebugReadOneByte(memaddr + 1) << 8) +
+                (DebugReadOneByte(memaddr + 2) << 16));
+        }
+
+        public Int32 DebugReadFourByte(Int32 memaddr)
+        {
+            return (Int32)
+                (DebugReadOneByte(memaddr + 0) +
+                (DebugReadOneByte(memaddr + 1) << 8) +
+                (DebugReadOneByte(memaddr + 2) << 16) +
+                (DebugReadOneByte(memaddr + 3) << 24));
+        }
+
         public byte DebugReadOneByteRawMem(Int32 memaddr)
         {
             return this.mem[memaddr];
@@ -342,6 +365,23 @@ namespace Project_Nested.Emulation
             memaddr = this.map[(memaddr + 0) >> 13] + ((memaddr + 0));
             this.mem[memaddr + 0] = (byte)(data >> 0);
             this.mem[memaddr + 1] = (byte)(data >> 8);
+        }
+
+        public void DebugWriteThreeByte(Int32 memaddr, Int32 data)
+        {
+            memaddr = this.map[(memaddr + 0) >> 13] + ((memaddr + 0));
+            this.mem[memaddr + 0] = (byte)(data >> 0);
+            this.mem[memaddr + 1] = (byte)(data >> 8);
+            this.mem[memaddr + 2] = (byte)(data >> 16);
+        }
+
+        public void DebugWriteFourByte(Int32 memaddr, Int32 data)
+        {
+            memaddr = this.map[(memaddr + 0) >> 13] + ((memaddr + 0));
+            this.mem[memaddr + 0] = (byte)(data >> 0);
+            this.mem[memaddr + 1] = (byte)(data >> 8);
+            this.mem[memaddr + 2] = (byte)(data >> 16);
+            this.mem[memaddr + 3] = (byte)(data >> 24);
         }
 
         public byte DebugReadRomByte(Int32 memaddr)

@@ -21,6 +21,7 @@ namespace Project_Nested.Injection
         public int NesAddress { get; private set; }
         public int NesBank { get; private set; }
         public byte[] Data { get; private set; }
+        public int Length { get => Data.Length; }
 
         public Patch(int nesAddress, int nesBank, byte[] data)
         {
@@ -73,6 +74,21 @@ namespace Project_Nested.Injection
                 this.NesAddress;
 
             rom.WriteArray(addr, this.Data, this.Data.Length);
+        }
+
+        public int GetNesAddress(int prgSize, int prgBanksTotal, bool end)
+        {
+            int prgMask = prgSize - 1;
+
+            int addr = end ? this.NesAddress + this.Length - 1 : this.NesAddress;
+
+            int rtn = NesBank >= 0 ?
+                // bank:addr format
+                (addr | (prgMask ^ 0xffff)) + ((this.NesBank % prgBanksTotal) << 16) :
+                // file address format
+                ((addr - 0x10) / prgSize * 0x10000) + (((addr - 0x10) | ~prgMask) & 0xffff);
+
+            return rtn;
         }
 
         public string GetAddressString()

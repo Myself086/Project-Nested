@@ -24,6 +24,11 @@ namespace Project_Nested.Injection
 
         Int32 finalRomSize;
 
+        Int32 prgBankSize;
+        Int32 chrBankSize;
+        Int32 prgBanksTotal;
+        Int32 chrBanksTotal;
+
         #endregion
         // --------------------------------------------------------------------
         #region ROM settings
@@ -140,7 +145,11 @@ namespace Project_Nested.Injection
 
             void WriteBanks(int prgSize, int chrSize, PrgBankMirrorMode mirrorMode, byte[] startingBanks)
             {
-                int prgBanksTotal = prgBanks * PRG_BANK_SIZE / prgSize;
+                this.prgBankSize = prgSize;
+                this.chrBankSize = chrSize;
+
+                this.prgBanksTotal = prgBanks * PRG_BANK_SIZE / prgSize;
+                this.chrBanksTotal = chrBanks * CHR_BANK_SIZE / chrSize;
 
                 // Apply user patches
                 foreach (var item in patches)
@@ -428,6 +437,11 @@ namespace Project_Nested.Injection
 
         private byte[] FinalChanges()
         {
+            c65816 emu;
+
+            // Clone OutData so it can be restored to a state prior to these changes
+            var oldOutData = (byte[])this.OutData.Clone();
+
             // Copy start-up code to its proper location for ROMs using more than 4mb
             Array.Copy(OutData, 0x00ff00, OutData, 0x40ff00, 0x100);
 
@@ -436,7 +450,6 @@ namespace Project_Nested.Injection
             OutData[0x40ffd5] = 0x35;
 
             // Compile known calls
-            byte[] finalData = null;
             {
                 // Bank range
                 this.AotCompileBanks.SetValueAt(0, (byte)(NewHiRomBank + 1));
@@ -468,12 +481,26 @@ namespace Project_Nested.Injection
                         sram.Write24(callsTable + i * 3, calls[i]);
                 }
 
-                // Call compiler
-                c65816 emu = new c65816(OutData, sram);
+#if DEBUG
+                // Save SRAM file for external debugging
+                File.WriteAllBytes(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Compile.srm", sram);
+#endif
+
+                // Initialize emulator
+                emu = new c65816(OutData, sram);
                 emu.InterruptUnusedReset();
-                emu.Execute();
-                // Get data back and using 'finalData' instead of 'OutData' from now
-                finalData = emu.memory.ReadROM();
+                emu.Execute(OutData);
+
+                // Patch ranges
+                {
+                    var patchRanges = GetPatchRangeData();
+                    var addr = AddData(emu, patchRanges);
+                    SetSetting("Patch.Ranges", addr.ToString());
+                    SetSetting("Patch.Ranges.Length", (patchRanges.Length * 4).ToString());
+                }
+
+                // Call compiler
+                StaticRecompiler(emu);
             }
 
             if (NewHiRomBank > 0x80)
@@ -481,7 +508,7 @@ namespace Project_Nested.Injection
                 // Find last used HiROM bank
                 for (; NewHiRomBank < 0xfe; NewHiRomBank++)
                 {
-                    if (finalData.Read16(BankToFileAddress(NewHiRomBank) + 0x7ffe) == 0)
+                    if (OutData.Read16(BankToFileAddress(NewHiRomBank) + 0x7ffe) == 0)
                         break;
                 }
             }
@@ -503,34 +530,39 @@ namespace Project_Nested.Injection
                     i /= 2;
                     n++;
                 }
-                finalData.Write8(0x00ffd7, n);
-                finalData.Write8(0x40ffd7, n);
+                OutData.Write8(0x00ffd7, n);
+                OutData.Write8(0x40ffd7, n);
             }
-
-            // Resize ROM
-            if (finalRomSize < finalData.Length)
-                Array.Resize(ref finalData, finalRomSize);
 
             // Erase clone header for ExHiROM
             if (finalRomSize > 0x400000)
-                finalData.WriteArray(0x00ffc0, new byte[0x40], 0x40);
+                OutData.WriteArray(0x00ffc0, new byte[0x40], 0x40);
 
             // Calculate checksum
             {
-                Int32 checksumAddress = finalData.Length <= 0x400000 ? 0x00ffdc : 0x40ffdc;
+                Int32 checksumAddress = finalRomSize <= 0x400000 ? 0x00ffdc : 0x40ffdc;
 
                 // Erase checksum
-                finalData.Write32(checksumAddress, 0x0000ffff);
+                OutData.Write32(checksumAddress, 0x0000ffff);
 
                 // Do checksum
-                Int32 sum = CalculateChecksum(finalData);
+                Int32 sum = CalculateChecksum(OutData);
 
                 // Write checksum
-                finalData.Write16(checksumAddress + 0, ~sum);
-                finalData.Write16(checksumAddress + 2, sum);
+                OutData.Write16(checksumAddress + 0, ~sum);
+                OutData.Write16(checksumAddress + 2, sum);
             }
 
-            return finalData;
+            // Resize ROM into a new array
+            var rtn = OutData;
+            if (finalRomSize < OutData.Length)
+                Array.Resize(ref rtn, finalRomSize);
+            else
+                rtn = (byte[])rtn.Clone();
+
+            // Restore old OutData before returning the final ROM
+            Array.Copy(oldOutData, OutData, OutData.Length);
+            return rtn;
         }
 
         private int CalculateChecksum(byte[] data)
@@ -567,6 +599,118 @@ namespace Project_Nested.Injection
         {
             return (((bankNum ^ 0x80) & 0x80) >> 1) |
                     (bankNum & 0x3f);
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Patch ranges
+
+        private int[] GetPatchRangeData()
+        {
+            var list = new List<Tuple<int, int>>();
+
+            // Create list
+            foreach (var item in patches)
+            {
+                var addrStart = item.Value.GetNesAddress(this.prgBankSize, this.prgBanksTotal, false);
+                var addrEnd = item.Value.GetNesAddress(this.prgBankSize, this.prgBanksTotal, true);
+
+                if (addrStart >= 0)
+                    list.Add(new Tuple<int, int>(addrStart, addrEnd));
+            }
+
+            // Sort list
+            list.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+
+            // Merge ranges
+            for (int i = list.Count - 1; i >= 1; i--)
+            {
+                var left = list[i - 1];
+                var right = list[i - 0];
+
+                if (left.Item2 > right.Item1)
+                {
+                    // Merge into 'left' range
+                    var start = left.Item1 < right.Item1 ? left.Item1 : right.Item1;
+                    var end = left.Item2 > right.Item2 ? left.Item2 : right.Item2;
+                    list[i - 1] = new Tuple<int, int>(start, end);
+
+                    // Remove 'right' range
+                    list.RemoveAt(i);
+
+                    // Test this again
+                    i++;
+                }
+            }
+
+            // Sort list again (shouldn't be necessary)
+            list.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+
+            // Return as int[]
+            var rtn = new List<int>();
+            foreach (var item in list)
+            {
+                rtn.Add(item.Item1);
+                rtn.Add(item.Item2);
+            }
+
+            return rtn.ToArray();
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Convert address
+
+        public static int ConvertSnesToFileAddress(int addr)
+        {
+            if ((addr & 0x7e0000) == 0x7e0000 || (addr & 0x408000) == 0)
+                throw new ArgumentOutOfRangeException();
+
+            return ((~addr & 0x800000) >> 1) | (addr & 0x3fffff);
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Add Data
+
+        private int AddData(c65816 emu, byte[] data)
+        {
+            int addr = Malloc(emu, data.Length);
+            int snesAddr = ConvertSnesToFileAddress(addr);
+
+            for (int i = 0; i < data.Length; i++)
+                OutData.Write32(snesAddr + i, data[i]);
+
+            return addr;
+        }
+
+        private int AddData(c65816 emu, int[] data)
+        {
+            int addr = Malloc(emu, data.Length * 4);
+            int snesAddr = ConvertSnesToFileAddress(addr);
+
+            for (int i = 0; i < data.Length; i++)
+                OutData.Write32(snesAddr + i * 4, data[i]);
+
+            return addr;
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Virtual calls
+
+        private void StaticRecompiler(c65816 emu)
+        {
+            emu.SetRegPC(GetSetting("StaticRec.Main").ReadInt());
+            emu.Execute(OutData);
+        }
+
+        private int Malloc(c65816 emu, int length)
+        {
+            emu.memory.DebugWriteTwoByte(0, length);
+            emu.SetRegPC(GetSetting("Memory.Alloc").ReadInt());
+            emu.Execute(OutData);
+            return emu.memory.DebugReadThreeByte(0);
         }
 
         #endregion

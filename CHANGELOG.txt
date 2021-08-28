@@ -30,6 +30,7 @@ Dev build:
 - Raised the maximum amount of characters for profile name (128 instead of 32)
 - Removed SRM feedback bottleneck
 - Added option to resize SRAM
+- Ignore repurposed opcodes outside of patch ranges, making native return address slightly more reliable
 
 v1.3
 - Added support for read-modify-write to IO ports

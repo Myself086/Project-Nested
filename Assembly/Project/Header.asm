@@ -111,15 +111,19 @@ Start__UnusedReset:
 	// Is this running live or through the injector?
 	bcc	$+Start__UnusedReset_Live
 		// Injector mode
-		call	StaticRec__Main
+		call	StaticRec__Init
 		stp
 Start__UnusedReset_Live:
 	// Live mode
+	call	StaticRec__Init
 	call	StaticRec__Main
 	sep	#0x20
 	.mx	0x20
 	lda	#0
 	sta	$=RomInfo_DebugCalls
+
+	ldx	#_STACK_TOP
+	txs
 	jmp	$=Main
 
 

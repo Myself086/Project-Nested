@@ -177,6 +177,28 @@ b_trap:
 	// ---------------------------------------------------------------------------
 
 	.mx	0x00
+	// Entry: int length
+	// Return: int address
+Memory__AllocForExe:
+	.vstack		_VSTACK_START
+	pea	$0x0000
+	plp
+	plb
+
+	lda	#_VSTACK_PAGE
+	tcd
+
+	lda	#0x00ff
+	ldx	$0x0000
+	call	Memory__Alloc
+	stx	$0x0000
+	sta	$0x0002
+
+	stp
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
 	.func	Memory__Trim	=StackPointer, _Length
 Memory__Trim:
 	phb

@@ -95,6 +95,7 @@ ExceptionData:
 	.include	"Project/Cop.asm"
 	.include	"Project/Hdma.asm"
 	.include	"Project/Sound.asm"
+	.include	"Project/Patch.asm"
 
 	// Trap unsupported mappers
 	[0x81ffff] = 0x00

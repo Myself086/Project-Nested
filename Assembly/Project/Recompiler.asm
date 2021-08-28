@@ -88,6 +88,7 @@ Recompiler__Build:
 	.local	_opcodeX2
 	.local	_recompileFlags, _stackTrace, _stackTraceReset, _stackDepth
 	.local	=bankStart
+	.local	.nesBank
 	.local	=writeAddr
 	.local	_thisOpcodeX2
 	// TODO: Replace stackTrace with stackDepth
@@ -193,6 +194,9 @@ b_1:
 		sta	$.readAddr+1
 		sta	$.bankStart+1
 		stz	$.bankStart
+		smx	#0x20
+		stz	$.nesBank
+		smx	#0x00
 		bra	$+Recompiler__Build_SkipRomRange
 
 Recompiler__Build_RomRange:
@@ -203,6 +207,10 @@ Recompiler__Build_RomRange:
 		sta	$.readAddr+1
 		sta	$.bankStart+1
 		stz	$.bankStart
+		smx	#0x20
+		lda	$_Program_BankNum,x
+		sta	$.nesBank
+		smx	#0x00
 
 Recompiler__Build_SkipRomRange:
 
@@ -238,11 +246,12 @@ Recompiler__Build_loop1_loop_switch:
 				.data16	_Recompiler__Build_loop1_loop_switch_Push
 				.data16	_Recompiler__Build_loop1_loop_switch_Pull
 				.data16	_Recompiler__Build_loop1_loop_switch_Tsx
-				.data16	_Recompiler__Build_loop1_loop_switch_Branch
+				.data16	_Recompiler__Build_loop1_loop_switch_BranchWait
 				.data16	_Recompiler__Build_loop1_loop_switch_NesReturn
 				.data16	_Recompiler__Build_loop1_loop_switch_SnesReturn
 				.data16	_Recompiler__Build_loop1_loop_switch_IllegalNop
 				.data16	_Recompiler__Build_loop1_loop_switch_LoadConst
+				.data16	_Recompiler__Build_loop1_loop_switch_Jsl
 
 Recompiler__Build_loop1_loop_switch_LoadConst:
 					// Is this instruction followed by a conditional branch?
@@ -316,6 +325,14 @@ Recompiler__Build_loop1_loop_switch_IllegalNop:
 						// Yes
 						jmp	$_Recompiler__Build_loop1_loop_next
 
+Recompiler__Build_loop1_loop_switch_BranchWait:
+					sty	$.opcodeX2
+					ldx	$.readAddr+0
+					lda	$.nesBank
+					call	Patch__IsInRange
+					ldy	$.opcodeX2
+					jcc	$_Recompiler__Build_loop1_loop_switch_Error
+					clc
 
 Recompiler__Build_loop1_loop_switch_Branch:
 					// "Call" following code, workaround for using this case when breaking off an unconditional branch
@@ -482,15 +499,44 @@ Recompiler__Build_loop1_loop_switch_Tsx:
 
 
 Recompiler__Build_loop1_loop_switch_NesReturn:
+					sty	$.opcodeX2
+					ldx	$.readAddr+0
+					lda	$.nesBank
+					call	Patch__IsInRange
+					ldy	$.opcodeX2
+					bcc	$+Recompiler__Build_loop1_loop_switch_Error
+					clc
+
 					// Set "pull return" flag to change caller's code
 					lda	#_Opcode_F_PullReturn
 					tsb	$.recompileFlags
 					jmp	$_Recompiler__Build_loop1_next
 
 
+Recompiler__Build_loop1_loop_switch_SnesReturn:
+					sty	$.opcodeX2
+					ldx	$.readAddr+0
+					lda	$.nesBank
+					call	Patch__IsInRange
+					ldy	$.opcodeX2
+					bcc	$+Recompiler__Build_loop1_loop_switch_Error
+					clc
+					bra	$+Recompiler__Build_loop1_loop_switch_Return
+
+
+Recompiler__Build_loop1_loop_switch_Jsl:
+					sty	$.opcodeX2
+					ldx	$.readAddr+0
+					lda	$.nesBank
+					call	Patch__IsInRange
+					ldy	$.opcodeX2
+					bcc	$+Recompiler__Build_loop1_loop_switch_Error
+					clc
+					bra	$+Recompiler__Build_loop1_loop_switch_Regular
+
+
 Recompiler__Build_loop1_loop_switch_Brk:
 					// Nothing special here yet?
-Recompiler__Build_loop1_loop_switch_SnesReturn:
 Recompiler__Build_loop1_loop_switch_JmpIndexed:
 Recompiler__Build_loop1_loop_switch_Error:
 Recompiler__Build_loop1_loop_switch_Return:
@@ -498,6 +544,14 @@ Recompiler__Build_loop1_loop_switch_Return:
 					jmp	$_Recompiler__Build_loop1_next
 
 Recompiler__Build_loop1_loop_switch_Cop:
+					sty	$.opcodeX2
+					ldx	$.readAddr+0
+					lda	$.nesBank
+					call	Patch__IsInRange
+					ldy	$.opcodeX2
+					bcc	$-Recompiler__Build_loop1_loop_switch_Error
+					clc
+
 Recompiler__Build_loop1_loop_switch_Regular:
 Recompiler__Build_loop1_loop_next:
 			// Next opcode
@@ -1936,7 +1990,13 @@ b_1:
 
 
 Recompiler__Build_OpcodeType_Brw:
-	// Branch + wait, overrides STP illegal opcodes (TODO: Confirmation code for using these branches)
+	// This opcode must be in a patch range
+	ldx	$.readAddr+0
+	lda	$.nesBank
+	call	Patch__IsInRange
+	jcc	$_Recompiler__Build_OpcodeType_None
+
+	// Branch + wait, overrides STP illegal opcodes
 
 	// Remove bit 2 (originally bit 1 but the value is shifted)
 	and	#0xfffb
@@ -2601,7 +2661,7 @@ b_3:
 	lda	$.stackTrace
 	bmi	$+Recompiler__Build_OpcodeType_RtlSnes_JumpIn
 
-Recompiler__Build_OpcodeType_RtsNes:
+Recompiler__Build_OpcodeType_RtsNes_in:
 Recompiler__Build_OpcodeType_RtsI:
 	// Call interpreter like this:
 	// jmp $=Interpret
@@ -2620,7 +2680,23 @@ Recompiler__Build_OpcodeType_RtsI:
 	rts
 
 
+Recompiler__Build_OpcodeType_RtsNes:
+	// This opcode must be in a patch range
+	ldx	$.readAddr+0
+	lda	$.nesBank
+	call	Patch__IsInRange
+	jcc	$_Recompiler__Build_OpcodeType_None
+	
+	bra	$-Recompiler__Build_OpcodeType_RtsNes_in
+
+
 Recompiler__Build_OpcodeType_RtlSnes:
+	// This opcode must be in a patch range
+	ldx	$.readAddr+0
+	lda	$.nesBank
+	call	Patch__IsInRange
+	jcc	$_Recompiler__Build_OpcodeType_None
+
 	// Flag this function as having a return
 	lda	#_Opcode_F_HasReturn
 	tsb	$.recompileFlags
@@ -2670,6 +2746,12 @@ b_1:
 
 
 Recompiler__Build_OpcodeType_Jsl:
+	// This opcode must be in a patch range
+	ldx	$.readAddr+0
+	lda	$.nesBank
+	call	Patch__IsInRange
+	jcc	$_Recompiler__Build_OpcodeType_None
+
 	// Repurposed illegal opcode 0x22, giving access to any code on SNES side
 	ldy	#2
 	lda	[$.readAddr]
@@ -2884,6 +2966,12 @@ Recompiler__Build_OpcodeType_Pla_SkipPullReturn:
 
 
 Recompiler__Build_OpcodeType_Cop:
+	// This opcode must be in a patch range
+	ldx	$.readAddr+0
+	lda	$.nesBank
+	call	Patch__IsInRange
+	bcc	$+Recompiler__Build_OpcodeType_None
+
 	// Read first 2 bytes, swap them and multiply by 2. Expected result for high byte is 0x04 or 0x05
 	lda	[$.readAddr]
 	xba

@@ -71,8 +71,11 @@ namespace Project_Nested.Injection
                     {
                         switch (setting.type)
                         {
+                            default:
+                                CreateLabel(setting, true);
+                                break;
                             case SettingType.Void:
-                                CreateLabel(setting);
+                                CreateLabel(setting, false);
                                 break;
                             case SettingType.VoidStar:
                                 CreateTextbox(setting, false);
@@ -103,11 +106,11 @@ namespace Project_Nested.Injection
             controls.Add(control);
         }
 
-        private void CreateLabel(Setting setting)
+        private void CreateLabel(Setting setting, bool tab)
         {
             // Label
             Label label = new Label();
-            label.Location = new Point(X, Y);
+            label.Location = new Point(tab ? X + TABULATION : X, Y);
             label.Text = setting.TitleWithPrivacy;
             label.ForeColor = GetSettingDefaultColor(setting);
             label.AutoSize = true;

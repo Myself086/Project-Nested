@@ -7,7 +7,7 @@ namespace Project_Nested.Injection
 {
     public enum SettingType
     {
-        Unknown = 0, Void, VoidStar, Bool, Byte, Short, Pointer, Int, Char
+        Unknown = 0, Void, VoidStar, Bool, Byte, Short, Pointer, Int, Char, Func
     }
 
     public class Setting
@@ -146,6 +146,14 @@ namespace Project_Nested.Injection
                                 }
                             }
                             break;
+                        case "func":
+                            if (lesserGreater != null)
+                            {
+                                this.type = SettingType.Func;
+                                this.Length = 1;
+                                this.SnesAddress |= 0x800000;
+                            }
+                            break;
                         default:
                             // Change name only if this is the last symbol
                             if (item == symbols.Last())
@@ -190,6 +198,7 @@ namespace Project_Nested.Injection
                     case SettingType.Void:
                         return null;
                     case SettingType.VoidStar:
+                    case SettingType.Func:
                         return $"0x{SnesAddress:x}";
                     case SettingType.Bool:
                         return (data.ReadBool(SnesAddress + index / 8, (short)(Mask << (index & 0x7)))).ToString();

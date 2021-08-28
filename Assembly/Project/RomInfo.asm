@@ -139,6 +139,11 @@ RomInfo_CpuSettings:
 RomInfo_StaticRanges:
 	.data8	0x00
 
+RomInfo_PatchRanges:
+	.fill	4
+RomInfo_PatchRanges_Length:
+	.fill	2
+
 	// ---------------------------------------------------------------------------
 
 	// Version number
@@ -201,6 +206,16 @@ RomInfo_Description:
 		RomInfo_DefineMac	"private void* Feedback.EntryPoints.Top", Feedback_Calls_Top-Feedback_Start, 0
 
 		//RomInfo_DefineMac	"private void* Feedback.Links", 0, 0
+
+	RomInfo_DefineMac	"private void Tab_Patch : Patch.", 0, 0
+
+		RomInfo_DefineMac	"private hex int Patch.Ranges", RomInfo_PatchRanges, 0
+		RomInfo_DefineMac	"private short Patch.Ranges.Length", RomInfo_PatchRanges_Length, 0
+
+	RomInfo_DefineMac	"private void Tab_VirtualCalls : Virtual calls.", 0, 0
+
+		RomInfo_DefineMac	"private func<int,int> Memory.Alloc", Memory__AllocForExe, 0
+		RomInfo_DefineMac	"private func<> StaticRec.Main", StaticRec__MainForExe, 0
 
 	RomInfo_DefineMac	"public void Tab_MemoryEmulation : Memory emulation accuracy settings.", 0, 0
 

@@ -11,9 +11,8 @@ StaticRec_Active:
 	// ---------------------------------------------------------------------------
 
 	.mx	0x00
-
-	.func	StaticRec__Main
-StaticRec__Main:
+	.func	StaticRec__Init
+StaticRec__Init:
 	// Initialize
 	call	Main__InitMemory
 	call	Feedback__Init
@@ -47,6 +46,24 @@ StaticRec__Main:
 		and	#_RomInfo_StackEmu_NATIVE_MASK
 		sta	$=RomInfo_StackEmulation
 b_1:
+
+	return
+
+	// ---------------------------------------------------------------------------
+
+StaticRec__MainForExe:
+	rep	#0x30
+	call	StaticRec__Main
+	stp
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
+	.func	StaticRec__Main
+StaticRec__Main:
+	// Change bank
+	phk
+	plb
 
 	// Index for the first 8 bits
 	.local	_lowBits
