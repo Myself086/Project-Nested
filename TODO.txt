@@ -10,7 +10,6 @@
 - Allow NMI to happen during NMI execution
 - Fix stack tracing for cross-bank JMP and indirect JMP
 - Fix memory emulation for STA (ZP,X) when writing to ROM
-- Interpret RTI
 - Stack wrap
 
 ----------------------------------------------------------------
