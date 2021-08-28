@@ -3,6 +3,7 @@ Assembly/*.exe
 Assembly/*.smc
 Assembly/*.srm
 Assembly/*.lnk
+Assembly/GlobalSettings.config
 Assembly/PatchList.txt
 Assembly/Games
 Assembly/Profiles
