@@ -147,11 +147,15 @@ RomInfo_PatchRanges_Length:
 	// ---------------------------------------------------------------------------
 
 	// Version number
-	[80ffdB] = 0x03
+	[80ffdB] = 0x04
+	.macro	RomInfo_VersionString
+		.string0	"1.4"
+	.endm
+
 RomInfo_Title:
 	.string0	"Project Nested"
 RomInfo_Version:
-	.string0	"1.3"
+	RomInfo_VersionString
 RomInfo_BuildDate:
 	.printdate	"yyyy-MM-dd"
 	.data8	0
@@ -170,10 +174,17 @@ RomInfo_BuildDate:
 		.data16	_Zero+{2}
 	.endm
 
+	.macro	RomInfo_DefineMac2		Definition, Address, Mask, Command
+		.string	"{0}"
+		{3}
+		.data24	=Zero+{1}
+		.data16	_Zero+{2}
+	.endm
+
 	// Pointer used in Header.asm
 RomInfo_Description:
 
-	RomInfo_DefineMac	"public void Tab_Version : smc version 1.3", 0, 0
+	RomInfo_DefineMac2	"public void Tab_Version : smc version ", 0, 0, RomInfo_VersionString
 
 	RomInfo_DefineMac	"private void Tab_Warning : Settings in RED are for debugging purposes ONLY.", 0, 0
 

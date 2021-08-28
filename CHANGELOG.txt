@@ -1,5 +1,5 @@
 
-Dev build:
+v1.4
 - Fixed CHR pattern swapping for mapper 4 (again)
 - Fixed indirect JMP list initial upper bound, was likely to crash games using non-native return address
 - Fixed noise channel from not playing for some games
