@@ -1995,6 +1995,7 @@ Recompiler__Build_OpcodeType_Brw:
 	lda	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
+	clc
 
 	// Branch + wait, overrides STP illegal opcodes
 
@@ -2686,6 +2687,7 @@ Recompiler__Build_OpcodeType_RtsNes:
 	lda	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
+	clc
 	
 	bra	$-Recompiler__Build_OpcodeType_RtsNes_in
 
@@ -2696,6 +2698,7 @@ Recompiler__Build_OpcodeType_RtlSnes:
 	lda	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
+	clc
 
 	// Flag this function as having a return
 	lda	#_Opcode_F_HasReturn
@@ -2751,6 +2754,7 @@ Recompiler__Build_OpcodeType_Jsl:
 	lda	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
+	clc
 
 	// Repurposed illegal opcode 0x22, giving access to any code on SNES side
 	ldy	#2
