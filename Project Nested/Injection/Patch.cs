@@ -67,6 +67,9 @@ namespace Project_Nested.Injection
 
         public void Apply(byte[] rom, int prgSize, int prgBanksTotal)
         {
+            if (NesBank >= 0 && NesAddress < 0x8000)
+                return;
+
             int addr = NesBank >= 0 ?
                 // bank:addr format
                 (this.NesAddress % prgSize) + ((this.NesBank % prgBanksTotal) * prgSize) + 0x10 :
@@ -81,6 +84,9 @@ namespace Project_Nested.Injection
             int prgMask = prgSize - 1;
 
             int addr = end ? this.NesAddress + this.Length - 1 : this.NesAddress;
+
+            if (NesBank >= 0 && NesAddress < 0x8000)
+                prgMask = 0xffff;
 
             int rtn = NesBank >= 0 ?
                 // bank:addr format

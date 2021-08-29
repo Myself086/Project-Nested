@@ -12,8 +12,9 @@ Patch__IsInRange:
 	// Ignore some bits in the address based on mapper PRG bank size
 	sta	$.addr+2
 	txa
-	bpl	$+b_return_false
-	ora	$=RomInfo_PrgBankingMask
+	bpl	$+b_1
+		ora	$=RomInfo_PrgBankingMask
+b_1:
 	sta	$.addr
 
 	.local	_min, _max
