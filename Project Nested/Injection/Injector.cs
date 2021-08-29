@@ -223,7 +223,7 @@ namespace Project_Nested.Injection
 
             Apply(MemoryEmulationLoad, ForcedFlagEnum.IndirectLoad);
             Apply(MemoryEmulationStore, ForcedFlagEnum.IndirectStore);
-            Apply(MemoryEmulationAbsBank , ForcedFlagEnum.AbsolutePrgBank);
+            Apply(MemoryEmulationAbsBank, ForcedFlagEnum.AbsolutePrgBank);
             Apply(MemoryEmulationAbsCrossBank, ForcedFlagEnum.AbsolutePrgBankCross);
         }
 
