@@ -3,6 +3,7 @@ v1.4.1
 - Fixed some patch-only opcodes
 - Fixed checksum
 - Fixed using patch-only opcodes in WRAM/SRAM
+- Added option to disable safe TSX
 
 v1.4
 - Fixed CHR pattern swapping for mapper 4 (again)

@@ -117,6 +117,7 @@ RomInfo_StackEmulation:
 	.def	RomInfo_StackEmu_LazyDoubleReturn		0x0001
 	.def	RomInfo_StackEmu_StackUnderflow			0x0002
 	.def	RomInfo_StackEmu_NativeReturn			0x0004
+	.def	RomInfo_StackEmu_SafeTsx				0x0008
 	.def	RomInfo_StackEmu_NativeReturnInterrupt	0x0100
 	.def	RomInfo_StackEmu_NATIVE_MASK			0xff00
 
@@ -338,6 +339,13 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"This option is ignored when 'Native return address' is turned off."
 		RomInfo_DefineMac	"public bool StackEmulation.StackUnderflow : Stack emulation, Stack underflow detection", RomInfo_StackEmulation, RomInfo_StackEmu_StackUnderflow
+
+		RomInfo_SummaryMac	"Treats TSX as needing a non-native return address."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Has no effect on performance but may make or break games."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"This option is ignored when 'Native return address' is turned off."
+		RomInfo_DefineMac	"public bool StackEmulation.SafeTsx : Stack emulation, Safe TSX", RomInfo_StackEmulation, RomInfo_StackEmu_SafeTsx
 
 		RomInfo_SummaryMac	"Ignores waiting for interrupt to end when stack pointer is set by TXS to a range specified here."
 		RomInfo_SummaryMac	""

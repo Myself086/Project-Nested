@@ -492,9 +492,14 @@ b_loop:
 						jmp	$_Recompiler__Build_loop1_loop_next
 
 Recompiler__Build_loop1_loop_switch_Tsx:
-					// Flag as pulling return
-					lda	#_Opcode_F_PullReturn
-					tsb	$.recompileFlags
+					// Safe TSX?
+					lda	$=RomInfo_StackEmulation
+					and	#_RomInfo_StackEmu_SafeTsx
+					beq	$+b_1
+						// Flag as pulling return
+						lda	#_Opcode_F_PullReturn
+						tsb	$.recompileFlags
+b_1:
 					jmp	$_Recompiler__Build_loop1_loop_next
 
 
