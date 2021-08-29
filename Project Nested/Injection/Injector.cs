@@ -546,7 +546,7 @@ namespace Project_Nested.Injection
                 OutData.Write32(checksumAddress, 0x0000ffff);
 
                 // Do checksum
-                Int32 sum = CalculateChecksum(OutData);
+                Int32 sum = CalculateChecksum(OutData, finalRomSize);
 
                 // Write checksum
                 OutData.Write16(checksumAddress + 0, ~sum);
@@ -565,9 +565,8 @@ namespace Project_Nested.Injection
             return rtn;
         }
 
-        private int CalculateChecksum(byte[] data)
+        private int CalculateChecksum(byte[] data, int fileSize)
         {
-            Int32 fileSize = data.Length;
             Int32 mirroredSize = fileSize.RoundToPowerOf2();
 
             int sum = 0;
