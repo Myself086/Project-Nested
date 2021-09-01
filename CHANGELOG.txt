@@ -1,4 +1,6 @@
 
+- Fixed loading games that have too many banks in the iNES header compared to file size
+
 v1.4.1
 - Fixed some patch-only opcodes
 - Fixed checksum

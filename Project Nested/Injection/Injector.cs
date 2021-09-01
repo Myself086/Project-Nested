@@ -143,6 +143,11 @@ namespace Project_Nested.Injection
             const Int32 PRG_BANK_SIZE = 0x4000;
             const Int32 CHR_BANK_SIZE = 0x2000;
 
+            // Is file size matching iNES header?
+            int expectedSize = prgBanks * PRG_BANK_SIZE + chrBanks * CHR_BANK_SIZE + 0x10;
+            if (this.SrcData.Length < expectedSize)
+                Array.Resize(ref this.SrcData, expectedSize);
+
             void WriteBanks(int prgSize, int chrSize, PrgBankMirrorMode mirrorMode, byte[] startingBanks)
             {
                 this.prgBankSize = prgSize;
