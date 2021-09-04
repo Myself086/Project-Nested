@@ -809,9 +809,16 @@ b_in:
 						// Jump to the already compiled code
 						lda	#0x004c
 						sta	[$.writeAddr]
-						lda	[$.destRead],y
+						lda	[$.destRead]
 						ldy	#1
 						sta	[$.writeAddr],y
+
+						// Record this address so we can fix it later
+						lda	$.writeAddr
+						inc	a
+						sta	[$.Recompiler_BranchSrcList]
+						ldx	#_Recompiler_BranchSrcList
+						call	Array__Insert
 
 						// Add to write address
 						lda	#3
