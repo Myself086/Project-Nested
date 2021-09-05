@@ -60,6 +60,7 @@ namespace Project_Nested.Injection
         SettingWrapper<byte> PrgBankNumbers => new SettingWrapper<byte>(settings, "PrgBanks");
 
         SettingWrapper<int> PrgBankingMask => new SettingWrapper<int>(settings, "PrgBankMask");
+        SettingWrapper<byte> PrgBankNumMask => new SettingWrapper<byte>(settings, "PrgBankNumMask");
 
         SettingWrapper<short> _JmpRange => new SettingWrapper<short>(settings, "JumpRange");
         SettingWrapper<short> _JmpRange_x2 => new SettingWrapper<short>(settings, "JumpRange_x2");
@@ -163,6 +164,7 @@ namespace Project_Nested.Injection
                 AddPrgBanks(prgStart, prgSize, prgBanksTotal, mirrorMode);
                 AddChrBanks(prgStart + PRG_BANK_SIZE * prgBanks, CHR_BANK_SIZE * chrBanks, chrSize);
                 this.PrgBankingMask.SetValue(-prgSize);
+                this.PrgBankNumMask.SetValue((byte)(this.prgBanksTotal.RoundToPowerOf2() - 1));
                 this.PrgBankNumbers.SetArray(startingBanks);
             }
 

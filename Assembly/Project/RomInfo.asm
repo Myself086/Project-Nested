@@ -53,7 +53,10 @@ RomInfo_PrgBankNumbers:
 	// Which bits of PRG count towards bank boundaries
 RomInfo_PrgBankingMask:
 	.data16	0
-	
+
+RomInfo_PrgBankNumMask:
+	.data8	0
+
 	// Maximum range for JMP to count as a branch (negative if unused)
 RomInfo_JmpRange:
 	.data16	0xffff
@@ -360,6 +363,8 @@ RomInfo_Description:
 		RomInfo_DefineMac	"private hex byte[4] PrgBanks : Starting PRG banks", RomInfo_PrgBankNumbers, 0
 
 		RomInfo_DefineMac	"private hex short PrgBankMask : Program bank mask", RomInfo_PrgBankingMask, 0
+
+		RomInfo_DefineMac	"private hex byte PrgBankNumMask : Program bank number mask", RomInfo_PrgBankNumMask, 0
 
 		RomInfo_SummaryMac	"Maximum distance for a JMP to count as being considered in the same function."
 		RomInfo_SummaryMac	"May cause some games to crash."

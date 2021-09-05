@@ -1,6 +1,7 @@
 
 - Fixed loading games that have too many banks in the iNES header compared to file size
 - Fixed a crash related to the reset fix of v1.4
+- Fixed using patch-only opcodes in bank 0xff
 
 v1.4.1
 - Fixed some patch-only opcodes

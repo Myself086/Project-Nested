@@ -10,6 +10,7 @@ Patch__IsInRange:
 
 	.local	=addr
 	// Ignore some bits in the address based on mapper PRG bank size
+	and	$=RomInfo_PrgBankNumMask
 	sta	$.addr+2
 	txa
 	bpl	$+b_1
