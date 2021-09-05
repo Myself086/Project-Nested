@@ -153,7 +153,7 @@ RomInfo_PatchRanges_Length:
 	// Version number
 	[80ffdB] = 0x04
 	.macro	RomInfo_VersionString
-		.string0	"1.4.1"
+		.string0	"1.4.2"
 	.endm
 
 RomInfo_Title:
