@@ -415,3 +415,17 @@ this__:
 		.def	temp__	segmentByteCount__-1
 		.addr	this__, this__|temp__
 	.endm
+
+	// ---------------------------------------------------------------------------
+	// Exe call related macros
+
+	.macro	FromExeInit16
+		.vstack		_VSTACK_START
+		pea	$0x0000
+		plp
+		plb
+		.mx	0x00
+
+		lda	#_VSTACK_PAGE
+		tcd
+	.endm

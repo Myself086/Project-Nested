@@ -52,7 +52,7 @@ b_1:
 	// ---------------------------------------------------------------------------
 
 StaticRec__MainForExe:
-	rep	#0x30
+	FromExeInit16
 	call	StaticRec__Main
 	stp
 

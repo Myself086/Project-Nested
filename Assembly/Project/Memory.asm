@@ -180,13 +180,7 @@ b_trap:
 	// Entry: int length
 	// Return: int address
 Memory__AllocForExe:
-	.vstack		_VSTACK_START
-	pea	$0x0000
-	plp
-	plb
-
-	lda	#_VSTACK_PAGE
-	tcd
+	FromExeInit16
 
 	lda	#0x00ff
 	ldx	$0x0000
