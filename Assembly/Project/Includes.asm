@@ -34,10 +34,6 @@ Game "Empty                ", 0x00, 0x00
 	// Must be in the same bank as Interpret_and_Inline.asm and can't be bank 0x00 nor HiROM banks
 	.include	"Project/Interpret_Indirect.asm"
 	.include	"Project/Interpret_and_Inline.asm"
-
-	.include	"Project/Chr.asm"
-	.include	"Project/IO.asm"
-	.def	IO__BANK			0x80
 	.def	Interpret__BANK		0x80
 
 	// ---------------------------------------------------------------------------
@@ -114,7 +110,7 @@ JMPiU_Start:
 	.include	"Project/JMPiUnrolled.asm"
 
 	// ---------------------------------------------------------------------------
-	// Bank 82: Static recompiler call tables (no static data)
+	// Bank 83: Static recompiler call tables (no static data)
 
 	.addr	0xc30000, 0xc3ffff
 StaticRec_Tables:
@@ -125,9 +121,18 @@ StaticRec_Tables:
 	// [6] 16-bit recompiler flags
 
 	// ---------------------------------------------------------------------------
+	// Bank 84
+
+	.addr	0x848000, 0x84ffff
+
+	.include	"Project/Chr.asm"
+	.include	"Project/IO.asm"
+	.def	IO__BANK			0x84
+
+	// ---------------------------------------------------------------------------
 
 	// Final ROM size
-	.finalsize	0x030000
+	.finalsize	0x050000
 
 	// ---------------------------------------------------------------------------
 }
