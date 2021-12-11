@@ -351,14 +351,17 @@ Start__Irq_NesNmi:
 	bit	$_IO_2000-1
 	bpl	$-Start__Irq_Return
 
+	// Is main thread's DP in use? If so, skip this frame
+	lda	$1,s
+	cmp	#_VSTACK_PAGE
+	beq	$-Start__Irq_Return
+
 	// Is NMI emulation busy?
 	lda	#0x8000
 	tsb	$_NmiReturn_Busy-1
 	bne	$-Start__Irq_Return
 
-	// Use main thread's DP if not in use, otherwise skip this frame
-	lda	$1,s
-	bne	$-Start__Irq_Return
+	// Use main thread's DP
 	lda	#_VSTACK_PAGE
 	tcd
 
