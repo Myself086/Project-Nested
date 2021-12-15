@@ -2011,11 +2011,11 @@ Recompiler__Build_OpcodeType_Brw:
 
 	// Branch + wait, overrides STP illegal opcodes
 
-	// Remove bit 2 (originally bit 1 but the value is shifted)
-	and	#0xfffb
+	// Remove opcode bit 2
+	lda	[$.readAddr]
+	and	#0x00fd
 
 	// Write branch opcode
-	lsr	a
 	eor	#0x0320
 	sta	[$.writeAddr]
 	lda	#0x004c
@@ -2198,7 +2198,7 @@ b_1:
 		.unlocal	=brStart, _brByteCount
 
 Recompiler__Build_OpcodeType_Br_Idle_Default:
-		// b.. $+7
+		// b.. $+10
 		//  jsl $=Interpret__Idle
 		//  stz $_Memory_NesBank
 		// jmp $_destination
