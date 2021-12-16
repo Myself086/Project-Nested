@@ -2,6 +2,7 @@
 Dev build:
 - Fixed a bug that caused the emulator to pause forever without error screen
 - Fixed patching idle loops
+- Fixed loading SRM file names longer than 32 characters
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size

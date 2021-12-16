@@ -94,7 +94,7 @@ namespace Project_Nested
             if (this.profileName == null)
                 return null;
 
-            return data.ReadString(this.profileName.Value, 0x20).Trim(' ', '\t', '\0');
+            return data.ReadString(this.profileName.Value, 0x80).Trim(' ', '\t', '\0');
         }
 
         public List<int> GetFunctionEntryPoints()
