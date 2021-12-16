@@ -1891,23 +1891,14 @@ Recompiler__Build_OpcodeType_LdaConst_PushReturn:
 			// Write code
 			ldx	#_Inline__PushConstantReturn
 			lda	#_Inline__PushConstantReturn/0x10000
-			jsr	$_Recompiler__Build_InlineNoInc
+			ldy	#0
+			jsr	$_Recompiler__Build_Inline2NoInc
 			tyx
 
 			// Copy last LDA
 			ldy	#3
 			lda	[$.readAddr],y
 			sta	[$.writeAddr]
-
-			// Write call
-			ldy	#_Inline__PushConstantReturn_Call-Inline__PushConstantReturn+2
-			lda	$.writeAddr+1
-			sta	[$.writeAddr],y
-			dey
-			txa
-			clc
-			adc	$.writeAddr
-			sta	[$.writeAddr],y
 
 			// Write original return
 			ldy	#4

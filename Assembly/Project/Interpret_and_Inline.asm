@@ -590,8 +590,9 @@ Inline__JsrToRam_OriginalValue:
 
 Inline__PushConstantReturn:
 	lda	#0x85
-Inline__PushConstantReturn_Call:
-	jsr	$0xc0ffee
+	phk
+	per	$0xff01
+	bra	$+Inline__PushConstantReturn_end
 Inline__PushConstantReturn_OriginalReturn:
 		pea	$0x50da
 Inline__PushConstantReturn_OriginalValue:
@@ -599,6 +600,7 @@ Inline__PushConstantReturn_OriginalValue:
 		jsr	$=Interpret__Jsr
 		nop
 		rtl
+Inline__PushConstantReturn_end:
 
 	.data8	0
 
