@@ -710,6 +710,7 @@ Interpret__Jsr:
 	
 	.vstack		_VSTACK_START
 	.local	.a, .x, .y, .p, =return, .return_b
+	.local	_originalCall, _originalReturn
 
 	// Push P and disable interrupts
 	php
@@ -733,8 +734,10 @@ Interpret__Jsr:
 	.precall	Recompiler__CallFunction		_originalFunction
 	lda	$6,s
 	sta	$_Param_originalFunction
+	sta	$_originalCall
 	lda	$8,s
 	sta	$_StackEmu_Compare+8,x
+	sta	$_originalReturn
 	lda	$3,s
 	sta	$_StackEmu_LowBits+8,x
 	sta	$_return
@@ -814,16 +817,36 @@ Interpret__Jsr_NoDebugCall:
 
 Interpret__Jsr_SkipDebugCall:
 
-		// Rewrite JSR destination
-		ldy	$.functionListIndex
-		lda	[$.Recompiler_FunctionList+3],y
-		ldy	#0x0007
-		sta	[$.return],y
-		ldy	$.functionListIndex
-		iny
-		lda	[$.Recompiler_FunctionList+3],y
-		ldy	#0x0008
-		sta	[$.return],y
+		// Dynamic JSR?
+		lda	$=RomInfo_CpuSettings
+		and	#_RomInfo_Cpu_DynamicJsr
+		beq	$+b_else
+			// Are we crossing bank?
+			lda	$.originalReturn
+			ldy	$.originalCall
+			call	DynamicJsr__IsTargetStatic
+			bcs	$+b_else
+				lda	$.originalCall
+				call	DynamicJsr__CreateJsrLink
+				xba
+				ldy	#0x0008
+				sta	[$.return],y
+				txa
+				dey
+				sta	[$.return],y
+				bra	$+b_1
+b_else:
+				// Rewrite JSR destination
+				ldy	$.functionListIndex
+				lda	[$.Recompiler_FunctionList+3],y
+				ldy	#0x0007
+				sta	[$.return],y
+				ldy	$.functionListIndex
+				iny
+				lda	[$.Recompiler_FunctionList+3],y
+				ldy	#0x0008
+				sta	[$.return],y
+b_1:
 
 		// Is this call followed by a NOP+RTL?
 		ldy	#0x000a
@@ -874,16 +897,36 @@ Interpret__Jsr_RewriteJmp:
 		ldy	#0x0003
 		sta	[$.return],y
 
-		// Rewrite JMP destination
-		ldy	$.functionListIndex
-		lda	[$.Recompiler_FunctionList+3],y
-		ldy	#0x0004
-		sta	[$.return],y
-		ldy	$.functionListIndex
-		iny
-		lda	[$.Recompiler_FunctionList+3],y
-		ldy	#0x0005
-		sta	[$.return],y
+		// Dynamic JSR?
+		lda	$=RomInfo_CpuSettings
+		and	#_RomInfo_Cpu_DynamicJsr
+		beq	$+b_else
+			// Are we crossing bank?
+			lda	$.originalReturn
+			ldy	$.originalCall
+			call	DynamicJsr__IsTargetStatic
+			bcs	$+b_else
+				lda	$.originalCall
+				call	DynamicJsr__CreateJsrLink
+				xba
+				ldy	#0x0005
+				sta	[$.return],y
+				txa
+				dey
+				sta	[$.return],y
+				bra	$+b_1
+b_else:
+				// Rewrite JMP destination
+				ldy	$.functionListIndex
+				lda	[$.Recompiler_FunctionList+3],y
+				ldy	#0x0004
+				sta	[$.return],y
+				ldy	$.functionListIndex
+				iny
+				lda	[$.Recompiler_FunctionList+3],y
+				ldy	#0x0005
+				sta	[$.return],y
+b_1:
 
 		// Write NOPs
 		lda	#0xeaea
@@ -1076,12 +1119,30 @@ b_loop:
 		rep	#0x20
 		.mx	0x00
 
+		// Dynamic JSR?
+		lda	$=RomInfo_CpuSettings
+		and	#_RomInfo_Cpu_DynamicJsr
+		beq	$+b_else
+			// Are we crossing bank?
+			ldx	$.return
+			lda	$=StaticRec_Origins+2,x		// Original call
+			tay
+			lda	$=StaticRec_Origins+0,x		// Original return
+			call	DynamicJsr__IsTargetStatic
+			bcs	$+b_else
+				ldx	$.return
+				lda	$=StaticRec_Origins+2,x		// Original call
+				call	DynamicJsr__CreateJsrLink
+				xba
+				bra	$+b_2
+b_else:
+				ldy	$.functionListIndex
+				lda	[$.Recompiler_FunctionList+3],y
+				tax
+				iny
+				lda	[$.Recompiler_FunctionList+3],y
+b_2:
 		// Write new destination in our extra code
-		ldy	$.functionListIndex
-		lda	[$.Recompiler_FunctionList+3],y
-		tax
-		iny
-		lda	[$.Recompiler_FunctionList+3],y
 		ldy	#_Inline__StaticJmpAcrossBank_Jmp-Inline__StaticJmpAcrossBank+2
 		sta	[$.extraCode],y
 		txa
@@ -1109,14 +1170,33 @@ b_1:
 	and	#_Opcode_F_PullReturn
 	bne	$+Interpret__StaticJsr_PullReturn
 Interpret__StaticJsr_Regular:
-		// Copy destination address
 		lda	#0x5c5c
 		sta	[$.return]
-		ldy	$.functionListIndex
-		lda	[$.Recompiler_FunctionList+3],y
-		tax
-		iny
-		lda	[$.Recompiler_FunctionList+3],y
+
+		// Dynamic JSR?
+		lda	$=RomInfo_CpuSettings
+		and	#_RomInfo_Cpu_DynamicJsr
+		beq	$+b_else
+			// Are we crossing bank?
+			ldx	$.return
+			lda	$=StaticRec_Origins+2,x		// Original call
+			tay
+			lda	$=StaticRec_Origins+0,x		// Original return
+			call	DynamicJsr__IsTargetStatic
+			bcs	$+b_else
+				ldx	$.return
+				lda	$=StaticRec_Origins+2,x		// Original call
+				call	DynamicJsr__CreateJsrLink
+				xba
+				bra	$+b_1
+b_else:
+				ldy	$.functionListIndex
+				lda	[$.Recompiler_FunctionList+3],y
+				tax
+				iny
+				lda	[$.Recompiler_FunctionList+3],y
+b_1:
+		// Copy destination address
 		ldy	#2
 		sta	[$.return],y
 		txa
@@ -1154,12 +1234,30 @@ Interpret__StaticJsr_PullReturn_Loop:
 		lda	$=StaticRec_Origins+0,x
 		sta	[$.extraCode],y
 
+		// Dynamic JSR?
+		lda	$=RomInfo_CpuSettings
+		and	#_RomInfo_Cpu_DynamicJsr
+		beq	$+b_else
+			// Are we crossing bank?
+			ldx	$.return
+			lda	$=StaticRec_Origins+2,x		// Original call
+			tay
+			lda	$=StaticRec_Origins+0,x		// Original return
+			call	DynamicJsr__IsTargetStatic
+			bcs	$+b_else
+				ldx	$.return
+				lda	$=StaticRec_Origins+2,x		// Original call
+				call	DynamicJsr__CreateJsrLink
+				xba
+				bra	$+b_2
+b_else:
+				ldy	$.functionListIndex
+				lda	[$.Recompiler_FunctionList+3],y
+				tax
+				iny
+				lda	[$.Recompiler_FunctionList+3],y
+b_2:
 		// Write new destination in our extra code
-		ldy	$.functionListIndex
-		lda	[$.Recompiler_FunctionList+3],y
-		tax
-		iny
-		lda	[$.Recompiler_FunctionList+3],y
 		ldy	#_Inline__StaticOriginalReturn_Jmp-Inline__StaticOriginalReturn+2
 		sta	[$.extraCode],y
 		txa
@@ -1301,7 +1399,6 @@ Interpret__Rts_Changed:
 	//plp
 	//rtl
 	.mx	0x30
-
 
 	// ---------------------------------------------------------------------------
 

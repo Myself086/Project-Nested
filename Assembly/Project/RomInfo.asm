@@ -138,6 +138,7 @@ RomInfo_CpuSettings:
 	.data16	0x0000
 	.def	RomInfo_Cpu_RecompilePrgRam				0x0001
 	.def	RomInfo_Cpu_IllegalNop					0x0002
+	.def	RomInfo_Cpu_DynamicJsr					0x0004
 
 	// Defines whether page range is static, 1 bit per range, 8 ranges in total, bit is set when range is static
 RomInfo_StaticRanges:
@@ -300,6 +301,11 @@ RomInfo_Description:
 
 		RomInfo_SummaryMac	"This option is for games that store static code into PRG RAM."
 		RomInfo_DefineMac	"public bool Cpu.RecompilePrgRam : Recompile PRG RAM", RomInfo_CpuSettings, RomInfo_Cpu_RecompilePrgRam
+
+		RomInfo_SummaryMac	"Adds bank checking to any JSR crossing into a dynamic ROM address."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Comes at a cost of performance."
+		RomInfo_DefineMac	"public bool Cpu.DynamicJsr : Dynamic JSR", RomInfo_CpuSettings, RomInfo_Cpu_DynamicJsr
 
 		RomInfo_SummaryMac	"Allow recompiling illegal NOP opcodes."
 		RomInfo_SummaryMac	"Activating this may break games that derail the disassembler."

@@ -36,6 +36,8 @@ Game "Empty                ", 0x00, 0x00
 	.include	"Project/Interpret_and_Inline.asm"
 	.def	Interpret__BANK		0x80
 
+	.include	"Project/DynamicJsr.asm"
+
 	// ---------------------------------------------------------------------------
 	// Bank c0: ROM information and various code not depending on ROM DB
 
