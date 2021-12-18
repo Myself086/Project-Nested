@@ -44,12 +44,13 @@
             this.btnCredits = new System.Windows.Forms.Button();
             this.btnPatreon = new System.Windows.Forms.Button();
             this.btnCompatibility = new System.Windows.Forms.Button();
+            this.btnSaveAndPlay = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOpen
             // 
-            this.btnOpen.Location = new System.Drawing.Point(12, 111);
+            this.btnOpen.Location = new System.Drawing.Point(12, 95);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(75, 23);
             this.btnOpen.TabIndex = 0;
@@ -59,7 +60,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(12, 140);
+            this.btnSave.Location = new System.Drawing.Point(12, 124);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 1;
@@ -70,11 +71,11 @@
             // lblMapper
             // 
             this.lblMapper.AutoSize = true;
-            this.lblMapper.Location = new System.Drawing.Point(9, 168);
+            this.lblMapper.Location = new System.Drawing.Point(12, 179);
             this.lblMapper.Name = "lblMapper";
-            this.lblMapper.Size = new System.Drawing.Size(74, 65);
+            this.lblMapper.Size = new System.Drawing.Size(74, 52);
             this.lblMapper.TabIndex = 3;
-            this.lblMapper.Text = "Mapper: -1\r\nNot supported\r\n\r\n0 PRG banks\r\n0 CHR banks";
+            this.lblMapper.Text = "Mapper: -1\r\nNot supported\r\n0 PRG banks\r\n0 CHR banks";
             // 
             // groupBox1
             // 
@@ -98,14 +99,14 @@
             this.panel.Location = new System.Drawing.Point(0, 19);
             this.panel.Name = "panel";
             this.panel.Size = new System.Drawing.Size(391, 297);
-            this.panel.TabIndex = 0;
+            this.panel.TabIndex = 10;
             // 
             // btnLoadSrm
             // 
-            this.btnLoadSrm.Location = new System.Drawing.Point(12, 245);
+            this.btnLoadSrm.Location = new System.Drawing.Point(12, 234);
             this.btnLoadSrm.Name = "btnLoadSrm";
             this.btnLoadSrm.Size = new System.Drawing.Size(75, 23);
-            this.btnLoadSrm.TabIndex = 2;
+            this.btnLoadSrm.TabIndex = 3;
             this.btnLoadSrm.Text = "Load SRM";
             this.btnLoadSrm.UseVisualStyleBackColor = true;
             this.btnLoadSrm.Click += new System.EventHandler(this.btnLoadSrm_Click);
@@ -116,7 +117,7 @@
             this.btnSettingsText.Location = new System.Drawing.Point(12, 317);
             this.btnSettingsText.Name = "btnSettingsText";
             this.btnSettingsText.Size = new System.Drawing.Size(75, 23);
-            this.btnSettingsText.TabIndex = 3;
+            this.btnSettingsText.TabIndex = 4;
             this.btnSettingsText.Text = "Settings text";
             this.btnSettingsText.UseVisualStyleBackColor = true;
             this.btnSettingsText.Click += new System.EventHandler(this.btnSettingsText_Click);
@@ -129,7 +130,7 @@
             this.comboGameProfile.Location = new System.Drawing.Point(174, 92);
             this.comboGameProfile.Name = "comboGameProfile";
             this.comboGameProfile.Size = new System.Drawing.Size(226, 21);
-            this.comboGameProfile.TabIndex = 6;
+            this.comboGameProfile.TabIndex = 8;
             this.comboGameProfile.SelectedIndexChanged += new System.EventHandler(this.comboGameProfile_SelectedIndexChanged);
             // 
             // lblGameProfile
@@ -149,7 +150,7 @@
             this.btnSaveProfile.Location = new System.Drawing.Point(406, 90);
             this.btnSaveProfile.Name = "btnSaveProfile";
             this.btnSaveProfile.Size = new System.Drawing.Size(75, 23);
-            this.btnSaveProfile.TabIndex = 8;
+            this.btnSaveProfile.TabIndex = 9;
             this.btnSaveProfile.Text = "Save profile";
             this.btnSaveProfile.UseVisualStyleBackColor = true;
             this.btnSaveProfile.Click += new System.EventHandler(this.btnSaveProfile_Click);
@@ -166,7 +167,7 @@
             // lblKnownCalls
             // 
             this.lblKnownCalls.AutoSize = true;
-            this.lblKnownCalls.Location = new System.Drawing.Point(9, 271);
+            this.lblKnownCalls.Location = new System.Drawing.Point(9, 260);
             this.lblKnownCalls.Name = "lblKnownCalls";
             this.lblKnownCalls.Size = new System.Drawing.Size(72, 13);
             this.lblKnownCalls.TabIndex = 10;
@@ -178,7 +179,7 @@
             this.btnCredits.Location = new System.Drawing.Point(12, 404);
             this.btnCredits.Name = "btnCredits";
             this.btnCredits.Size = new System.Drawing.Size(75, 23);
-            this.btnCredits.TabIndex = 6;
+            this.btnCredits.TabIndex = 7;
             this.btnCredits.Text = "Credits";
             this.btnCredits.UseVisualStyleBackColor = true;
             this.btnCredits.Click += new System.EventHandler(this.btnCredits_Click);
@@ -189,7 +190,7 @@
             this.btnPatreon.Location = new System.Drawing.Point(12, 375);
             this.btnPatreon.Name = "btnPatreon";
             this.btnPatreon.Size = new System.Drawing.Size(75, 23);
-            this.btnPatreon.TabIndex = 5;
+            this.btnPatreon.TabIndex = 6;
             this.btnPatreon.Text = "Patreon";
             this.btnPatreon.UseVisualStyleBackColor = true;
             this.btnPatreon.Click += new System.EventHandler(this.btnPatreon_Click);
@@ -200,10 +201,20 @@
             this.btnCompatibility.Location = new System.Drawing.Point(12, 346);
             this.btnCompatibility.Name = "btnCompatibility";
             this.btnCompatibility.Size = new System.Drawing.Size(75, 23);
-            this.btnCompatibility.TabIndex = 4;
+            this.btnCompatibility.TabIndex = 5;
             this.btnCompatibility.Text = "Compatibility";
             this.btnCompatibility.UseVisualStyleBackColor = true;
             this.btnCompatibility.Click += new System.EventHandler(this.btnCompatibility_Click);
+            // 
+            // btnSaveAndPlay
+            // 
+            this.btnSaveAndPlay.Location = new System.Drawing.Point(12, 153);
+            this.btnSaveAndPlay.Name = "btnSaveAndPlay";
+            this.btnSaveAndPlay.Size = new System.Drawing.Size(75, 23);
+            this.btnSaveAndPlay.TabIndex = 2;
+            this.btnSaveAndPlay.Text = "Save && play";
+            this.btnSaveAndPlay.UseVisualStyleBackColor = true;
+            this.btnSaveAndPlay.Click += new System.EventHandler(this.btnSaveAndPlay_Click);
             // 
             // Form1
             // 
@@ -221,6 +232,7 @@
             this.Controls.Add(this.btnLoadSrm);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.lblMapper);
+            this.Controls.Add(this.btnSaveAndPlay);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnOpen);
             this.Controls.Add(this.lblInstructions);
@@ -252,6 +264,7 @@
         private System.Windows.Forms.Button btnCredits;
         private System.Windows.Forms.Button btnPatreon;
         private System.Windows.Forms.Button btnCompatibility;
+        private System.Windows.Forms.Button btnSaveAndPlay;
     }
 }
 

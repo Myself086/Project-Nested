@@ -179,24 +179,41 @@ namespace Project_Nested
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            SaveSnes();
+        }
+
+        private void btnSaveAndPlay_Click(object sender, EventArgs e)
+        {
+            var filename = SaveSnes();
+
+            if (filename != null)
+                Process.Start(filename);
+        }
+
+        private string SaveSnes()
+        {
             if (injector == null)
-                return;
+                return null;
 
             if (!injector.mapperSupported)
             {
                 MessageBox.Show($"Mapper {injector.ReadMapper()} isn't supported.");
-                return;
+                return null;
             }
 
 #if !DEBUG
             //try
 #endif
             {
+                var fullFileName = filename + ".smc";
+
                 injector.GameName.SetValue(profileLoaded != null ? profileLoaded : string.Empty);
                 byte[] data = injector.ApplyPostChanges();
-                File.WriteAllBytes(filename + ".smc", data);
+                File.WriteAllBytes(fullFileName, data);
 
                 SaveGlobalSettings();
+
+                return fullFileName;
             }
 #if !DEBUG
             /*catch (Exception ex)
@@ -204,6 +221,7 @@ namespace Project_Nested
                 MessageBox.Show(ex, "Error!");
             }*/
 #endif
+            return null;
         }
 
         private void btnSettingsText_Click(object sender, EventArgs e)
@@ -554,7 +572,7 @@ namespace Project_Nested
 
         private void ShowRomInfo()
         {
-            lblMapper.Text = string.Format("Mapper: {0}{1}\n\n{2} PRG banks\n{3} CHR banks",
+            lblMapper.Text = string.Format("Mapper: {0}{1}\n{2} PRG banks\n{3} CHR banks",
                 injector.ReadMapper(),
                 injector.mapperSupported ? "" : "\nNot supported",
                 injector.ReadPrgBanks(),
