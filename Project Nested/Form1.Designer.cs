@@ -212,7 +212,7 @@
             this.btnSaveAndPlay.Name = "btnSaveAndPlay";
             this.btnSaveAndPlay.Size = new System.Drawing.Size(75, 23);
             this.btnSaveAndPlay.TabIndex = 2;
-            this.btnSaveAndPlay.Text = "Save && play";
+            this.btnSaveAndPlay.Text = "Save && Play";
             this.btnSaveAndPlay.UseVisualStyleBackColor = true;
             this.btnSaveAndPlay.Click += new System.EventHandler(this.btnSaveAndPlay_Click);
             // 
