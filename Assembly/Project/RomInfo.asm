@@ -449,6 +449,5 @@ RomInfo_Description:
 		RomInfo_DefineMac	"global public bool Gui.HardwareUsage : Show hardware usage.", RomInfo_DebugOverlay, 0x80
 
 	// End of description
-	RomInfo_SummaryMac	""
 	RomInfo_DefineMac	"", Zero, 0
 
