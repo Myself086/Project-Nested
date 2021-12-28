@@ -826,7 +826,7 @@ Interpret__Jsr_SkipDebugCall:
 			// Are we crossing bank?
 			lda	$.originalReturn
 			ldy	$.originalCall
-			call	DynamicJsr__IsTargetStatic
+			call	DynamicJsr__IsRangeStatic
 			bcs	$+b_else
 				lda	$.originalCall
 				call	DynamicJsr__CreateJsrLink
@@ -906,7 +906,7 @@ Interpret__Jsr_RewriteJmp:
 			// Are we crossing bank?
 			lda	$.originalReturn
 			ldy	$.originalCall
-			call	DynamicJsr__IsTargetStatic
+			call	DynamicJsr__IsRangeStatic
 			bcs	$+b_else
 				lda	$.originalCall
 				call	DynamicJsr__CreateJsrLink
@@ -1130,7 +1130,7 @@ b_loop:
 			lda	$=StaticRec_Origins+2,x		// Original call
 			tay
 			lda	$=StaticRec_Origins+0,x		// Original return
-			call	DynamicJsr__IsTargetStatic
+			call	DynamicJsr__IsRangeStatic
 			bcs	$+b_else
 				ldx	$.return
 				lda	$=StaticRec_Origins+2,x		// Original call
@@ -1184,7 +1184,7 @@ Interpret__StaticJsr_Regular:
 			lda	$=StaticRec_Origins+2,x		// Original call
 			tay
 			lda	$=StaticRec_Origins+0,x		// Original return
-			call	DynamicJsr__IsTargetStatic
+			call	DynamicJsr__IsRangeStatic
 			bcs	$+b_else
 				ldx	$.return
 				lda	$=StaticRec_Origins+2,x		// Original call
@@ -1245,7 +1245,7 @@ Interpret__StaticJsr_PullReturn_Loop:
 			lda	$=StaticRec_Origins+2,x		// Original call
 			tay
 			lda	$=StaticRec_Origins+0,x		// Original return
-			call	DynamicJsr__IsTargetStatic
+			call	DynamicJsr__IsRangeStatic
 			bcs	$+b_else
 				ldx	$.return
 				lda	$=StaticRec_Origins+2,x		// Original call

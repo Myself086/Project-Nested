@@ -236,8 +236,8 @@ b_1:
 	// ---------------------------------------------------------------------------
 
 	.mx	0x00
-	.func	DynamicJsr__IsTargetStatic
-DynamicJsr__IsTargetStatic:
+	.func	DynamicJsr__IsRangeStatic
+DynamicJsr__IsRangeStatic:
 	// Entry: A = Source address, Y = Destination address
 	// Return: Carry = true when static
 
