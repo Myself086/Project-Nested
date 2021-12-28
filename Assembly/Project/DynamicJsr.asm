@@ -249,7 +249,7 @@ DynamicJsr__IsRangeStatic:
 	and	$=RomInfo_PrgBankingMask
 	bne	$+b_1
 		// Same range
-		clc
+		sec
 		return
 b_1:
 
