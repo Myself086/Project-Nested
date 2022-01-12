@@ -97,6 +97,12 @@ b_loop:
 	// Entry: X = List Pointer
 
 Array__Insert_Resize:
+		// Decrement
+		lda	$0x0000,x
+		sec
+		sbc	$0x0009,x
+		sta	$0x0000,x
+
 		// Double the size of the array
 		lda	$0x0006,x
 		sec
@@ -150,6 +156,12 @@ Array__Insert_loop1:
 	.local	_at, _listPointer
 
 Array__InsertAt_Resize:
+		// Decrement
+		lda	$0x0000,x
+		sec
+		sbc	$0x0009,x
+		sta	$0x0000,x
+
 		// Double the size of the array
 		lda	$0x0006,x
 		sec
