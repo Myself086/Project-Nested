@@ -83,7 +83,7 @@ b_1:
 	.def	Recompiler_CompileType_MoveToCart	0x0001
 	// Return: A = Index for function list, X = HeapStack pointer, Y = HeapStack pointer bank
 Recompiler__Build:
-	.local	=destListReadP
+	.local	_destListReadOffset
 	.local	_startAddr, =readAddr
 	.local	_opcodeX2
 	.local	_recompileFlags, _stackTrace, _stackTraceReset, _stackDepth
@@ -118,12 +118,6 @@ b_1:
 	call	Array__Clear
 	ldx	#_Recompiler_BranchDestList
 	call	Array__Clear
-	
-	// Keep base address for reading
-	ldx	$.Recompiler_BranchDestList
-	stx	$.destListReadP
-	ldx	$.Recompiler_BranchDestList+1
-	stx	$.destListReadP+1
 
 	// Add current ROM address to destinations
 	lda	$.romAddr
@@ -215,13 +209,19 @@ Recompiler__Build_RomRange:
 Recompiler__Build_SkipRomRange:
 
 	// Loop through the list of destination
+	stz	$.destListReadOffset
 Recompiler__Build_loop1:
 		// Read next destination
-		lda	[$.destListReadP]
+		lda	$.destListReadOffset
+		tay
+		clc
+		adc	#6
+		tax
+		lda	[$.Recompiler_BranchDestList+3],y
 		sta	$.readAddr
 		sta	$.startAddr
-		ldy	#0x0006
-		lda	[$.destListReadP],y
+		txy
+		lda	[$.Recompiler_BranchDestList+3],y
 		sta	$.stackDepth
 
 Recompiler__Build_loop1_loop:
@@ -563,6 +563,7 @@ Recompiler__Build_loop1_loop_next:
 			lda	$_Opcode__BytesTable,y
 			adc	$.readAddr
 			sta	$.readAddr
+			bcs	$+Recompiler__Build_loop1_next_clc			// Overflow into RAM: 0xffff -> 0x0000
 			jmp	$_Recompiler__Build_loop1_loop
 
 Recompiler__Build_loop1_next_clc:
@@ -572,13 +573,16 @@ Recompiler__Build_loop1_next:
 
 		// Complete this range
 		lda	$.readAddr
-		ldy	#0x0002
-		sta	[$.destListReadP],y
+		ldy	$.destListReadOffset
+		iny
+		iny
+		sta	[$.Recompiler_BranchDestList+3],y
 
 		// Next if more destinations are available
-		lda	$.destListReadP
+		lda	$.destListReadOffset
 		adc	$.Recompiler_BranchDestList+9
-		sta	$.destListReadP
+		sta	$.destListReadOffset
+		adc	$.Recompiler_BranchDestList+3
 		cmp	$.Recompiler_BranchDestList
 		bcs	$+Recompiler__Build_loop1_exit
 		jmp	$_Recompiler__Build_loop1
@@ -717,6 +721,14 @@ Recompiler__Build_loop2_loop_skip2:
 			lda	$_Opcode__BytesTable_OneOrMore,y
 			adc	$.readAddr
 			sta	$.readAddr
+			bcc	$+b_1
+				// Overflow into RAM: 0xffff -> 0x0000
+				tax
+				tdc		// Not exactly zero but the low byte is zero
+				sta	[$.writeAddr]
+				inc	$.writeAddr
+				txa
+b_1:
 
 			// Are we done?
 			cmp	$.lastReadAddr
@@ -883,6 +895,14 @@ b_1:
 			lda	$_Opcode__BytesTable_OneOrMore,y
 			adc	$.readAddr
 			sta	$.readAddr
+			bcc	$+b_1
+				// Overflow into RAM: 0xffff -> 0x0000
+				tax
+				tdc		// Not exactly zero but the low byte is zero
+				sta	[$.writeAddr]
+				inc	$.writeAddr
+				txa
+b_1:
 
 			// Are we done?
 			cmp	$.lastReadAddr

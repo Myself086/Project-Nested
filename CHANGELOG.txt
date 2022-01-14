@@ -6,6 +6,7 @@ Dev build:
 - Added optional Dynamic JSR, allowing each JSR to point to multiple banks
 - Fixed pushing return address via PHA when code is written to SRAM
 - Added button "Save & play" for faster testing on SNES emulator
+- Fixed various recompiler crashes
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size
