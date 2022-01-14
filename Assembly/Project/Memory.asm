@@ -254,7 +254,7 @@ b_trap:
 	ldx	$.Length
 	unlock
 	trap
-	Exception	"Memory Trim Failed{}{}{}Memory.Trim attempted to allocate more bytes than its original size.{}0x{X:X} -> 0x{A:X}"
+	Exception	"Memory Trim Failed{}{}{}Memory.Trim attempted to allocate more bytes than its original size.{}0x{A:X} -> 0x{X:X}"
 
 	// ---------------------------------------------------------------------------
 
