@@ -747,6 +747,7 @@ IO__w2007_In:
 b_3:
 
 			// Call
+			lda	$_IO_Temp
 			jmp	$_ChrRam_Write
 b_2:
 
