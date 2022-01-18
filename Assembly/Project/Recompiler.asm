@@ -906,7 +906,7 @@ b_1:
 
 			// Are we done?
 			cmp	$.lastReadAddr
-			bcc	$-Recompiler__Build_loop2b_loop
+			jcc	$_Recompiler__Build_loop2b_loop
 
 		// Next
 		jmp	$_Recompiler__Build_loop2b
@@ -3442,7 +3442,14 @@ b_1__:
 		.macro	Recompiler__Build_CoreCall_IfGoto
 			lda	${0}
 			and	#{1}
-			b{2}	$-b_branch
+			.ifnamecontains	{2}, "j"
+			{
+				{2}	$_b_branch
+			}
+			.else
+			{
+				{2}	$-b_branch
+			}
 			inc	$.src
 			break
 		.endm
@@ -3459,34 +3466,34 @@ b_branch:
 		break
 
 	case	CoreCall_IfFreeA
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, ne
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, bne
 
 	case	CoreCall_IfNotFreeA
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, eq
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0100, beq
 
 	case	CoreCall_IfFreeX
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, ne
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, bne
 
 	case	CoreCall_IfNotFreeX
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, eq
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0200, beq
 
 	case	CoreCall_IfFreeY
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, ne
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, bne
 
 	case	CoreCall_IfNotFreeY
-		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, eq
+		Recompiler__Build_CoreCall_IfGoto	.freeRegs, 0x0400, beq
 
 	case	CoreCall_IfFreeP
-		Recompiler__Build_CoreCall_IfGoto	.pushFlags, _CoreCallFlag_PushP, eq
+		Recompiler__Build_CoreCall_IfGoto	.pushFlags, _CoreCallFlag_PushP, beq
 
 	case	CoreCall_IfNotFreeP
-		Recompiler__Build_CoreCall_IfGoto	.pushFlags, _CoreCallFlag_PushP, ne
+		Recompiler__Build_CoreCall_IfGoto	.pushFlags, _CoreCallFlag_PushP, bne
 
 	case	CoreCall_IfJit
-		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, ne
+		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, bne
 
 	case	CoreCall_IfAot
-		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, eq
+		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, jeq
 
 	case	CoreCall_Jump
 		lda	[$.src]
