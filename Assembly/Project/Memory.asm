@@ -277,9 +277,11 @@ Memory__CanAlloc:
 	lda	$_Memory_HeapStack
 	sbc	$_Memory_Top
 	sbc	#0x0010
+	bcc	$+b_return
 	// Do we have enough space? Return carry==true if so
 	cmp	$.temp
 
+b_return:
 	plb
 	return
 
@@ -304,9 +306,11 @@ Memory__CanAllocCart:
 	lda	$_Memory_HeapStack-0x8000
 	sbc	$_Memory_Top-0x8000
 	sbc	#0x0010
+	bcc	$+b_return
 	// Do we have enough space? Return carry==true if so
 	cmp	$.temp
-	
+
+b_return:
 	plb
 	return
 
