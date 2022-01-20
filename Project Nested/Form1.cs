@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Project_Nested.Injection;
@@ -157,6 +158,9 @@ namespace Project_Nested
             {
                 injector.KnownCallCountChanged += Injector_KnownCallCountChanged;
 
+                injector.save = () => btnSave_Click(null, null);
+                injector.saveAndPlay = () => btnSaveAndPlay_Click(null, null);
+
                 this.filename = filename;
 
                 if (SelectProfile(ConvertPathToTitle(filename), true))
@@ -179,18 +183,75 @@ namespace Project_Nested
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            SaveSnes();
+#if SYNC_SAVE
+            SaveSnesSync();
+#else
+            SaveSnesAsync();
+#endif
         }
 
-        private void btnSaveAndPlay_Click(object sender, EventArgs e)
+        private async void btnSaveAndPlay_Click(object sender, EventArgs e)
         {
-            var filename = SaveSnes();
+#if SYNC_SAVE
+            var filename = SaveSnesSync();
+#else
+            var filename = await SaveSnesAsync();
+#endif
 
             if (filename != null)
                 Process.Start(filename);
         }
 
-        private string SaveSnes()
+        public async Task<string> SaveSnesAsync()
+        {
+            CancellationTokenSource ct = new CancellationTokenSource();
+
+            var progress = new FrmSaveProgress(ct);
+
+            var rtn = Task.Run(async () =>
+            {
+                if (injector == null)
+                    return null;
+
+                if (!injector.mapperSupported)
+                {
+                    MessageBox.Show($"Mapper {injector.ReadMapper()} isn't supported.");
+                    return null;
+                }
+
+                try
+                {
+                    var fullFileName = filename + ".smc";
+
+                    injector.GameName.SetValue(profileLoaded != null ? profileLoaded : string.Empty);
+                    var data = Task.Run(() =>
+                    {
+                        var data2 = injector.FinalChanges(ct.Token, progress);
+                        return data2;
+                    }, ct.Token);
+                    await data;
+                    File.WriteAllBytes(fullFileName, data.Result);
+
+                    SaveGlobalSettings();
+
+                    return fullFileName;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error!");
+                }
+                return null;
+            }, ct.Token);
+
+            progress.ShowDialog();
+
+            await rtn;
+
+            return rtn.Result;
+        }
+
+#if SYNC_SAVE
+        public string SaveSnesSync()
         {
             if (injector == null)
                 return null;
@@ -201,28 +262,27 @@ namespace Project_Nested
                 return null;
             }
 
-#if !DEBUG
             //try
-#endif
             {
                 var fullFileName = filename + ".smc";
 
                 injector.GameName.SetValue(profileLoaded != null ? profileLoaded : string.Empty);
-                byte[] data = injector.ApplyPostChanges();
+                var data = injector.FinalChanges(null, null);
                 File.WriteAllBytes(fullFileName, data);
 
                 SaveGlobalSettings();
 
+                MessageBox.Show("Saving done!");
+
                 return fullFileName;
             }
-#if !DEBUG
             /*catch (Exception ex)
             {
-                MessageBox.Show(ex, "Error!");
+                MessageBox.Show(ex.Message, "Error!");
             }*/
-#endif
             return null;
         }
+#endif
 
         private void btnSettingsText_Click(object sender, EventArgs e)
         {

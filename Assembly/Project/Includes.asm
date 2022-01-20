@@ -56,6 +56,7 @@ Spc_Code_End:
 	.include	"Project/Gui.asm"
 	.include	"Project/Gui.StringFormat.asm"
 	.include	"Project/JMPiList.asm"
+	.include	"Project/EmuCalls.asm"
 
 	// Exception data must be at the end of the bank and in the same bank as Gui
 ExceptionData_Start:

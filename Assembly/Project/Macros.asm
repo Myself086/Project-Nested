@@ -170,6 +170,21 @@ branch__:
 	.endm
 
 	// ---------------------------------------------------------------------------
+	// Quick if statement
+
+	.macro	andbeq		arg1, arg2, dest
+		lda	{0}
+		and	{1}
+		beq	{2}
+	.endm
+
+	.macro	andbne		arg1, arg2, dest
+		lda	{0}
+		and	{1}
+		bne	{2}
+	.endm
+
+	// ---------------------------------------------------------------------------
 	// Switch related macros
 
 	.macro	switch		count, defaultDestination, breakDestination

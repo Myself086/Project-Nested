@@ -7,10 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project Nested", "Project N
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Sync|Any CPU = Debug Sync|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1428DDD8-6690-42E6-8611-CE86EE7124C7}.Debug Sync|Any CPU.ActiveCfg = Debug Sync|Any CPU
+		{1428DDD8-6690-42E6-8611-CE86EE7124C7}.Debug Sync|Any CPU.Build.0 = Debug Sync|Any CPU
 		{1428DDD8-6690-42E6-8611-CE86EE7124C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1428DDD8-6690-42E6-8611-CE86EE7124C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1428DDD8-6690-42E6-8611-CE86EE7124C7}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,9 +1,11 @@
 ﻿using Project_Nested.Emulation;
+using Project_Nested.Optimize;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Project_Nested.Injection
@@ -28,6 +30,8 @@ namespace Project_Nested.Injection
         Int32 chrBankSize;
         Int32 prgBanksTotal;
         Int32 chrBanksTotal;
+
+        public Action save, saveAndPlay;
 
         #endregion
         // --------------------------------------------------------------------
@@ -81,6 +85,7 @@ namespace Project_Nested.Injection
         SettingWrapper<byte> ChrBankLut_low => new SettingWrapper<byte>(settings, "ChrBankLut_lo", true);
         SettingWrapper<byte> ChrBankLut_high => new SettingWrapper<byte>(settings, "ChrBankLut_hi", true);
 
+        SettingWrapper<byte> StaticRange => new SettingWrapper<byte>(settings, "MemoryEmulation.StaticRange");
         SettingWrapper<bool> StaticRange_80 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_80");
         SettingWrapper<bool> StaticRange_a0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_a0");
         SettingWrapper<bool> StaticRange_c0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_c0");
@@ -114,10 +119,14 @@ namespace Project_Nested.Injection
             Array.Resize(ref this.OutData, 0x800000);
             finalRomSize = OutData.Length;
 
+            // Copy start-up code to its proper location for ROMs using more than 4mb
+            Array.Copy(OutData, 0x00ff00, OutData, 0x40ff00, 0x100);
+
             this.SrcDataCopy = data;
 
             // Dummy preparation because I'm too lazy to decouple the "switch (mapper)" part
-            WriteNesRom(true);
+            if (data != null)
+                WriteNesRom(true);
         }
 
         #endregion
@@ -266,7 +275,7 @@ namespace Project_Nested.Injection
             }
         }
 
-        public byte[] ApplyPostChanges()
+        public void MergeRoms()
         {
             // Write NES ROM
             WriteNesRom(false);
@@ -282,9 +291,6 @@ namespace Project_Nested.Injection
 
             // Copy static ROM ranges to every bank
             CopyStaticData();
-
-            // Finish writing the ROM
-            return FinalChanges();
         }
 
         #endregion
@@ -442,15 +448,20 @@ namespace Project_Nested.Injection
             this.ChrBankLut_high.SetArray(ChrBanks_high.ToArray());
         }
 
-        private byte[] FinalChanges()
+#if SYNC_SAVE
+        public byte[] FinalChanges(CancellationToken? ct, IProgress<Tuple<string, int, int>> progress)
+#else
+        public async Task<byte[]> FinalChanges(CancellationToken? ct, IProgress<Tuple<string, int, int>> progress)
+#endif
         {
+            MergeRoms();
+
+            progress?.Report(new Tuple<string, int, int>("Compiling", 0, 0));
+
             c65816 emu;
 
             // Clone OutData so it can be restored to a state prior to these changes
             var oldOutData = (byte[])this.OutData.Clone();
-
-            // Copy start-up code to its proper location for ROMs using more than 4mb
-            Array.Copy(OutData, 0x00ff00, OutData, 0x40ff00, 0x100);
 
             // Rom makeup, HiROM vs ExHiROM (required for SD2SNES ExHiROM)
             OutData[0x00ffd5] = 0x31;
@@ -461,6 +472,18 @@ namespace Project_Nested.Injection
                 // Bank range
                 this.AotCompileBanks.SetValueAt(0, (byte)(NewHiRomBank + 1));
                 this.AotCompileBanks.SetValueAt(1, 0xff);
+
+                OptimizeGroup optGroup = null;
+                if (Convert.ToBoolean(GetSetting("Optimize.Enabled")))
+                {
+                    optGroup = new OptimizeGroup(this, calls.Where(e => !excludedCalls.Contains(e)).ToList(), StaticRange.Value, progress);
+#if SYNC_SAVE
+                    optGroup.OptimizeAllSync();
+#else
+                    await optGroup.OptimizeAllAsync(ct);
+#endif
+                    IfCancel();
+                }
 
                 // Build SRAM
                 byte[] sram = new byte[0x4000];
@@ -494,9 +517,7 @@ namespace Project_Nested.Injection
 #endif
 
                 // Initialize emulator
-                emu = new c65816(OutData, sram);
-                emu.InterruptUnusedReset();
-                emu.Execute(OutData);
+                emu = NewEmulator(sram);
 
                 // Patch ranges
                 {
@@ -507,7 +528,11 @@ namespace Project_Nested.Injection
                 }
 
                 // Call compiler
+                optGroup?.WriteLinks(emu);
                 StaticRecompiler(emu);
+                optGroup?.FixLinks(emu);
+                if (optGroup != null)
+                    emu.memory.ReadROM(OutData);
             }
 
             if (NewHiRomBank > 0x80)
@@ -569,7 +594,18 @@ namespace Project_Nested.Injection
 
             // Restore old OutData before returning the final ROM
             Array.Copy(oldOutData, OutData, OutData.Length);
+            progress?.Report(new Tuple<string, int, int>(null, 0, 0));
             return rtn;
+
+            void IfCancel()
+            {
+                if (ct.HasValue && ct.Value.IsCancellationRequested)
+                {
+                    // Restore old OutData when task is cancelled
+                    Array.Copy(oldOutData, OutData, OutData.Length);
+                    ct?.ThrowIfCancellationRequested();
+                }
+            }
         }
 
         private int CalculateChecksum(byte[] data, int fileSize)
@@ -705,6 +741,20 @@ namespace Project_Nested.Injection
         // --------------------------------------------------------------------
         #region Virtual calls
 
+        public c65816 NewEmulator(byte[] sram)
+        {
+            var emu = new c65816(OutData, sram);
+            emu.ExecuteInit(null);
+            emu.memory.ReadROM(OutData);
+            return emu;
+        }
+
+        public c65816 NewEmulatorNoInit(byte[] sram)
+        {
+            var emu = new c65816(OutData, sram);
+            return emu;
+        }
+
         private void StaticRecompiler(c65816 emu)
         {
             emu.SetRegPC(GetSetting("StaticRec.Main").ReadInt());
@@ -717,6 +767,100 @@ namespace Project_Nested.Injection
             emu.SetRegPC(GetSetting("Memory.Alloc").ReadInt());
             emu.Execute(OutData);
             return emu.memory.DebugReadThreeByte(0);
+        }
+
+        public Raw65816 RecompilerBuild(c65816 emu, int nesAddr)
+        {
+            emu.memory.DebugWriteFourByte(0, nesAddr);
+            emu.SetRegPC(GetSetting("Recompiler.Build").ReadInt());
+            emu.Execute();
+            return new Raw65816(
+                nesAddr,
+                emu.PullByteArray(),
+                emu.memory.DebugReadThreeByte(0),
+                emu.memory.DebugReadThreeByte(4),
+                emu.memory.DebugReadTwoByte(8));
+        }
+
+        internal int AddCallLinks(c65816 emu, List<LinkOrigin> links)
+        {
+            if (links.Count == 0)
+                return 0;
+
+            int? baseAddress = null;
+            emu.memory.WriteROM(OutData);
+            foreach (var link in links)
+            {
+                emu.memory.DebugWriteFourByte(0, link.wholeData);
+                emu.SetRegPC(GetSetting("StaticRec.AddCallLink").ReadInt());
+                emu.Execute();
+
+                if (baseAddress == null)
+                    baseAddress = emu.memory.DebugReadTwoByte(0);
+            }
+            emu.memory.ReadROM(OutData);
+
+            return baseAddress.Value;
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Range test
+
+        public bool IsRangeStatic(int src, int dest)
+        {
+            // Also exists in assembly form as DynamicJsr__IsRangeStatic
+
+            // Are source and destination in the same range?
+            if (((src ^ dest) & PrgBankingMask.Value) == 0)
+                return true;        // Same range
+
+            // Return whether range is static
+            return ((StaticRange.Value >> (dest >> 13)) & 1) != 0;
+        }
+
+        public int GetStaticBankDestination(int src, int dest)
+        {
+            if (IsRangeStatic(src, dest) && (ushort)dest >= 0x8000)
+            {
+                if (src == dest)
+                    return (src >> 16) & 0xff;
+                else
+                    return PrgBankNumbers[(dest >> 13) - 4];
+            }
+            else
+                return -1;
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Emulator calls
+
+        public static List<EmulatorCall> InitEmulatorCallList()
+        {
+            var injector = new Injector(null);
+
+            var list = new List<EmulatorCall>();
+
+            var addr = injector.GetSetting("EmuCalls.Table").ReadInt();
+
+            // ID 0 should be invalid
+            list.Add(EmulatorCall.Unknown());
+
+            while (true)
+            {
+                var name = injector.OutData.ReadString0(ref addr);
+                if (name == string.Empty)
+                    break;
+
+                var snesAddr = injector.OutData.Read24(ref addr);
+                var usage = injector.OutData.Read32(ref addr);
+                var change = injector.OutData.Read32(ref addr);
+
+                list.Add(new EmulatorCall(name, snesAddr, (FlagAndRegs)usage, (FlagAndRegs)change, list.Count));
+            }
+
+            return list;
         }
 
         #endregion

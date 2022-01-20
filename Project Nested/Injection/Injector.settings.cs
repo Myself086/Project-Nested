@@ -15,12 +15,14 @@ namespace Project_Nested.Injection
         public int KnownCallCount => calls.Count;
         public event Action KnownCallCountChanged;
 
+        public List<int> excludedCalls = new List<int>();
+
         private void LoadSettings()
         {
             _settings.Clear();
 
             // Settings pointer is expected to be at 0x00ff00 in the file
-            int addr = OutData.Read24(0x00ff00) & 0x3fffff;
+            int addr = ConvertSnesToFileAddress(OutData.Read24(0x00ff00));
 
             // Read settings
             while (true)
@@ -74,7 +76,7 @@ namespace Project_Nested.Injection
 
             // Settings
             foreach (var item in settings)
-                if (item.Value.IsPublic && !item.Value.IsGlobal && item.Value.type != SettingType.Void)
+                if (item.Value.IsPublic && !item.Value.IsGlobal && item.Value.IsVariable)
                     sb.AppendLine(item.Value.ToString());
 
             // Unknown settings
@@ -105,6 +107,16 @@ namespace Project_Nested.Injection
         public int[] GetAllKnownCalls()
         {
             return calls.ToArray();
+        }
+
+        public bool KnownCallsContainsInclusively(int addr)
+        {
+            return calls.Contains(addr);
+        }
+
+        public bool KnownCallsContainsExclusively(int addr)
+        {
+            return calls.Contains(addr) && !excludedCalls.Contains(addr);
         }
 
         public string ConvertCallsToString(List<int> calls)

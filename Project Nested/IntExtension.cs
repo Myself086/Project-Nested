@@ -19,5 +19,16 @@ namespace Project_Nested
             value++;
             return value;
         }
+
+        public static int RoundToNextPowerOf2(this int value)
+        {
+            value |= value >> 1;
+            value |= value >> 2;
+            value |= value >> 4;
+            value |= value >> 8;
+            value |= value >> 16;
+            value++;
+            return value;
+        }
     }
 }

@@ -90,6 +90,9 @@ namespace Project_Nested.Injection
                             case SettingType.Char:
                                 CreateTextbox(setting, true);
                                 break;
+                            case SettingType.Button:
+                                CreateButton(setting);
+                                break;
                         }
                     }
                 }
@@ -148,7 +151,7 @@ namespace Project_Nested.Injection
 
             setting.Changed += (sender) =>
             {
-                if (!busy)
+                if (!busy && !box.InvokeRequired)
                     box.Checked = Convert.ToBoolean(sender.GetValue());
             };
 
@@ -203,7 +206,7 @@ namespace Project_Nested.Injection
 
             setting.Changed += (sender) =>
             {
-                if (!busy)
+                if (!busy && !textbox.InvokeRequired)
                     textbox.Text = sender.GetValues();
             };
 
@@ -249,6 +252,38 @@ namespace Project_Nested.Injection
                     if (!label.IsDisposed)
                         UpdateLabel();
                 };
+            };
+
+            // Increment Y
+            Y += 29;
+        }
+
+        private void CreateButton(Setting setting)
+        {
+            // Button
+            Button button = new Button();
+            button.Location = new Point(X + TABULATION, Y);
+            button.Text = setting.TitleWithPrivacy;
+            button.Width = TextRenderer.MeasureText(button.Text, button.Font).Width + 16;
+            button.AutoSize = true;
+            tip.SetToolTip(button, setting.Summary);
+            AddControl(button);
+
+            button.Click += (sender, e) =>
+            {
+                switch (setting.Name)
+                {
+                    case "Optimize":
+                        {
+                            var form = new Optimize.FrmOptimize();
+                            form.Show((Control)sender);
+                            form.injector = injector;
+                        }
+                        break;
+                    default:
+                        MessageBox.Show($"Unknown button behavior for \"{setting.Name}\".");
+                        break;
+                }
             };
 
             // Increment Y

@@ -232,6 +232,8 @@ RomInfo_Description:
 
 		RomInfo_DefineMac	"private func<int,int> Memory.Alloc", Memory__AllocForExe, 0
 		RomInfo_DefineMac	"private func<> StaticRec.Main", StaticRec__MainForExe, 0
+		RomInfo_DefineMac	"private func<short,short> StaticRec.AddCallLink", StaticRec__AddCallLinkForExe, 0
+		RomInfo_DefineMac	"private func<int> Recompiler.Build", Recompiler__BuildForExe, 0
 
 	RomInfo_DefineMac	"public void Tab_MemoryEmulation : Memory emulation accuracy settings.", 0, 0
 
@@ -258,6 +260,8 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Clears RAM upon reset, losing all data that would otherwise carry over."
 		RomInfo_SummaryMac	"Doesn't lose data from saved files."
 		RomInfo_DefineMac	"public bool MemoryEmulation.ZeroMemoryReset : Zero Memory upon reset", RomInfo_ZeroMemoryReset, 0x80
+
+		RomInfo_DefineMac	"private readonly hex byte MemoryEmulation.StaticRange : Static range", RomInfo_StaticRanges, 0
 
 		RomInfo_SummaryMac	"Defines ROM range 0x8000-0x9fff as static."
 		RomInfo_SummaryMac	"May improve compatibility."
@@ -322,6 +326,14 @@ RomInfo_Description:
 		RomInfo_SummaryMac	" E2"
 		RomInfo_SummaryMac	" F4, FA, FC"
 		RomInfo_DefineMac	"public bool Cpu.IllegalNop : Allow illegal NOPs", RomInfo_CpuSettings, RomInfo_Cpu_IllegalNop
+
+		RomInfo_SummaryMac	"Improves performance but may be unstable."
+		RomInfo_SummaryMac	"Please report games that behave differently when this is enabled versus disabled."
+		RomInfo_DefineMac	"public bool Optimize.Enabled : Enable AOT optimization (beta)", RomInfo_Optimize, RomInfo_Optimize_StaticRec
+
+		RomInfo_DefineMac	"public Button Optimize : Debug AOT optimization", Zero, 0
+
+		RomInfo_DefineMac	"private void* EmuCalls.Table", EmuCalls_Table, 0
 
 	RomInfo_DefineMac	"public void Tab_Stack : Stack related rules.", 0, 0
 

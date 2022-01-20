@@ -31,6 +31,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug Sync|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug Sync\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SYNC_SAVE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
@@ -47,6 +57,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ByteArrayExtension.cs" />
+    <Compile Include="Emulation\c65816.wdm.cs" />
+    <Compile Include="FrmSaveProgress.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSaveProgress.Designer.cs">
+      <DependentUpon>FrmSaveProgress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimize\Asm65816Dictionary.cs" />
     <Compile Include="Emulation\c65816.cs" />
     <Compile Include="Emulation\Memory.cs" />
     <Compile Include="Form1.cs">
@@ -66,6 +84,36 @@
     <Compile Include="Injection\Patch.cs" />
     <Compile Include="Injection\Setting.cs" />
     <Compile Include="IntExtension.cs" />
+    <Compile Include="Optimize\AsmIL65816.cs" />
+    <Compile Include="Optimize\FrmFindFaultySubRoutine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Optimize\FrmFindFaultySubRoutine.Designer.cs">
+      <DependentUpon>FrmFindFaultySubRoutine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimize\LinkOrigin.cs" />
+    <Compile Include="Optimize\EmulatorCall.cs" />
+    <Compile Include="Optimize\CodeBlock.cs" />
+    <Compile Include="Optimize\InstructionSet.cs" />
+    <Compile Include="Optimize\MakeBinary.cs" />
+    <Compile Include="Optimize\Operations\OptRemoveLabels.cs" />
+    <Compile Include="Optimize\Operations\OptRemoveCode.cs" />
+    <Compile Include="Optimize\Operations\OptSimplifyBranches.cs" />
+    <Compile Include="Optimize\Operations\OptSolveConstants.cs" />
+    <Compile Include="Optimize\Operations\OptUnrollLoops.cs" />
+    <Compile Include="Optimize\Operations\OptDictionary.cs" />
+    <Compile Include="Optimize\OptimizeGroup.cs" />
+    <Compile Include="Optimize\OptimizeOperation.cs" />
+    <Compile Include="Optimize\OptimizeOperator.cs" />
+    <Compile Include="Optimize\Raw65816.cs" />
+    <Compile Include="Optimize\FrmOptimize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Optimize\FrmOptimize.Designer.cs">
+      <DependentUpon>FrmOptimize.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Optimize\OpcodeDescription.cs" />
+    <Compile Include="RichTextBoxExtension.cs" />
     <Compile Include="SrmFeedbackReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,6 +125,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrmPatches.resx">
       <DependentUpon>FrmPatches.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmSaveProgress.resx">
+      <DependentUpon>FrmSaveProgress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Optimize\FrmOptimize.resx">
+      <DependentUpon>FrmOptimize.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -103,5 +157,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

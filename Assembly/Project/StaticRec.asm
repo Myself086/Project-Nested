@@ -33,6 +33,22 @@ StaticRec__Init:
 	// Activate StaticRec mode
 	sta	$_StaticRec_Active
 
+	// Reset call table
+	lda	#_StaticRec_Tables+0x400
+	sta	$_StaticRec_AddFunctionForExe_CallTableOffset
+	stz	$_StaticRec_AddFunctionForExe_CallTableLowByte
+	ldx	#0x03fc
+b_loop:
+		lda	#_StaticRec_Tables+0x400
+		sta	$=StaticRec_Tables+0,x
+		lda	#0x0000
+		sta	$=StaticRec_Tables+2,x
+		dex
+		dex
+		dex
+		dex
+		bpl	$-b_loop
+
 	call	Main__InitMemory
 
 	// Format ROM
@@ -48,6 +64,94 @@ StaticRec__Init:
 b_1:
 
 	return
+
+	// ---------------------------------------------------------------------------
+
+StaticRec_AddFunctionForExe_CallTableOffset:
+	.data16		0
+StaticRec_AddFunctionForExe_CallTableLowByte:
+	.data16		0
+
+
+	// Entry: int originalAddress, int newAddress, short recompileFlags
+StaticRec__AddFunctionListingForExe:
+	// OBSOLETE
+	trap
+
+	FromExeInit16
+
+	// Low byte of original address must be greater or equal to the previous one entered
+	lda	$0x0000
+	and	#0x00ff
+	cmp	$=StaticRec_AddFunctionForExe_CallTableLowByte
+	trapcc
+	sta	$=StaticRec_AddFunctionForExe_CallTableLowByte
+	beq	$+b_1
+		// New low byte
+		asl	a
+		asl	a
+		tax
+		lda	$=StaticRec_AddFunctionForExe_CallTableOffset
+		sta	$=StaticRec_Tables+0,x
+b_1:
+
+	// Add listing
+	lda	$=StaticRec_AddFunctionForExe_CallTableOffset
+	tax
+	lda	$0x0000
+	sta	$=StaticRec_Tables+0,x
+	lda	$0x0002
+	sta	$=StaticRec_Tables+2,x
+	lda	$0x0004
+	sta	$=StaticRec_Tables+3,x
+	lda	$0x0006
+	sta	$=StaticRec_Tables+5,x
+	lda	$0x0008
+	sta	$=StaticRec_Tables+6,x
+
+	// Increment count
+	lda	$=StaticRec_AddFunctionForExe_CallTableLowByte
+	asl	a
+	asl	a
+	tax
+	lda	$=StaticRec_Tables+2,x
+	clc
+	adc	#8
+	sta	$=StaticRec_Tables+2,x
+
+	// Increment offset
+	lda	$=StaticRec_AddFunctionForExe_CallTableOffset
+	clc
+	adc	#8
+	sta	$=StaticRec_AddFunctionForExe_CallTableOffset
+
+	stp
+
+	// ---------------------------------------------------------------------------
+
+	// Entry: short originalReturn, short originalCall
+	// Return: short basePointer
+StaticRec__AddCallLinkForExe:
+	FromExeInit16
+
+	// Get and increment origin count
+	lda	$=StaticRec_OriginCount
+	tax
+	clc
+	adc	#4
+	trapcs
+	sta	$=StaticRec_OriginCount
+
+	// Add link, assuming it's a new link
+	lda	$0x0000
+	sta	$=StaticRec_Origins+0,x
+	lda	$0x0002
+	sta	$=StaticRec_Origins+2,x
+
+	// Return base pointer
+	stx	$0x0000
+
+	stp
 
 	// ---------------------------------------------------------------------------
 
@@ -71,11 +175,11 @@ StaticRec__Main:
 	sta	$.lowBits
 
 	// Address for writing call table
-	.local	=tableEP
+	.local	=callTableEP
 	lda	#_StaticRec_Tables/0x100
-	sta	$.tableEP+1
+	sta	$.callTableEP+1
 	lda	#_StaticRec_Tables+0x400
-	sta	$.tableEP
+	sta	$.callTableEP
 
 StaticRec__Main_Loop2:
 		// Define starting pointer for feedback addresses
@@ -90,7 +194,7 @@ StaticRec__Main_Loop2:
 		asl	a
 		asl	a
 		tax
-		lda	$.tableEP
+		lda	$.callTableEP
 		sta	$=StaticRec_Tables,x
 		lda	#0
 		sta	$=StaticRec_Tables+2,x
@@ -105,68 +209,91 @@ StaticRec__Main_Loop:
 			jmp	$_StaticRec__Main_Loop_Next
 b_in:
 
-				// Set banks
-				sep	#0x20
-				.mx	0x20
 				ldy	#0x0002
 				lda	[$.pointer],y
-				sta	$_Program_BankNum_8000
-				sta	$_Program_BankNum_a000
-				sta	$_Program_BankNum_c000
-				sta	$_Program_BankNum_e000
-				tax
-				lda	$=RomInfo_BankLut_80,x
-				sta	$_Program_Bank_0+2
-				lda	$=RomInfo_BankLut_a0,x
-				sta	$_Program_Bank_1+2
-				lda	$=RomInfo_BankLut_c0,x
-				sta	$_Program_Bank_2+2
-				lda	$=RomInfo_BankLut_e0,x
-				sta	$_Program_Bank_3+2
-				rep	#0x20
-				.mx	0x00
+				call	Recompiler__SetBank
 
 				// Clear known calls
 				ldx	#_Recompiler_FunctionList
 				call	Array__Clear
 
-				// Call recompiler
-				.precall	Recompiler__Build		_romAddr, _compileType
-				lda	[$.pointer]
-				// Address must be in ROM range
-				//bpl	$+StaticRec__Main_Loop_Next
-				// Address must be >= 0x8000
-				cmp	#0x8000
-				bcc	$+StaticRec__Main_Loop_Next
-				sta	$.Param_romAddr
-				lda	#_Recompiler_CompileType_MoveToCart
-				sta	$.Param_compileType
-				call
-
-				// Optimize
-//				.precall	Optimize__Simplify		=functionHeapStackPointer, _callIndex
-//				sta	$.Param_callIndex
-//				// Are we optimizing?
-//				lda	$=RomInfo_Optimize
-//				and	#_RomInfo_Optimize_StaticRec
-//				beq	$+b_1
-//					stx	$.Param_functionHeapStackPointer
-//					sty	$.Param_functionHeapStackPointer+2
-//					call
-//b_1:
-
-				// Add to list
-				lda	[$.Recompiler_FunctionList+3]
-				sta	[$.tableEP]
+				// Was this already done by exe?
 				ldy	#2
-				lda	[$.Recompiler_FunctionList+3],y
-				sta	[$.tableEP],y
-				ldy	#4
-				lda	[$.Recompiler_FunctionList+3],y
-				sta	[$.tableEP],y
-				ldy	#6
-				lda	[$.Recompiler_FunctionList+3],y
-				sta	[$.tableEP],y
+				lda	[$.pointer],y
+				tay
+				lda	[$.pointer]
+				clc
+				WDM_RequestFunction
+				bcc	$+b_else
+					.local	_entryPoint, _compileFlags, _bankReservation
+					sta	$.entryPoint
+					stx	$.compileFlags
+					sty	$.bankReservation
+
+					// Allocate ROM space for code
+					.local	=code
+					tya
+					WDM_PeekByteArray
+					call	Memory__Alloc
+					stx	$.code+0
+					sta	$.code+2
+					// Write code
+					tay
+					txa
+					WDM_SetFunctionSnesAddress
+					WDM_PullByteArray
+
+					// Add to list
+					// Original address
+					ldy	#2
+					lda	[$.pointer],y
+					sta	[$.callTableEP],y
+					lda	[$.pointer]
+					sta	[$.callTableEP]
+					// Recompiled address
+					ldy	#4
+					lda	$.code+1
+					sta	[$.callTableEP],y
+					lda	$.code
+					clc
+					adc	$.entryPoint
+					dey
+					sta	[$.callTableEP],y
+					// Recompiler flags
+					lda	$.compileFlags
+					ldy	#6
+					sta	[$.callTableEP],y
+
+					bra	$+b_1
+					.unlocal	=code
+					.unlocal	_entryPoint, _compileFlags, _bankReservation
+b_else:
+					// Call recompiler
+					.precall	Recompiler__Build		_romAddr, _compileType
+					lda	[$.pointer]
+					// Address must be in ROM range
+					//bpl	$+StaticRec__Main_Loop_Next
+					// Address must be >= 0x8000
+					cmp	#0x8000
+					bcc	$+StaticRec__Main_Loop_Next
+					sta	$.Param_romAddr
+					lda	#_Recompiler_CompileType_MoveToCart
+					sta	$.Param_compileType
+					call
+
+					// Add to list
+					lda	[$.Recompiler_FunctionList+3]
+					sta	[$.callTableEP]
+					ldy	#2
+					lda	[$.Recompiler_FunctionList+3],y
+					sta	[$.callTableEP],y
+					ldy	#4
+					lda	[$.Recompiler_FunctionList+3],y
+					sta	[$.callTableEP],y
+					ldy	#6
+					lda	[$.Recompiler_FunctionList+3],y
+					sta	[$.callTableEP],y
+b_1:
 
 				// Increment table length, assume carry clear after asl
 				lda	$.lowBits
@@ -179,8 +306,8 @@ b_in:
 
 				// Increment table pointer, assume carry clear from previous adc
 				lda	#8
-				adc	$.tableEP
-				sta	$.tableEP
+				adc	$.callTableEP
+				sta	$.callTableEP
 
 StaticRec__Main_Loop_Next:
 			// Next

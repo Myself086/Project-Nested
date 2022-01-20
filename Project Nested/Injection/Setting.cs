@@ -7,7 +7,7 @@ namespace Project_Nested.Injection
 {
     public enum SettingType
     {
-        Unknown = 0, Void, VoidStar, Bool, Byte, Short, Pointer, Int, Char, Func
+        Unknown = 0, Void, VoidStar, Bool, Byte, Short, Pointer, Int, Char, Func, Button
     }
 
     public class Setting
@@ -106,6 +106,7 @@ namespace Project_Nested.Injection
                             break;
                         case "void":
                             this.type = SettingType.Void;
+                            this.IsVariable = false;
                             break;
                         case "void*":
                             this.type = SettingType.VoidStar;
@@ -153,6 +154,11 @@ namespace Project_Nested.Injection
                                 this.Length = 1;
                                 this.SnesAddress |= 0x800000;
                             }
+                            this.IsVariable = false;
+                            break;
+                        case "button":
+                            this.type = SettingType.Button;
+                            this.IsVariable = false;
                             break;
                         default:
                             // Change name only if this is the last symbol

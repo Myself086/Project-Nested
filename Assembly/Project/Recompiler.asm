@@ -77,11 +77,67 @@ b_1:
 
 	// ---------------------------------------------------------------------------
 
+	// Entry: int romAddr
+	// Return: int baseAddress, int entryPointOffset, short recompileFlags, byte[] code
+Recompiler__BuildForExe:
+	FromExeInit16
+
+	lda	$0x0002
+	call	Recompiler__SetBank
+
+	.precall	Recompiler__Build		_romAddr, _compileType
+	lda	$0x0000
+	sta	$.Param_romAddr
+	lda	#_Recompiler_CompileType_MoveToExe
+	sta	$.Param_compileType
+	call
+
+	sta	$0x0000
+	lda	$.DP_ZeroBank
+	sta	$0x0002
+	stx	$0x0004
+	stz	$0x0006
+	sty	$0x0008
+	stp
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
+	.func	Recompiler__SetBank
+	// Entry: A = NES bank number, A.hi = ingored
+	// NOTE: Only used for static recompilation
+Recompiler__SetBank:
+	// Set banks
+	and	#0x00ff
+	sep	#0x20
+	.mx	0x20
+	sta	$_Program_BankNum_8000
+	sta	$_Program_BankNum_a000
+	sta	$_Program_BankNum_c000
+	sta	$_Program_BankNum_e000
+	tax
+	lda	$=RomInfo_BankLut_80,x
+	sta	$_Program_Bank_0+2
+	lda	$=RomInfo_BankLut_a0,x
+	sta	$_Program_Bank_1+2
+	lda	$=RomInfo_BankLut_c0,x
+	sta	$_Program_Bank_2+2
+	lda	$=RomInfo_BankLut_e0,x
+	sta	$_Program_Bank_3+2
+	rep	#0x20
+	.mx	0x00
+	
+	return
+
+	// ---------------------------------------------------------------------------
+
 	.mx	0x00
 	.func	Recompiler__Build		_romAddr, _compileType
 	// Compile type flags
 	.def	Recompiler_CompileType_MoveToCart	0x0001
+	.def	Recompiler_CompileType_MoveToExe	0x0002
 	// Return: A = Index for function list, X = HeapStack pointer, Y = HeapStack pointer bank
+	// Return2 (MoveToExe set): A = Base address, X = Entry point offset, Y = Recompile flags, ZeroBank = Base address bank
 Recompiler__Build:
 	.local	_destListReadOffset
 	.local	_startAddr, =readAddr
@@ -959,6 +1015,65 @@ b_1:
 Recompiler__Build_loop3_exit:
 
 Recompiler__Build_SkipRecompiler:
+
+	// Are we transferring this code to exe?
+	lda	$.compileType
+	and	#_Recompiler_CompileType_MoveToExe
+	beq	$+b_1
+		// Transfer code to exe
+
+		// Push code
+		//  X = Length
+		lda	$.writeAddr
+		sec
+		sbc	[$.heapStackIndex]
+		tax
+		//  Y = Address bank
+		lda	$.writeAddr+2
+		and	#0x00ff
+		tay
+		//  A = Address
+		lda	[$.heapStackIndex]
+		WDM_PushByteArray
+
+		// Find this function's starting address
+		lda	$.romAddr
+		sta	[$.Recompiler_BranchDestList]
+		ldx	#_Recompiler_BranchDestList
+		ldy	#0x0002
+		call	Array__Find
+		clc
+		adc	#0x0004
+		tay
+		lda	[$.Recompiler_BranchDestList+3],y
+		sec
+		sbc	[$.heapStackIndex]
+		.local	_entryPointOffset, =baseAddress
+		sta	$.entryPointOffset
+		lda	[$.heapStackIndex]
+		sta	$.baseAddress
+		lda	$.heapStackIndex+2
+		sta	$.baseAddress+2
+
+		// Dealloc
+		.precall	Memory__Trim	=StackPointer, _Length
+		lda	$.heapStackIndex+1
+		sta	$.Param_StackPointer+1
+		lda	$.heapStackIndex+0
+		sta	$.Param_StackPointer+0
+		stz	$.Param_Length
+		call
+
+		// Return base address and entry point offset
+		lda	$.baseAddress+2
+		and	#0x00ff
+		sta	$.DP_ZeroBank
+		ldy	$.recompileFlags
+		ldx	$.entryPointOffset
+		lda	$.baseAddress
+		return
+		.unlocal	_entryPointOffset, =baseAddress
+b_1:
 
 	// Trim memory used
 	.precall	Memory__Trim	=StackPointer, _Length
@@ -1854,6 +1969,9 @@ b_back:
 	cmp	#0x00a9
 	bne	$-Recompiler__Build_OpcodeType_LdaConst_Regular
 
+	// Are we compiling for the exe?
+	andbne	$.compileType, #_Recompiler_CompileType_MoveToExe, $-Recompiler__Build_OpcodeType_Const
+
 	// Write TDC instead
 	lda	#0x007b
 	sta	[$.writeAddr]
@@ -1974,7 +2092,7 @@ b_1:
 		// Write original value
 		sta	$=StaticRec_Origins+2,x
 
-		// Write and increment origin count, assume carry clear from previous adc
+		// Write and increment origin count, assume carry clear from Recompiler__Build_Inline2NoInc
 		txa
 		ldy	#_Inline__PushConstantReturnAOT_JmpToRam-Inline__PushConstantReturnAOT+1
 		sta	[$.writeAddr],y
@@ -4096,7 +4214,7 @@ Recompiler__AddQuickFunction_loopEnd:
 
 	.mx	0x00
 	.func	Recompiler__CallFunction		_originalFunction
-	// Return: Y = index for known calls
+	// Return: A = Y = index for known calls
 Recompiler__CallFunction:
 	.local	_originalFunction_b
 	.local	_base, _add
@@ -4159,36 +4277,19 @@ Recompiler__CallFunction_SkipStatic:
 		call
 		plb
 
-		// Keep function index
-		.local	_rtn
+		// Return function index
 		clc
 		adc	#3
-		sta	$.rtn
-
-		// Optimize
-//		lda	$=RomInfo_Optimize
-//		and	#_RomInfo_Optimize_MainThread
-//		beq	$+b_1
-//			.precall	Optimize__Simplify		=functionHeapStackPointer, _callIndex
-//			stx	$.Param_functionHeapStackPointer
-//			sty	$.Param_functionHeapStackPointer+2
-//			lda	$.rtn
-//			sta	$.Param_callIndex
-//			call
-//b_1:
-
-		ldy	$.rtn
+		tay
 		return
 
-		.unlocal	_rtn
-
 Recompiler__CallFunction_call:
-	// Return index
-	sec
+	// Return function index
+	clc
 	adc	$.add
+	clc
+	adc	#3
 	tay
-	iny
-	iny
 
 	return
 

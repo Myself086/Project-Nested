@@ -18,5 +18,13 @@ namespace Project_Nested
             else
                 return Convert.ToInt32(value);
         }
+
+        public static int ReadNesAddress(this string value)
+        {
+            // Remove colon
+            value = value.Replace(":", "");
+
+            return Convert.ToInt32(value, 16);
+        }
     }
 }

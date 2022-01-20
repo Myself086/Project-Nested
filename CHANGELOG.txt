@@ -8,6 +8,7 @@ Dev build:
 - Added button "Save & play" for faster testing on SNES emulator
 - Fixed various recompiler crashes
 - Fixed memory overflow during memory allocation
+- Added AOT optimization
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size

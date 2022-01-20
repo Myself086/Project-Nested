@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Project_Nested.Emulation
 {
-    partial class c65816
+    public partial class c65816
     {
         public Memory memory = new Memory();
 
@@ -66,7 +66,8 @@ namespace Project_Nested.Emulation
         {
             memory.WriteROM(rom);
             memory.ResetRam(Memory.RomSize.ExHiROM);
-            memory.WriteSRAM(sram);
+            if (sram != null)
+                memory.WriteSRAM(sram);
             Init();
         }
 
@@ -579,12 +580,27 @@ namespace Project_Nested.Emulation
             }
         }
 
+        public void ExecuteInit(byte[] romData)
+        {
+            InterruptUnusedReset();
+            Execute(romData);
+        }
+
         public bool Execute(byte[] romData)
         {
-            memory.WriteROM(romData);
-            var rtn = Execute();
-            memory.ReadROM(romData);
-            return rtn;
+            if (romData == null)
+            {
+                // Execute and return without sending ROM data back
+                return Execute();
+            }
+            else
+            {
+                // Execute and return ROM data back
+                memory.WriteROM(romData);
+                var rtn = Execute();
+                memory.ReadROM(romData);
+                return rtn;
+            }
         }
 
         public bool Execute()
@@ -639,6 +655,7 @@ namespace Project_Nested.Emulation
                     $"\n" +
                     $"PC = {GetRegPC():x6}\n" +
                     $"PC base = {r_PC:x6}") ;
+                throw new Exception("Emulation error.");
             }
             //#endif
             return false;
@@ -1990,12 +2007,6 @@ namespace Project_Nested.Emulation
         void op___WAI(Int32 i)
         {
             setflag_w(-1);
-        }
-
-        void op___WDM(Int32 i)
-        {
-            i = memory.ReadOneByte(i);
-            // TODO: Will be used for injector feedback and optimization
         }
 
         void op___XBA(Int32 i)
