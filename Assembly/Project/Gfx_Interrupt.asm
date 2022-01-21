@@ -195,9 +195,14 @@ Start__Irq_Fast:
 	.mx	0x10
 	sep	#0x10
 
+	// Interrupt in process
+	ldx	#0x80
+	stx	$_IRQ_InterruptInProcess+1
+
 	// Are we in Vblank? Also acknowledge IRQ at the same time
 	lda	$0x4211
-	bpl	$+b_1
+	jpl	$_b_SkipVblankUpdates
+
 		// Swap HDMA buffers if ready
 		ldx	$.HDMA_SideBufferReady+1
 		beq	$+b_2
@@ -215,44 +220,42 @@ Start__Irq_Fast:
 			Gfx__HdmaSwap_Mac	HDMA_LayersEnabled, 3
 b_2:
 		ldx	$.Sound_Ready
-		beq	$+b_1
+		beq	$+b_2
 			// Always swap sound buffers
 			Gfx__HdmaSwap_Mac	HDMA_Sound, 1
 			stz	$.Sound_Ready
-b_1:
+b_2:
 
-	// Has VramQ overflown? Keep result in carry for Gfx__VramQueue
-	lda	[$.Vram_Queue_Top_2]
-	cmp	#1
+		// Has VramQ overflown? Keep result in carry for Gfx__VramQueue
+		lda	[$.Vram_Queue_Top_2]
+		cmp	#1
 
-	// Change DP to page 21 for faster IO access
-	lda	#0x2100
-	tcd
+		// Change DP to page 21 for faster IO access
+		lda	#0x2100
+		tcd
 
-	// Black screen until transfer is done (TODO: Test recycling the value read from $0x4211)
-	//cpx	#0x80
-	//trapcc
-	ldx	#0x80
-	stx	$0x00
+		// Black screen until transfer is done (TODO: Test recycling the value read from $0x4211)
+		//cpx	#0x80
+		//trapcc
+		ldx	#0x80
+		stx	$0x00
 
-	// Interrupt in process
-	stx	$_IRQ_InterruptInProcess+1
+		// Clip 8 pixels on the left of the screen if set
+		ldy	$_IO_2001
+		ldx	$_Gfx__WindowClip_LUT,y
+		stx	$0x2e
 
-	// Clip 8 pixels on the left of the screen if set
-	ldy	$_IO_2001
-	ldx	$_Gfx__WindowClip_LUT,y
-	stx	$0x2e
+		// Screen size (TODO: Only write this once OR move this to VramQ to support mappers with dynamic nametable mirrors)
+		ldx	$_IO_BG_MIRRORS
+		stx	$0x07
 
-	// Screen size (TODO: Only write this once OR move this to VramQ to support mappers with dynamic nametable mirrors)
-	ldx	$_IO_BG_MIRRORS
-	stx	$0x07
+		// Do VRAM updates, assume carry clear from CMP way above
+		Gfx__VramQueue
 
-	// Do VRAM updates, assume carry clear from CMP way above
-	Gfx__VramQueue
-
-	// Show screen
-	ldx	#0x0f
-	stx	$0x00
+		// Show screen
+		ldx	#0x0f
+		stx	$0x00
+b_SkipVblankUpdates:
 
 	// Change mode
 	.mx	0x00
