@@ -125,12 +125,14 @@ IO_BG_MIRRORS:
 
 
 	.addr	0x0a27, 0x0a3f
-	// 14/25
+	// 15/25
 
 IO_PPUADDR:
 	.fill	2
 IO_PPUADDR_INC:
 	.fill	2
+IO_PPUADDR_INC_QUEUED:
+	.fill	1
 
 IO_SCROLL_X:
 	.fill	2

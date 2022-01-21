@@ -65,42 +65,25 @@ IO__w2000_in:
 
 IO__w2000_in2:
 	lda	$_IO_2000
-	bit	#0x04
-	bne	$+IO__w2000_a_inc32
-		// Change name tables
-		and	#0x03
-		sta	$_PPU_SCROLL_X+1
+	sta	$_PPU_SCROLL_X+1
+	lsr	a
+	sta	$_PPU_SCROLL_Y+1	// Bit 7 of Y must be clear here and LSR guarantees it
+
+	and	#2
+	cmp	$_IO_PPUADDR_INC_QUEUED
+	beq	$+b_1
+		sta	$_IO_PPUADDR_INC_QUEUED
+		ora	#.VramQ_PpuAddrInc1
+		sta	$0x2180
+		adc	#.Zero+0x3e-VramQ_PpuAddrInc1		// Sets bit 6 when bit 1 was set and puts the opposite value in bit 1
 		lsr	a
-		sta	$_PPU_SCROLL_Y+1
-
-		// Inc 1
-		lda	#.VramQ_PpuAddrInc
-		sta	$0x2180
-		lda	#0x01
-		sta	$0x2180
+		and	#0x21
 		sta	$_IO_PPUADDR_INC
+b_1:
 
-		xba
-		plp
-		rtl
-
-IO__w2000_a_inc32:
-		// Change name tables
-		and	#0x03
-		sta	$_PPU_SCROLL_X+1
-		lsr	a
-		sta	$_PPU_SCROLL_Y+1
-
-		// Inc 32
-		lda	#.VramQ_PpuAddrInc
-		sta	$0x2180
-		lda	#0x20
-		sta	$0x2180
-		sta	$_IO_PPUADDR_INC
-
-		xba
-		plp
-		rtl
+	xba
+	plp
+	rtl
 
 
 IO__r2001_a:

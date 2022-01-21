@@ -222,6 +222,7 @@ b_loop:
 
 	// Nes PPU increment by 1
 	inc	$_IO_PPUADDR_INC
+	dec	$_IO_PPUADDR_INC_QUEUED
 
 	// Disable backgrounds and sprites until the game decides to enable them
 	stz	$0x212c

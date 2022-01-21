@@ -736,54 +736,56 @@ Int__TestMainThread_BranchType:
 	.def	VramQ_PpuAddrLow			0x12
 	// PpuAddrHigh(u8)
 	.def	VramQ_PpuAddrHigh			0x14
-	// PpuAddrInc(u8)
-	.def	VramQ_PpuAddrInc			0x16
 	// Read()
-	.def	VramQ_Read					0x18
+	.def	VramQ_Read					0x16
+	// PpuAddrInc1()
+	.def	VramQ_PpuAddrInc1			0x18	// Index bit 1 must be clear
+	// PpuAddrInc32()
+	.def	VramQ_PpuAddrInc32			0x1a
 	// ScrollY(u8)
-	.def	VramQ_ScrollY				0x1a
+	.def	VramQ_ScrollY				0x1c
 	// ScrollX(u8)
-	.def	VramQ_ScrollX				0x1c
+	.def	VramQ_ScrollX				0x1e
 	// ChrBank(u8 highBitsVramAddr, u16 highBitsSourceAddr, u8 highBitsLength)
-	.def	VramQ_ChrBank				0x1e
+	.def	VramQ_ChrBank				0x20
 	// Tiles(u8[u8 length] tileData)
-	.def	VramQ_Tiles					0x20
+	.def	VramQ_Tiles					0x22
 	// TilesAtAddress(u16 vramAddress, u8[u8 length] tileData)
-	.def	VramQ_TilesAtAddress		0x22
+	.def	VramQ_TilesAtAddress		0x24
 	// NameTableMirrorChange(u8 value)
-	.def	VramQ_NameTableMirrorChange	0x24
+	.def	VramQ_NameTableMirrorChange	0x26
 	// DebugRow0()
-	.def	VramQ_DebugRow0				0x26
+	.def	VramQ_DebugRow0				0x28
 	// DebugRow1()
-	.def	VramQ_DebugRow1				0x28
+	.def	VramQ_DebugRow1				0x2a
 	// DebugRow2()
-	.def	VramQ_DebugRow2				0x2a
+	.def	VramQ_DebugRow2				0x2c
 	// DebugRow3()
-	.def	VramQ_DebugRow3				0x2c
+	.def	VramQ_DebugRow3				0x2e
 	// DebugRow4()
-	.def	VramQ_DebugRow4				0x2e
+	.def	VramQ_DebugRow4				0x30
 	// DebugRow6()
-	.def	VramQ_DebugRow5				0x30
+	.def	VramQ_DebugRow5				0x32
 	// DebugRow6()
-	.def	VramQ_DebugRow6				0x32
+	.def	VramQ_DebugRow6				0x34
 	// DebugRow7()
-	.def	VramQ_DebugRow7				0x34
+	.def	VramQ_DebugRow7				0x36
 	// DebugRow8()
-	.def	VramQ_DebugRow8				0x36
+	.def	VramQ_DebugRow8				0x38
 	// DebugRow9()
-	.def	VramQ_DebugRow9				0x38
+	.def	VramQ_DebugRow9				0x3a
 	// DebugRow10()
-	.def	VramQ_DebugRow10			0x3a
+	.def	VramQ_DebugRow10			0x3c
 	// DebugRow11()
-	.def	VramQ_DebugRow11			0x3c
+	.def	VramQ_DebugRow11			0x3e
 	// DebugRow12()
-	.def	VramQ_DebugRow12			0x3e
+	.def	VramQ_DebugRow12			0x40
 	// DebugRow13()
-	.def	VramQ_DebugRow13			0x40
+	.def	VramQ_DebugRow13			0x42
 	// DebugRow14()
-	.def	VramQ_DebugRow14			0x42
+	.def	VramQ_DebugRow14			0x44
 	// DebugRow15()
-	.def	VramQ_DebugRow15			0x44
+	.def	VramQ_DebugRow15			0x46
 
 	.mx	0x10
 	.macro	Gfx__VramQueue
@@ -832,8 +834,9 @@ Gfx__VramQueue_Switch:
 	.data16	_Gfx__VramQueue_VramQ_PpuAddr
 	.data16	_Gfx__VramQueue_VramQ_PpuAddrLow
 	.data16	_Gfx__VramQueue_VramQ_PpuAddrHigh
-	.data16	_Gfx__VramQueue_VramQ_PpuAddrInc
 	.data16	_Gfx__VramQueue_VramQ_Read
+	.data16	_Gfx__VramQueue_VramQ_PpuAddrInc1
+	.data16	_Gfx__VramQueue_VramQ_PpuAddrInc32
 	.data16	_Gfx__VramQueue_VramQ_ScrollY
 	.data16	_Gfx__VramQueue_VramQ_ScrollX
 	.data16	_Gfx__VramQueue_VramQ_ChrBank
@@ -875,6 +878,10 @@ Gfx__VramQueue_VramQ_Init:
 	// Activate HDMA (01111010b)
 	ldy	#0x7a
 	sty	$0x420c
+
+	// Reset PPU address increment
+	ldy	#1
+	sty	$_Vram_Queue_PpuAddrInc
 
 	// Next
 	ldx	$0x80
@@ -1202,8 +1209,17 @@ Gfx__VramQueue_VramQ_PpuAddrHigh_IsNameTableLUT:
 	.fill	0xd0, 0x00
 
 
-Gfx__VramQueue_VramQ_PpuAddrInc:
+Gfx__VramQueue_VramQ_PpuAddrInc1:
+	ldx	#1
+	stx	$_Vram_Queue_PpuAddrInc
+
+	// Next
 	ldx	$0x80
+	jmp	($_Gfx__VramQueue_Switch,x)
+
+
+Gfx__VramQueue_VramQ_PpuAddrInc32:
+	ldx	#32
 	stx	$_Vram_Queue_PpuAddrInc
 
 	// Next
