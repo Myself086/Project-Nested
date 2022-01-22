@@ -69,7 +69,11 @@ Cop__SetScanline:
 	CoreCall_CopyUpTo	+b_1
 		sta	$_Scanline
 		rep	#0x10
+		phb
+		phd
 		call	Hdma__UpdateScrolling
+		pld
+		plb
 		sep	#0x30
 b_1:
 	CoreCall_Pull
@@ -88,7 +92,11 @@ Cop__AddScanline:
 		clc
 		adc	$_Scanline_HDMA
 		sta	$_Scanline
+		phb
+		phd
 		call	Hdma__UpdateScrolling
+		pld
+		plb
 b_1:
 	CoreCall_Pull
 	CoreCall_End
@@ -106,7 +114,11 @@ Cop__IncScanline:
 		lda	$_Scanline_HDMA
 		inc	a
 		sta	$_Scanline
+		phb
+		phd
 		call	Hdma__UpdateScrolling
+		pld
+		plb
 b_1:
 	CoreCall_Pull
 	CoreCall_End

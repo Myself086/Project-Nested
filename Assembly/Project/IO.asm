@@ -159,7 +159,11 @@ IO__r2002_y:
 			.mx	0x20
 
 			.vstack		_VSTACK_START
+			phb
+			phd
 			call	Hdma__UpdateScrolling
+			pld
+			plb
 
 			// Change mode back
 			sep	#0x30

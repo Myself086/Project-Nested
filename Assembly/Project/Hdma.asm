@@ -107,6 +107,7 @@ Hdma__InitChannels:
 
 	.mx	0x20
 	.func	Hdma__UpdateScrolling
+	// Return: DB = HDMA_BUFFER_BANK/0x10000, DP = HDMA_VSTACK_PAGE
 Hdma__UpdateScrolling_ReturnFromIRQ:
 	nop
 
@@ -126,8 +127,6 @@ Hdma__UpdateScrolling_ReturnFromIRQ:
 	sta	$.Scanline
 	bne	$+b_SkipNewFrame
 		stz	$.Scanline_Busy
-		plb
-		pld
 b_exit:
 		return
 
@@ -138,8 +137,6 @@ Hdma__UpdateScrolling:
 	bne	$-b_exit
 
 	// Change DP and DB
-	phd
-	phb
 	pea	$_HDMA_VSTACK_PAGE
 	pld
 	lda	#.HDMA_BUFFER_BANK/0x10000
@@ -235,8 +232,6 @@ b_2:
 b_1:
 	jsr	$_Hdma__UpdateScrolling_RecursiveCall
 	stz	$.Scanline_Busy
-	plb
-	pld
 	return
 
 
@@ -630,18 +625,9 @@ Hdma__UpdateScrolling_SoundUpdateLine:
 
 	.mx	0x20
 	//.func	Hdma__SwapBuffers
+	// Entry: DB = HDMA_BUFFER_BANK/0x10000, DP = HDMA_VSTACK_PAGE
 Hdma__SwapBuffers:
-	// TODO: Nest this function into Hdma__UpdateScrolling
-
-	// Change DP and Vstack
 	.vstack		HDMA_VSTACK_START
-	phd
-	phb
-	pea	$_HDMA_VSTACK_PAGE
-	pld
-	lda	#.HDMA_BUFFER_BANK/0x10000
-	pha
-	plb
 
 	// Invalidate side buffer in case it was already queued (not necessary because our only caller is locking thread)
 	//stz	$.HDMA_SideBufferReady+1
@@ -859,8 +845,6 @@ b_next:
 	// Reset sound update number
 	stz	$.Sound_UpdateNumber
 
-	plb
-	pld
 	rtl
 
 

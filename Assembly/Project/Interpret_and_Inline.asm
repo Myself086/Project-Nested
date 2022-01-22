@@ -1482,7 +1482,11 @@ Interpret__Idle:
 
 			// Call next IRQ and return
 			sta	$_Scanline
+			phb
+			phd
 			call	Hdma__UpdateScrolling
+			pld
+			plb
 			sep	#0x30
 			ply
 			plx
@@ -1593,6 +1597,8 @@ Interpret__Wait4Vblank:
 
 	lda	#0xef
 	sta	$_Scanline
+	phb
+	phd
 	call	Hdma__UpdateScrolling
 
 	// Swap buffers while delaying IRQ
@@ -1602,6 +1608,8 @@ Interpret__Wait4Vblank:
 
 	// Update sound
 	call	Sound__Update
+	pld
+	plb
 
 	// Change mode, clear thread lock, clear carry and keep it clear during the loop below
 	rep	#0x35
