@@ -35,6 +35,11 @@ namespace Project_Nested.Optimize
             return obj;
         }
 
+        public static void Reset()
+        {
+            _emuCalls = null;
+        }
+
         static OpcodeDescription[] InitOpcodes()
         {
             var opcodes = new OpcodeDescription[0x1000];

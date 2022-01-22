@@ -299,6 +299,9 @@ namespace Project_Nested
             {
                 // Reload NES and SNES files
                 LoadNesFile(this.filename);
+
+                // Reset lookup tables for optimization
+                Optimize.Asm65816Dictionary.Reset();
             }
         }
 
