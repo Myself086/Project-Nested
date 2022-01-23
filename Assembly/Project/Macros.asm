@@ -111,7 +111,7 @@ trap__:
 
 	.macro	ExceptionStart
 		.pushaddr
-		.addr	ExceptionData,		ExceptionData|0x7fff
+		.addr	ExceptionData_WritePointer
 ExceptionStart__:
 		// Pointer to next element
 		.data16	0
@@ -124,9 +124,9 @@ ExceptionStart__:
 	.macro	ExceptionEnd
 this__:
 		// Link this element to the next
-		.addr	ExceptionData,		ExceptionData|0x7fff
+		.addr	ExceptionData_WritePointer
 		.data16	this__
-		.def	ExceptionData,		this__
+		.def	ExceptionData_WritePointer,		this__
 		.pulladdr
 	.endm
 

@@ -297,9 +297,9 @@ Gui__BlueScreen:
 
 	// Find error tag
 	.precall	Dict__FindElement		=list, =compareString, .length
-	ldx	#_ExceptionData_Start
+	ldx	#_ExceptionData
 	stx	$.Param_list
-	lda	#_ExceptionData_Start/0x10000+0x0300
+	lda	#_ExceptionData/0x10000+0x0300
 	sta	$.Param_list+2
 	ldx	#_BlueScreen_PC
 	stx	$.Param_compareString
@@ -876,4 +876,12 @@ Gui__Text_RegisterBottom16:
 
 Gui__Text_RegisterBottom8:
 	.string0	"X:   {x:X}  SP:  {S:X}  DP:{DP:X}{}Y:   {y:X}  PC:{PC:X}{}{}{title} v{version}{}{}Build date: {buildDate}"
+
+	// ---------------------------------------------------------------------------
+
+	// Exception data
+ExceptionData:
+	.addrlow	ExceptionData_WritePointer
+	.data8		0
+	.def		ExceptionData_WritePointer		ExceptionData
 
