@@ -2919,9 +2919,13 @@ Recompiler__Build_OpcodeType_Txs:
 	beq	$+b_in
 	bcs	$+b_1
 b_in:
+		ldy	#1
+		andbne	$=RomInfo_StackEmulation, #_RomInfo_StackEmu_Page01, $+b_2
+			ldy	#9
+b_2:
 		ldx	#_Inline__Txs_WithRangeTest
 		lda	#_Inline__Txs_WithRangeTest/0x10000
-		jsr	$_Recompiler__Build_InlineNoInc
+		jsr	$_Recompiler__Build_Inline2NoInc
 
 		// Add to write address
 		tya
@@ -2944,9 +2948,13 @@ b_in:
 		.mx	0x00
 b_1:
 
-	ldx	#_Inline__Txs
-	lda	#_Inline__Txs/0x10000
-	jmp	$_Recompiler__Build_Inline
+	ldy	#1
+	andbne	$=RomInfo_StackEmulation, #_RomInfo_StackEmu_Page01, $+b_1
+		ldy	#9
+b_1:
+	ldx	#_Inline__Txs_Regular
+	lda	#_Inline__Txs_Regular/0x10000
+	jmp	$_Recompiler__Build_Inline2
 
 
 Recompiler__Build_OpcodeType_Pha:

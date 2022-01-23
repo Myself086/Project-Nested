@@ -116,12 +116,13 @@ RomInfo_DebugOverlay:
 
 	// 16 bits of "Stack emulation" flags
 RomInfo_StackEmulation:
-	.data16	0x010f
+	.data16	0x030f
 	.def	RomInfo_StackEmu_LazyDoubleReturn		0x0001
 	.def	RomInfo_StackEmu_StackUnderflow			0x0002
 	.def	RomInfo_StackEmu_NativeReturn			0x0004
 	.def	RomInfo_StackEmu_SafeTsx				0x0008
 	.def	RomInfo_StackEmu_NativeReturnInterrupt	0x0100
+	.def	RomInfo_StackEmu_Page01					0x0200
 	.def	RomInfo_StackEmu_NATIVE_MASK			0xff00
 
 RomInfo_StackResetRange:
@@ -374,6 +375,10 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"This option may prevent some games from hanging."
 		RomInfo_DefineMac	"public hex byte[2] StackEmulation.StackResetRange : Reset interrupt on stack reset.", RomInfo_StackResetRange, 0
+
+		RomInfo_SummaryMac	"Decides whether to put stack in page 01 or 09."
+		RomInfo_SummaryMac	"Can fix some games and break other games."
+		RomInfo_DefineMac	"public bool StackEmulation.Page01 : Stack page 01", RomInfo_StackEmulation, RomInfo_StackEmu_Page01
 
 	RomInfo_DefineMac	"public void Tab_Banks : Bank and range related rules.", 0, 0
 

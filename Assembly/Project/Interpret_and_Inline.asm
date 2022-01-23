@@ -8,22 +8,26 @@
 
 	// ---------------------------------------------------------------------------
 
-	.mx	0x10
-Inline__Txs:
-	rep	#0x10
+Inline__Txs_Regular:
+	.mx	0x30
 	stx	$_IO_Temp16
-	inc	$_IO_Temp16+1
+	ldx	#0xff
+	stx	$_IO_Temp16+1
+	rep	#0x10
+	.mx	0x10
 	ldx	$_IO_Temp16
 	txs
 	sep	#0x30
 
 	.data8	0
 
-	.mx	0x10
 Inline__Txs_WithRangeTest:
-	rep	#0x10
+	.mx	0x30
 	stx	$_IO_Temp16
-	inc	$_IO_Temp16+1
+	ldx	#0xff
+	stx	$_IO_Temp16+1
+	rep	#0x10
+	.mx	0x10
 	ldx	$_IO_Temp16
 	txs
 	sep	#0x30
