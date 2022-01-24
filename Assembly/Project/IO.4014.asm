@@ -1064,7 +1064,7 @@ IO__w4014_8x16_exit:
 	sep	#0x20
 	.mx	0x20
 
-	// Save sprite size, write any non-zero value for 8x16
+	// Save sprite size, set bit 7 for 8x16
 	lda	#0xf0
 	sta	$_IO_4014_SpriteSize
 
