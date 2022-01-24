@@ -27,6 +27,7 @@ namespace Project_Nested.Injection
         private List<int> validMappers;
         public bool IsValidMapper(int mapper) => validMappers == null || validMappers.Contains(mapper);
 
+        public int FileAddress { get; private set; }
         public int SnesAddress { get; private set; }
         public SettingType type { get; private set; }
         public int Length { get; private set; } = 1;
@@ -45,6 +46,14 @@ namespace Project_Nested.Injection
         {
             this.data = data;
             this.SnesAddress = snesAddr;
+            try
+            {
+                this.FileAddress = Injector.ConvertSnesToFileAddress(snesAddr);
+            }
+            catch (Exception)
+            {
+                this.FileAddress = int.MinValue;
+            }
             this.Mask = (Int16)mask;
             Constructor(definition, summary);
         }
@@ -152,7 +161,6 @@ namespace Project_Nested.Injection
                             {
                                 this.type = SettingType.Func;
                                 this.Length = 1;
-                                this.SnesAddress |= 0x800000;
                             }
                             this.IsVariable = false;
                             break;
@@ -207,17 +215,17 @@ namespace Project_Nested.Injection
                     case SettingType.Func:
                         return $"0x{SnesAddress:x}";
                     case SettingType.Bool:
-                        return (data.ReadBool(SnesAddress + index / 8, (short)(Mask << (index & 0x7)))).ToString();
+                        return (data.ReadBool(FileAddress + index / 8, (short)(Mask << (index & 0x7)))).ToString();
                     case SettingType.Byte:
-                        return string.Format(IsHex ? "0x{0:x2}" : "{0}", data.Read8(SnesAddress + index * 1));
+                        return string.Format(IsHex ? "0x{0:x2}" : "{0}", data.Read8(FileAddress + index * 1));
                     case SettingType.Short:
-                        return string.Format(IsHex ? "0x{0:x4}" : "{0}", data.Read16(SnesAddress + index * 2));
+                        return string.Format(IsHex ? "0x{0:x4}" : "{0}", data.Read16(FileAddress + index * 2));
                     case SettingType.Pointer:
-                        return string.Format("0x{0:x6}", data.Read8(SnesAddress + index * 3));
+                        return string.Format("0x{0:x6}", data.Read8(FileAddress + index * 3));
                     case SettingType.Int:
-                        return string.Format(IsHex ? "0x{0:x8}" : "{0}", data.Read32(SnesAddress + index * 4));
+                        return string.Format(IsHex ? "0x{0:x8}" : "{0}", data.Read32(FileAddress + index * 4));
                     case SettingType.Char:
-                        return ((char)(data.Read8(SnesAddress + index * 1))).ToString();
+                        return ((char)(data.Read8(FileAddress + index * 1))).ToString();
                 }
             }
             set
@@ -234,22 +242,22 @@ namespace Project_Nested.Injection
                     case SettingType.Void:
                         throw new InvalidOperationException($"Setting {this.Title} is read only.");
                     case SettingType.Bool:
-                        data.WriteBool(SnesAddress + index / 8, (short)(Mask << (index & 0x7)), Convert.ToBoolean(value));
+                        data.WriteBool(FileAddress + index / 8, (short)(Mask << (index & 0x7)), Convert.ToBoolean(value));
                         break;
                     case SettingType.Byte:
-                        data.Write8(SnesAddress + index * 1, value.ReadInt());
+                        data.Write8(FileAddress + index * 1, value.ReadInt());
                         break;
                     case SettingType.Short:
-                        data.Write16(SnesAddress + index * 2, value.ReadInt());
+                        data.Write16(FileAddress + index * 2, value.ReadInt());
                         break;
                     case SettingType.Pointer:
-                        data.Write24(SnesAddress + index * 3, value.ReadInt());
+                        data.Write24(FileAddress + index * 3, value.ReadInt());
                         break;
                     case SettingType.Int:
-                        data.Write32(SnesAddress + index * 4, value.ReadInt());
+                        data.Write32(FileAddress + index * 4, value.ReadInt());
                         break;
                     case SettingType.Char:
-                        data.Write8(SnesAddress + index * 1, Convert.ToByte(value[0]));
+                        data.Write8(FileAddress + index * 1, Convert.ToByte(value[0]));
                         break;
                 }
 
@@ -266,9 +274,9 @@ namespace Project_Nested.Injection
                 AttemptWrite();
 
                 if (Length >= 0)
-                    data.WriteString(SnesAddress, value, Length, '\0');
+                    data.WriteString(FileAddress, value, Length, '\0');
                 else
-                    data.WriteString(SnesAddress, value, value.Length, '\0');
+                    data.WriteString(FileAddress, value, value.Length, '\0');
             }
             else
                 this[0] = value;
@@ -300,9 +308,9 @@ namespace Project_Nested.Injection
             if (type == SettingType.Char)
             {
                 if (Length >= 0)
-                    return data.ReadString(SnesAddress, Length);
+                    return data.ReadString(FileAddress, Length);
                 else
-                    return data.ReadString0(SnesAddress);
+                    return data.ReadString0(FileAddress);
             }
             return this[0];
         }

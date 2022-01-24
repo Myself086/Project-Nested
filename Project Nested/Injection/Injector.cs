@@ -842,7 +842,7 @@ namespace Project_Nested.Injection
 
             var list = new List<EmulatorCall>();
 
-            var addr = injector.GetSetting("EmuCalls.Table").ReadInt();
+            var addr = ConvertSnesToFileAddress(injector.GetSetting("EmuCalls.Table").ReadInt());
 
             // ID 0 should be invalid
             list.Add(EmulatorCall.Unknown());

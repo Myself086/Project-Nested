@@ -1173,10 +1173,11 @@ namespace Project_Nested.Emulation
         // Break
         void op___BRK(Int32 i)
         {
-            if (getflag_e())
+            r_ePC -= 2;
+            /*if (getflag_e())
                 CallInterrupt6502(VECTOR_BRK_6502);
             else
-                CallInterrupt65816(VECTOR_BRK_65816);
+                CallInterrupt65816(VECTOR_BRK_65816);*/
         }
 
         void op___CLC(Int32 i) { setflag_c(0); }

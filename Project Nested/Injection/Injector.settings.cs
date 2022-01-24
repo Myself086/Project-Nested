@@ -31,7 +31,7 @@ namespace Project_Nested.Injection
                 if (def == string.Empty)
                     break;
 
-                Int32 snesAddr = OutData.Read24(ref addr) & 0x3fffff;
+                Int32 snesAddr = OutData.Read24(ref addr);
                 Int16 mask = OutData.Read16(ref addr);
 
                 // Split summary and definition
