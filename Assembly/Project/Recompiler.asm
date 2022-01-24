@@ -515,7 +515,7 @@ b_tonext:
 					//dec	$.stackTrace
 					//bpl	$+Recompiler__Build_loop1_loop_next
 					lda	$.stackTrace
-					bne	$+Recompiler__Build_loop1_loop_next
+					jne	$_Recompiler__Build_loop1_loop_next
 
 					// Using legacy stack underflow detection?
 					lda	$=RomInfo_StackEmulation
