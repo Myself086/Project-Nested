@@ -1,4 +1,5 @@
 
+	.mx	0x30
 	.vstack		_VSTACK_START
 
 	// This code must be placed in a LoROM bank, non-zero bank and non-zero page
