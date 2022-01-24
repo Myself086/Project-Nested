@@ -3731,7 +3731,7 @@ b_exit:
 	// Return: A = Call address, ZeroBank = Bank for call address
 Recompiler__GetIOAccess:
 	// Load default bank address
-	lda	#_IO__BANK
+	lda	#_IO__BANK/0x10000
 	sta	$.DP_ZeroBank
 
 	.macro	Recompiler__GetIOAccess_Compare		value, opcode, destination

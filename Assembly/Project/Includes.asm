@@ -74,7 +74,6 @@ BankEnd_c0:
 	.def	Interpret__BANK		0x80
 
 	.include	"Project/IO.asm"
-	.def	IO__BANK			0x80
 
 BankEnd_80:
 
