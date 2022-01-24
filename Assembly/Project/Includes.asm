@@ -15,6 +15,20 @@ Game "Empty                ", 0x00, 0x00
 
 	// ---------------------------------------------------------------------------
 
+	// Macro for crossing half-bank boundary
+	.macro	Include_CrossOver	top
+temp__:
+		.if temp__&0xffff < 0x8000
+		{
+			.def	temp__		temp__&0xff0000|0x8000
+		}
+		.def		temp__		temp__&0xbfffff
+		.addr		temp__		temp__&0xff0000|{0}
+		.vstack		_VSTACK_START
+	.endm
+
+	// ---------------------------------------------------------------------------
+
 	// Files with no direct writing
 	.include	"Project/Variables.asm"
 	.include	"Project/Macros.asm"
@@ -26,22 +40,10 @@ Game "Empty                ", 0x00, 0x00
 	.include	"Project/Header.asm"
 
 	// ---------------------------------------------------------------------------
-	// Bank 80: Various code including start-up
-
-	.addr	0x808000, 0x80feff
-
-	// Interpret_Indirect.asm is first in the bank because it starts with a page alignment
-	// Must be in the same bank as Interpret_and_Inline.asm and can't be bank 0x00 nor HiROM banks
-	.include	"Project/Interpret_Indirect.asm"
-	.include	"Project/Interpret_and_Inline.asm"
-	.def	Interpret__BANK		0x80
-
-	.include	"Project/DynamicJsr.asm"
-
-	// ---------------------------------------------------------------------------
 	// Bank c0: ROM information and various code not depending on ROM DB
 
-	.addr	0xc00000, 0xc07fff
+	.addr	0xc00000, 0xc0feff
+
 	.include	"Project/RomInfo.asm"
 
 	// Sound
@@ -58,10 +60,54 @@ Spc_Code_End:
 	.include	"Project/JMPiList.asm"
 	.include	"Project/EmuCalls.asm"
 
+BankEnd_c0:
+
+	// ---------------------------------------------------------------------------
+	// Bank 80
+
+	Include_CrossOver	0xfeff
+
+	// Interpret_Indirect.asm is first in the bank because it starts with a page alignment
+	// Must be in the same bank as Interpret_and_Inline.asm and can't be bank 0x00 nor HiROM banks
+	.include	"Project/Interpret_Indirect.asm"
+	.include	"Project/Interpret_and_Inline.asm"
+	.def	Interpret__BANK		0x80
+
+	.include	"Project/IO.asm"
+	.def	IO__BANK			0x80
+
+BankEnd_80:
+
+	// ---------------------------------------------------------------------------
+	// Bank c1
+
+	.addr	0xc10000, 0xc1fffe
+
+	.include	"Project/Chr.asm"
+
+	// Memory management
+	.include	"Project/Array.asm"
+	.include	"Project/Memory.asm"
+	.include	"Project/Dictionary.asm"
+
+	.include	"Project/DynamicJsr.asm"
+
+	.include	"Project/Feedback.asm"
+
+	.include	"Project/Cop.asm"
+	.include	"Project/Hdma.asm"
+	.include	"Project/Sound.asm"
+	.include	"Project/Patch.asm"
+
+	// Low level emulation
+	.include	"Project/Interpreter.asm"
+
+BankEnd_c1:
+
 	// ---------------------------------------------------------------------------
 	// Bank 81
 
-	.addr	0x818000, 0x81fffe
+	Include_CrossOver	0xfffe
 
 	.include	"Project/Main.asm"
 	.include	"Project/Gfx_Interrupt.asm"
@@ -75,31 +121,13 @@ Spc_Code_End:
 	.include	"Project/Mappers/Mapper4.asm"
 	.include	"Project/Mappers/Mapper7.asm"
 
-	// Memory management
-	.include	"Project/Array.asm"
-	.include	"Project/Memory.asm"
-	.include	"Project/Dictionary.asm"
-
-	// Static recompiler code
-	.include	"Project/Feedback.asm"
+	// Static recompiler must be in LoROM bank
 	.include	"Project/StaticRec.asm"
-
-	// Low level emulation
-	.include	"Project/Interpreter.asm"
-
-	.include	"Project/Cop.asm"
-	.include	"Project/Hdma.asm"
-	.include	"Project/Sound.asm"
-	.include	"Project/Patch.asm"
 
 	// Trap unsupported mappers
 	[0x81ffff] = 0x00
 
-	// ---------------------------------------------------------------------------
-	// Bank c1: Unlinked calls recompiled ahead of time
-
-	// Origins: [0] = Original return, [2] = Original destination
-	.def	StaticRec_Origins		0xc10000
+BankEnd_81:
 
 	// ---------------------------------------------------------------------------
 	// Bank c2: Unrolled indirect JMP
@@ -120,18 +148,15 @@ StaticRec_Tables:
 	// [6] 16-bit recompiler flags
 
 	// ---------------------------------------------------------------------------
-	// Bank 84
+	// Bank c4: Unlinked calls recompiled ahead of time (no static data)
 
-	.addr	0x848000, 0x84ffff
-
-	.include	"Project/Chr.asm"
-	.include	"Project/IO.asm"
-	.def	IO__BANK			0x84
+	// Origins: [0] = Original return, [2] = Original destination
+	.def	StaticRec_Origins		0xc40000
 
 	// ---------------------------------------------------------------------------
 
 	// Final ROM size
-	.finalsize	0x050000
+	.finalsize	0x030000
 
 	// ---------------------------------------------------------------------------
 }
