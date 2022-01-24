@@ -73,7 +73,7 @@ BankEnd_c0:
 	.include	"Project/Interpret_and_Inline.asm"
 	.def	Interpret__BANK		0x80
 
-	.include	"Project/IO.asm"
+	.include	"Project/IO.4014.asm"
 
 BankEnd_80:
 
@@ -83,6 +83,8 @@ BankEnd_80:
 	.addr	0xc10000, 0xc1fffe
 
 	.include	"Project/Chr.asm"
+
+	.include	"Project/IO.asm"
 
 	// Memory management
 	.include	"Project/Array.asm"
