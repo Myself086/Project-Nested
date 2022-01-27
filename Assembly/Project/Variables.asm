@@ -78,7 +78,7 @@
 
 
 	.addr	0x0a07, 0x0a1f
-	// 25/25
+	// 24/25
 
 	// Unused
 StackPointer_6502:
@@ -110,12 +110,6 @@ IO_2000_EarlyValue:
 IO_2007r:
 	.fill	1
 
-	// Contains flags for how the sprite transfer was handled
-	//  bit 7: set = 8x16, clear = 8x8
-	//  bit 0: set when off screen sprites for 8x8 are already written
-IO_4014_SpriteSize:
-	.fill	1
-
 IO_BG_MIRRORS:
 	.fill	2
 
@@ -125,7 +119,13 @@ IO_BG_MIRRORS:
 
 
 	.addr	0x0a27, 0x0a3f
-	// 15/25
+	// 17/25
+
+	// IO_4014_SpriteSize contains flags for how the sprite transfer was handled
+	//  bit 7: set = 8x16, clear = 8x8
+	//  bit 0: set when off screen sprites for 8x8 are already written (limit only)
+	DefineGlobalVariable	IO_4014_SpriteSize			1
+	DefineGlobalVariable	IO_4014_UsedSpriteOffset	1		// Top used sprite offset divided by 2 (exception for 0)
 
 IO_PPUADDR:
 	.fill	2

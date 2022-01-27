@@ -303,7 +303,7 @@ IO__w4014_8x8_nolimit:
 	sta	$_IO_Temp16
 
 	// Replace stack pointer to the sprite buffer
-	lda	#_Sprites_Buffer+0x0ff
+	lda	#_Sprites_Buffer+0x1ff
 	tcs
 
 	// Change mode
@@ -397,56 +397,50 @@ b_1:
 	IO__w4014_mac8x8	0x04
 	IO__w4014_mac8x8	0x00
 
-	// Are extra sprites already loaded?
-	bit	$_IO_4014_SpriteSize
-	bpl	$+b_1
-		// Change mode
-		.mx	0x00
-		rep	#0x30
-
-		// Clear the second half of sprite memory and extra bits
-		lda	#0xf000
-		ldx	#0x001c
-b_loop:
-			sta	$_Sprites_Buffer+0x100,x
-			sta	$_Sprites_Buffer+0x120,x
-			sta	$_Sprites_Buffer+0x140,x
-			sta	$_Sprites_Buffer+0x160,x
-			sta	$_Sprites_Buffer+0x180,x
-			sta	$_Sprites_Buffer+0x1a0,x
-			sta	$_Sprites_Buffer+0x1c0,x
-			sta	$_Sprites_Buffer+0x1e0,x
-			stz	$_Sprites_Buffer+0x200,x
-			dex
-			dex
-			dex
-			dex
-			bpl	$-b_loop
-
-		// Change mode
-		.mx	0x30
-		sep	#0x30
-b_1:
-
-	// Queue sprite DMA (TODO: No priority transfer)
-	lda	#.VramQ_SpriteXfer8x8
-	sta	$0x2180
+	// Queue sprite DMA
+	smx	#0x10
+	ldx	#.VramQ_SpritePartialXferNL
+	stx	$0x2180
 	tsc
 	inc	a
 	lsr	a
-	sta	$0x2180
+	cmp	#_Sprites_Buffer/2+0x100
+	.mx	0x30
+	sep	#0x31			// Set carry for SBC later down
+	bne	$+b_1
+		// Move "first" sprite off screen
+		pea	$0xf0f0
+		pea	$0xf0f0
+		// No sprite on screen but count it as 1
+		lda	#0xfe
+b_1:
 
-	// Change mode
-	.mx	0x20
-	rep	#0x10
+	// Do we have more sprites than before? Assume carry set from SEP
+	tax
+	sbc	$_IO_4014_UsedSpriteOffset
+	bcs	$+b_1
+		// Top sprite from current upload
+		stx	$0x2180
+		// More sprites than before, don't erase any sprite
+		stx	$_IO_4014_UsedSpriteOffset
+		jmp	$_IO__w4014_QuickFillSwitch_End
+b_1:
 
-	// Save sprite size
-	stz	$_IO_4014_SpriteSize
+	// Top sprite from previous upload
+	ldy	$_IO_4014_UsedSpriteOffset
+	sty	$0x2180
 
-	// Fill remaining space in the sprite buffer
-	tsx
+	// Save number of sprites used this time
+	stx	$_IO_4014_UsedSpriteOffset
+	// X = number of sprites to fill (times 2)
+	tax
+
+	// Fill newly unused sprites
+	rmx	0x20
+	tsc
+	tay
 	lda	#0xf0
-	jmp	($_IO__w4014_FillSwitch+1-Sprites_Buffer,x)
+	jmp	($_IO__w4014_QuickFillSwitch,x)
 
 
 IO__w4014_8x8_limit:
@@ -657,6 +651,10 @@ b_1:
 			// Save sprite size
 			lda	#0x01
 			sta	$_IO_4014_SpriteSize
+
+			// Reset sprite count
+			lda	#0x20
+			sta	$_IO_4014_UsedSpriteOffset
 b_2:
 		// Fill remaining space in the sprite buffer (Except first 8 sprites)
 		//tsx
@@ -788,23 +786,50 @@ b_1:
 	IO__w4014_mac8x16_nolimit	0x04
 	IO__w4014_mac8x16_nolimit	0x00
 
-	// Queue sprite DMA (TODO: No priority transfer)
-	lda	#.VramQ_SpriteXfer8x8
-	sta	$0x2180
+	// Queue sprite DMA
+	smx	#0x10
+	ldx	#.VramQ_SpritePartialXferNL
+	stx	$0x2180
 	tsc
 	inc	a
 	lsr	a
-	sta	$0x2180
+	cmp	#_Sprites_Buffer/2+0x100
+	.mx	0x30
+	sep	#0x31			// Set carry for SBC later down
+	bne	$+b_1
+		// Move "first" sprite off screen
+		pea	$0xf0f0
+		pea	$0xf0f0
+		// No sprite on screen but count it as 1
+		lda	#0xfe
+b_1:
 
-	// Change mode
-	.mx	0x20
-	rep	#0x10
+	// Do we have more sprites than before? Assume carry set from SEP
+	tax
+	sbc	$_IO_4014_UsedSpriteOffset
+	bcs	$+b_1
+		// Top sprite from current upload
+		stx	$0x2180
+		// More sprites than before, don't erase any sprite
+		stx	$_IO_4014_UsedSpriteOffset
+		jmp	$_IO__w4014_QuickFillSwitch_End
+b_1:
 
-	// Save sprite size and fill remaining space in the sprite buffer
-	tsx
+	// Top sprite from previous upload
+	ldy	$_IO_4014_UsedSpriteOffset
+	sty	$0x2180
+
+	// Save number of sprites used this time
+	stx	$_IO_4014_UsedSpriteOffset
+	// X = number of sprites to fill (times 2)
+	tax
+
+	// Fill newly unused sprites
+	rmx	0x20
+	tsc
+	tay
 	lda	#0xf0
-	sta	$_IO_4014_SpriteSize
-	jmp	($_IO__w4014_FillSwitch+1-Sprites_Buffer,x)
+	jmp	($_IO__w4014_QuickFillSwitch,x)
 
 
 IO__w4014_8x16_limit:
@@ -939,16 +964,16 @@ b_1:
 	inc	a
 	tax
 	cmp	#_Sprites_Buffer/2+0x100
-	bne	$+b_1
+	bne	$+b_else
 		// No sprite on screen
 		ldy	#.VramQ_SpriteXferEmpty
 		sty	$0x2180
-		bra	$+b_2
-b_1:
+		bra	$+b_1
+b_else:
 		ldy	#.VramQ_SpriteXfer8x16
 		sty	$0x2180
 		stx	$0x2180
-b_2:
+b_1:
 
 	// Adjust our pointer from 1-byte empty address to 4-byte full offset
 	.mx	0x00
@@ -1200,6 +1225,77 @@ IO__w4014_FillSwitch2_End:
 	plb
 	plp
 	rtl
+
+IO__w4014_QuickFillSwitch:
+	switch		0x80, IO__w4014_QuickFillSwitch_End, IO__w4014_QuickFillSwitch_End
+		.macro	IO__w4014_QuickFillSwitch_mac
+			.def	temp__		{0}
+			case	temp__/4
+				sta	$_Zero-{0}+2,y
+		.endm
+
+		.macro	IO__w4014_QuickFillSwitch_mac2
+			IO__w4014_QuickFillSwitch_mac		{0}c
+			IO__w4014_QuickFillSwitch_mac		{0}8
+			IO__w4014_QuickFillSwitch_mac		{0}4
+			{1}IO__w4014_QuickFillSwitch_mac	{0}0
+		.endm
+		
+		IO__w4014_QuickFillSwitch_mac2	0x1f, ""
+		IO__w4014_QuickFillSwitch_mac2	0x1e, ""
+		IO__w4014_QuickFillSwitch_mac2	0x1d, ""
+		IO__w4014_QuickFillSwitch_mac2	0x1c, ""
+		IO__w4014_QuickFillSwitch_mac2	0x1b, ""
+		IO__w4014_QuickFillSwitch_mac2	0x1a, ""
+		IO__w4014_QuickFillSwitch_mac2	0x19, ""
+		IO__w4014_QuickFillSwitch_mac2	0x18, ""
+		IO__w4014_QuickFillSwitch_mac2	0x17, ""
+		IO__w4014_QuickFillSwitch_mac2	0x16, ""
+		IO__w4014_QuickFillSwitch_mac2	0x15, ""
+		IO__w4014_QuickFillSwitch_mac2	0x14, ""
+		IO__w4014_QuickFillSwitch_mac2	0x13, ""
+		IO__w4014_QuickFillSwitch_mac2	0x12, ""
+		IO__w4014_QuickFillSwitch_mac2	0x11, ""
+		IO__w4014_QuickFillSwitch_mac2	0x10, ""
+		IO__w4014_QuickFillSwitch_mac2	0x0f, ""
+		IO__w4014_QuickFillSwitch_mac2	0x0e, ""
+		IO__w4014_QuickFillSwitch_mac2	0x0d, ""
+		IO__w4014_QuickFillSwitch_mac2	0x0c, ""
+		IO__w4014_QuickFillSwitch_mac2	0x0b, ""
+		IO__w4014_QuickFillSwitch_mac2	0x0a, ""
+		IO__w4014_QuickFillSwitch_mac2	0x09, ""
+		IO__w4014_QuickFillSwitch_mac2	0x08, ""
+		IO__w4014_QuickFillSwitch_mac2	0x07, ""
+		IO__w4014_QuickFillSwitch_mac2	0x06, ""
+		IO__w4014_QuickFillSwitch_mac2	0x05, ""
+		IO__w4014_QuickFillSwitch_mac2	0x04, ""
+		IO__w4014_QuickFillSwitch_mac2	0x03, ""
+		IO__w4014_QuickFillSwitch_mac2	0x02, ""
+		IO__w4014_QuickFillSwitch_mac2	0x01, ""
+		IO__w4014_QuickFillSwitch_mac2	0x00, "//"
+IO__w4014_QuickFillSwitch_End:
+
+	// Fix DP
+	rep	#0x20
+	.mx	0x00
+	lda	#0x0000
+	tcd
+
+	// Fix stack pointer
+	lda	$_IO_Temp16
+	tcs
+
+	// Change mode back
+	sep	#0x30
+	.mx	0x30
+
+	ply
+	plx
+	pla
+	plb
+	plp
+	rtl
+
 
 	// Align to avoid page boundary crossing penalty (TODO: Move this to a better place within the bank)
 	.align	0x100

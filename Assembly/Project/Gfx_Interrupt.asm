@@ -722,37 +722,39 @@ Int__TestMainThread_BranchType:
 	.def	VramQ_Tile					0x04		// Tile(u8 value)
 	.def	VramQ_TileAttribute			0x06		// TileAttribute(u8 value)
 	.def	VramQ_Palette				0x08		// Palette(u8 palette)
-	.def	VramQ_SpriteXfer8x8			0x0a		// SpriteXfer8x8(u8 priority)
-	.def	VramQ_SpriteXfer8x16		0x0c		// SpriteXfer8x16(u8 priority)
-	.def	VramQ_SpriteXferEmpty		0x0e		// SpriteEmpty()
-	.def	VramQ_PpuAddr				0x10		// PpuAddr(u16)
-	.def	VramQ_PpuAddrLow			0x12		// PpuAddrLow(u8)
-	.def	VramQ_PpuAddrHigh			0x14		// PpuAddrHigh(u8)
-	.def	VramQ_Read					0x16		// Read()
-	.def	VramQ_PpuAddrInc1			0x18		// PpuAddrInc1()			// Index bit 1 must be clear
-	.def	VramQ_PpuAddrInc32			0x1a		// PpuAddrInc32()
-	.def	VramQ_ScrollY				0x1c		// ScrollY(u8)
-	.def	VramQ_ScrollX				0x1e		// ScrollX(u8)
-	.def	VramQ_ChrBank				0x20		// ChrBank(u8 highBitsVramAddr, u16 highBitsSourceAddr, u8 highBitsLength)
-	.def	VramQ_Tiles					0x22		// Tiles(u8[u8 length] tileData)
-	.def	VramQ_TilesAtAddress		0x24		// TilesAtAddress(u16 vramAddress, u8[u8 length] tileData)
-	.def	VramQ_NameTableMirrorChange	0x26		// NameTableMirrorChange(u8 value)
-	.def	VramQ_DebugRow0				0x28		// DebugRow0()
-	.def	VramQ_DebugRow1				0x2a		// DebugRow1()
-	.def	VramQ_DebugRow2				0x2c		// DebugRow2()
-	.def	VramQ_DebugRow3				0x2e		// DebugRow3()
-	.def	VramQ_DebugRow4				0x30		// DebugRow4()
-	.def	VramQ_DebugRow5				0x32		// DebugRow5()
-	.def	VramQ_DebugRow6				0x34		// DebugRow6()
-	.def	VramQ_DebugRow7				0x36		// DebugRow7()
-	.def	VramQ_DebugRow8				0x38		// DebugRow8()
-	.def	VramQ_DebugRow9				0x3a		// DebugRow9()
-	.def	VramQ_DebugRow10			0x3c		// DebugRow10()
-	.def	VramQ_DebugRow11			0x3e		// DebugRow11()
-	.def	VramQ_DebugRow12			0x40		// DebugRow12()
-	.def	VramQ_DebugRow13			0x42		// DebugRow13()
-	.def	VramQ_DebugRow14			0x44		// DebugRow14()
-	.def	VramQ_DebugRow15			0x46		// DebugRow15()
+	.def	VramQ_SpritePartialXferNL	0x0a		// SpritePartialXferNL(u8 topSprite)
+	.def	VramQ_SpritePartialXferFL	0x0c		// SpritePartialXferFL(u8 priority, u8 topSprite)
+	.def	VramQ_SpriteXfer8x8			0x0e		// SpriteXfer8x8(u8 priority)
+	.def	VramQ_SpriteXfer8x16		0x10		// SpriteXfer8x16(u8 priority)
+	.def	VramQ_SpriteXferEmpty		0x12		// SpriteEmpty()
+	.def	VramQ_PpuAddr				0x14		// PpuAddr(u16)
+	.def	VramQ_PpuAddrLow			0x16		// PpuAddrLow(u8)
+	.def	VramQ_PpuAddrHigh			0x18		// PpuAddrHigh(u8)
+	.def	VramQ_Read					0x1a		// Read()
+	.def	VramQ_PpuAddrInc1			0x1c		// PpuAddrInc1()			// Index bit 1 must be clear
+	.def	VramQ_PpuAddrInc32			0x1e		// PpuAddrInc32()
+	.def	VramQ_ScrollY				0x20		// ScrollY(u8)
+	.def	VramQ_ScrollX				0x22		// ScrollX(u8)
+	.def	VramQ_ChrBank				0x24		// ChrBank(u8 highBitsVramAddr, u16 highBitsSourceAddr, u8 highBitsLength)
+	.def	VramQ_Tiles					0x26		// Tiles(u8[u8 length] tileData)
+	.def	VramQ_TilesAtAddress		0x28		// TilesAtAddress(u16 vramAddress, u8[u8 length] tileData)
+	.def	VramQ_NameTableMirrorChange	0x2a		// NameTableMirrorChange(u8 value)
+	.def	VramQ_DebugRow0				0x2c		// DebugRow0()
+	.def	VramQ_DebugRow1				0x2e		// DebugRow1()
+	.def	VramQ_DebugRow2				0x30		// DebugRow2()
+	.def	VramQ_DebugRow3				0x32		// DebugRow3()
+	.def	VramQ_DebugRow4				0x34		// DebugRow4()
+	.def	VramQ_DebugRow5				0x36		// DebugRow5()
+	.def	VramQ_DebugRow6				0x38		// DebugRow6()
+	.def	VramQ_DebugRow7				0x3a		// DebugRow7()
+	.def	VramQ_DebugRow8				0x3c		// DebugRow8()
+	.def	VramQ_DebugRow9				0x3e		// DebugRow9()
+	.def	VramQ_DebugRow10			0x40		// DebugRow10()
+	.def	VramQ_DebugRow11			0x42		// DebugRow11()
+	.def	VramQ_DebugRow12			0x44		// DebugRow12()
+	.def	VramQ_DebugRow13			0x46		// DebugRow13()
+	.def	VramQ_DebugRow14			0x48		// DebugRow14()
+	.def	VramQ_DebugRow15			0x4a		// DebugRow15()
 
 	.mx	0x10
 	.macro	Gfx__VramQueue
@@ -795,6 +797,8 @@ Gfx__VramQueue_Switch:
 	.data16	_Gfx__VramQueue_VramQ_Tile
 	.data16	_Gfx__VramQueue_VramQ_TileAttribute
 	.data16	_Gfx__VramQueue_VramQ_Palette
+	.data16	_Gfx__VramQueue_VramQ_SpritePartialXferNL
+	.data16	_Gfx__VramQueue_VramQ_SpritePartialXferFL
 	.data16	_Gfx__VramQueue_VramQ_SpriteXfer8x8
 	.data16	_Gfx__VramQueue_VramQ_SpriteXfer8x16
 	.data16	_Gfx__VramQueue_VramQ_SpriteXferEmpty
@@ -952,6 +956,46 @@ Gfx__VramQueue_VramQ_Palette:
 
 	// Next
 	adc	$_Vram_Queue_PpuAddrInc
+	ldx	$0x80
+	jmp	($_Gfx__VramQueue_Switch,x)
+
+
+Gfx__VramQueue_VramQ_SpritePartialXferNL:
+	// SpritePartialXferNL(u8 topSprite)
+
+	// Keep current PPU address
+	pha
+
+	// Y = Top Sprite
+	ldy	$0x80
+
+	// Set sprite address
+	tya
+	sta	$0x02
+
+	// Set DMA
+	lda	#0x0400
+	sta	$0x4300
+	lda	$_Gfx__VramQueue_SpritePartialXfer_Start,y
+	sta	$0x4302
+	lda	$_Gfx__VramQueue_SpritePartialXfer_ByteCount,y
+	sta	$0x4305
+	ldy	#0x01
+	sty	$0x4304
+	sty	$0x420b
+
+	// Next
+	pla
+	ldx	$0x80
+	jmp	($_Gfx__VramQueue_Switch,x)
+
+
+Gfx__VramQueue_VramQ_SpritePartialXferFL:
+	// SpritePartialXferFL(u8 priority, u8 topSprite)
+	trap
+
+	// Next
+	pla
 	ldx	$0x80
 	jmp	($_Gfx__VramQueue_Switch,x)
 
@@ -1631,3 +1675,9 @@ Gfx__VramQueue_VramQ_Tiles_AND0FSL1:
 	.data8	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e
 	.data8	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e
 	.data8	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e
+
+Gfx__VramQueue_SpritePartialXfer_Start:
+	LUT16	Sprites_Buffer+value__*2
+
+Gfx__VramQueue_SpritePartialXfer_ByteCount:
+	LUT16	Zero+0x200-value__*2
