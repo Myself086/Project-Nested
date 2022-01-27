@@ -185,6 +185,27 @@ branch__:
 	.endm
 
 	// ---------------------------------------------------------------------------
+	// Lookup table maker
+
+	.macro	LUT8	equation
+		.def	value__		0
+		.macro	LUT8_Maker
+			.data8	{0}
+			.def	value__		value__+1
+		.endm
+		.repeat		0x100, "LUT8_Maker {0}"
+	.endm
+
+	.macro	LUT16	equation
+		.def	value__		0
+		.macro	LUT_Maker
+			.data16	{0}
+			.def	value__		value__+2
+		.endm
+		.repeat		0x80, "LUT_Maker {0}"
+	.endm
+
+	// ---------------------------------------------------------------------------
 	// Switch related macros
 
 	.macro	switch		count, defaultDestination, breakDestination
