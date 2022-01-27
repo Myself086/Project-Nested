@@ -146,8 +146,13 @@ b_1:
 	// Clear palette memory
 	Main_ClearMemory	2, 0x08, 0x22, Main_ClearZero, 0x200
 
+	// Clear OAM
+	stz	$0x02
+	stz	$0x03
+	Main_ClearMemory	3, 0x08, 0x04, Main_ClearZero, 0x220
+
 	// Finish transfer
-	lda	#0x07
+	lda	#0x0f
 	sta	$0x420b
 
 	// Restore stack pointer
