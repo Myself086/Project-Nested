@@ -68,6 +68,7 @@ namespace Project_Nested.Optimize
 
 #if !DEBUG
             // Remove debug buttons in release mode
+            btnBreak.Visible = false;
             checkIgnoreError.Visible = false;
             txtAfter.Height = txtBefore.Height;
 #endif
