@@ -1183,10 +1183,10 @@ Gfx__VramQueue_VramQ_PpuAddr:
 
 
 Gfx__VramQueue_VramQ_PpuAddrLow:
-	sta	$_Vram_Queue_PpuAddr
-	ldx	$0x80
-	stx	$_Vram_Queue_PpuAddr
-	lda	$_Vram_Queue_PpuAddr
+	and	#0xff00
+	xba
+	ora	$0x7f
+	xba
 
 	// Next
 	ldx	$0x80
