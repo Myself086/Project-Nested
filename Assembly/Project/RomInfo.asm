@@ -462,7 +462,7 @@ RomInfo_Description:
 
 		//RomInfo_DefineMac	"global public bool Gui.Enabled : Shows CPU% and RAM%.", RomInfo_DebugOverlay, 0x80
 
-		RomInfo_SummaryMac	"Shows CPU% and RAM%."
+		RomInfo_SummaryMac	"Shows CPU% and RAM usage."
 		RomInfo_DefineMac	"global public bool Gui.HardwareUsage : Show hardware usage.", RomInfo_DebugOverlay, 0x80
 
 	// End of description
