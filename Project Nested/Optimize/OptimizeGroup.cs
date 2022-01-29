@@ -34,7 +34,7 @@ namespace Project_Nested.Optimize
         public OptimizeGroup(Injector injector, List<int> calls, byte staticRanges, IProgress<Tuple<string, int, int>> progress)
         {
             this.injector = injector;
-            this.calls = calls;
+            this.calls = calls.Where(e => (e & 0xffff) >= 0x8000).ToList();
             this.progress = progress;
         }
 
