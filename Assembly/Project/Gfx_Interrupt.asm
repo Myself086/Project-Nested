@@ -920,7 +920,7 @@ Gfx__VramQueue_VramQ_TileAttribute:
 	stx	$0x19
 	stx	$0x19
 	
-	// Do third row: 2 2 3 3
+	// Do fourth row: 2 2 3 3
 	adc	#0x0020
 	sta	$0x16
 	ldx	$_Gfx__TileAttributeSplit2LUT,y
