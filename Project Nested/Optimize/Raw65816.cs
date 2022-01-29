@@ -155,6 +155,17 @@ namespace Project_Nested.Optimize
                 Exceptions();
             }
 
+            // Do we add a label here? Out of bound label exception
+            {
+                pc = data.Length + baseAddress;
+                var labelIndex = labels.IndexOf(pc);
+                if (labelIndex >= 0)
+                {
+                    code.Add(new AsmIL65816(InstructionSet.Label, labelIndex));
+                    code.Add(new AsmIL65816(InstructionSet.STP, 0));
+                }
+            }
+
             return code;
         }
     }
