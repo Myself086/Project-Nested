@@ -98,7 +98,7 @@ namespace Project_Nested.Injection
             StringBuilder sb = new StringBuilder();
 
             foreach (var item in settings)
-                if (item.Value.IsPublic && item.Value.IsGlobal && item.Value.type != SettingType.Void)
+                if (item.Value.IsGlobal && item.Value.type != SettingType.Void)
                     sb.AppendLine(item.Value.ToString());
 
             return sb.ToString();
