@@ -300,7 +300,7 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"* Sizes below 16kb can't be loaded back into the exe."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Anything above 16kb is used as extra memory for code so that 'Out of Memory' errors are less likely to happen."
-		RomInfo_DefineMac	"global public byte Cartridge.SramSize : Sram size", Rom_SramSize, 0
+		RomInfo_DefineMac	"global public byte Cartridge.SramSize : Sram size", Rom_SramSize+0x800000, 0
 
 	RomInfo_DefineMac	"public void Tab_Cpu : CPU related rules.", 0, 0
 
