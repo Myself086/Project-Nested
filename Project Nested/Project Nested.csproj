@@ -58,6 +58,12 @@
   <ItemGroup>
     <Compile Include="ByteArrayExtension.cs" />
     <Compile Include="Emulation\c65816.wdm.cs" />
+    <Compile Include="FrmPalette.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmPalette.Designer.cs">
+      <DependentUpon>FrmPalette.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmSaveProgress.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -122,6 +128,9 @@
     <Compile Include="TitledVar.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmPalette.resx">
+      <DependentUpon>FrmPalette.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmPatches.resx">
       <DependentUpon>FrmPatches.cs</DependentUpon>

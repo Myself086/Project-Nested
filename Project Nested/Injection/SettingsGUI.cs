@@ -280,6 +280,13 @@ namespace Project_Nested.Injection
                             form.injector = injector;
                         }
                         break;
+                    case "CustomPalette":
+                        {
+                            var form = new FrmPalette();
+                            form.Show((Control)sender);
+                            form.injector = injector;
+                        }
+                        break;
                     default:
                         MessageBox.Show($"Unknown button behavior for \"{setting.Name}\".");
                         break;

@@ -63,6 +63,15 @@ b_loop:
 		sta	$=RomInfo_StackEmulation
 b_1:
 
+	// Copy palette mirror
+	ldx	#0x007e
+b_loop:
+		lda	$=Gfx_PaletteTable,x
+		lda	$=Gfx_PaletteTable+0x80,x
+		dex
+		dex
+		bpl	$-b_loop
+
 	return
 
 	// ---------------------------------------------------------------------------

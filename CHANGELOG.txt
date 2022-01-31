@@ -12,6 +12,7 @@ Dev build:
 - Fixed black lines from appearing in the middle of the screen after recompiling
 - Added option to move stack outside of page 01
 - Removed updating and uploading unchanging unused sprites (no limit only)
+- Added option to customize the NES palette
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size

@@ -458,6 +458,11 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"The queue is interpreted and emptied every vblank."
 		RomInfo_DefineMac	"public hex short VramQBufferSize : Vram queue buffer size.", RomInfo_VramQBufferSize, 0
 
+		RomInfo_DefineMac	"private global hex short[0x40] Palette", Gfx_PaletteTable, 0
+		RomInfo_DefineMac	"private hex short[0x40] PaletteDefault", Gfx_PaletteTable+0x80, 0
+
+		RomInfo_DefineMac	"public Button CustomPalette : Custom palette", Zero, 0
+
 	RomInfo_DefineMac	"public void Tab_Gui : Graphical user interface settings.", 0, 0
 
 		//RomInfo_DefineMac	"global public bool Gui.Enabled : Shows CPU% and RAM%.", RomInfo_DebugOverlay, 0x80
