@@ -120,6 +120,14 @@ b_1:
 	CoreCall_End
 
 
+	.macro		IO__r2002_SaveScanline
+		lda	$0x2137
+		lda	$0x213d
+		sta	$_IO_2002_SnesScanline+0
+		lda	$0x213d
+		//and	#0x01			// Top 7 bits are open bus
+		sta	$_IO_2002_SnesScanline+1
+	.endm
 IO__r2002_a:
 IO__r2002_a_i:
 IO__r2002_x:
@@ -129,20 +137,38 @@ IO__r2002_y:
 
 	stz	$_IO_HILO
 
-	// Did we hit sprite 0?
+	// Improved PPUSTATUS loop detection
+	lda	$=RomInfo_ImprovedPpuStatusLoop
+	bpl	$+b_SkipImprovement
+		// Was this recently called? Either this scanline or the previous scanline
+		sep	#0x05		// Set interrupt and carry
+		lda	$0x2137
+		lda	$0x213d
+		sbc	$_IO_2002_SnesScanline+0
+		xba
+		lda	$0x213d
+		sbc	$_IO_2002_SnesScanline+1
+		lsr	a
+		xba
+		lsr	a
+		beq	$+b_in
+b_SkipImprovement:
+
+	// Are we calling from the same address?
 	lda	$3,s
 	cmp	$_IO_2002_LastReturn
 	bne	$+IO__r2002_NewCall
 	lda	$4,s
 	sbc	$_IO_2002_LastReturn+1
 	bne	$+IO__r2002_NewCall
-
+b_in:
 		// Increment and compare with 3 to set bit 6, assuming A==0 and carry set from cmp+!bne
 		inc	$_IO_2002_CallCount
 		adc	$_IO_2002_CallCount
 		adc	#0x3c
 		and	#0x40
 
+		// Did we hit sprite 0?
 		beq	$+IO__r2002_NoSprite0
 			stz	$_IO_2002_CallCount
 			ora	$_IO_2002
@@ -157,7 +183,7 @@ IO__r2002_y:
 			// Add new HDMA coordinates
 			phx
 			phy
-			rep	#0x10
+			rep	#0x14
 			.mx	0x20
 
 			.vstack		_VSTACK_START
@@ -167,9 +193,11 @@ IO__r2002_y:
 			pld
 			plb
 
-			// Change mode back
-			sep	#0x30
+			// Change mode back and set interrupt
+			sep	#0x34
 			.mx	0x30
+
+			IO__r2002_SaveScanline
 
 			ply
 			plx
@@ -183,6 +211,8 @@ IO__r2002_NoSprite0:
 		eor	#0x80
 		sta	$_IO_2002
 		sta	$_IO_Temp
+
+		IO__r2002_SaveScanline
 
 		pla
 		plp
@@ -201,7 +231,9 @@ IO__r2002_NewCall:
 	eor	#0x80
 	sta	$_IO_2002
 	sta	$_IO_Temp
-	
+
+	IO__r2002_SaveScanline
+
 	pla
 	plp
 	rtl

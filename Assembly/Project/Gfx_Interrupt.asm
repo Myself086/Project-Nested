@@ -261,6 +261,10 @@ b_SkipVblankUpdates:
 	.mx	0x00
 	rep	#0x30
 
+	// Reset scanline count for detecting looped access to $2002
+	lda	#384		// Impossible scanline
+	sta	$_IO_2002_SnesScanline
+
 	// Change DP
 	lda	#_IRQ_VSTACK_PAGE
 	tcd

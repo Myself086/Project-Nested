@@ -135,6 +135,10 @@ RomInfo_VramQBufferSize:
 RomInfo_ChrRamClone:
 	.data8	0
 
+	// Negative when using improved PPUSTATUS loop detection
+RomInfo_ImprovedPpuStatusLoop:
+	.data8	0x80
+
 RomInfo_CpuSettings:
 	.data16	0x0000
 	.def	RomInfo_Cpu_RecompilePrgRam				0x0001
@@ -438,6 +442,11 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Doesn't take empty lines into account."
 		RomInfo_DefineMac	"public byte SpriteZeroOffset : Sprite zero hit offset.", RomInfo_SpriteZeroOffset, 0
+
+		RomInfo_SummaryMac	"Detects PPUSTATUS loop based on timing rather than program counter."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"May cause issues with some games."
+		RomInfo_DefineMac	"public byte ImprovedPpuStatusLoopDetection : Improved PPUSTATUS loop detection.", RomInfo_ImprovedPpuStatusLoop, 0x80
 
 		RomInfo_SummaryMac	"Determines how many lines to skip after an IRQ hit."
 		RomInfo_DefineMac	"public mapper<4> byte IrqOffset : Mapper IRQ hit offset.", RomInfo_IrqOffset, 0

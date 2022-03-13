@@ -622,7 +622,7 @@ IRQ_VSTACK_START:
 	// Channel 0: x x x x x x x !-!-0-! _
 	// Channel 1: x x x x x !-! ! x x x _
 	// Channel 2: x x x x x !-! ! x x x _ <- Unused HDMA channel
-	// Channel 3: x x x x x _ _ ! x x x _
+	// Channel 3: x x x x x !-! ! x x x _
 	// Channel 4: x x x x x _ _ _ x x x _
 	// Channel 5: x x x x x !-!-! x x x _
 	// Channel 6: x x x x x !-! _ x x x _
@@ -638,6 +638,7 @@ IRQ_VSTACK_START:
 	// Identifying loops accessing $2002 (LastReturn must be followed by CallCount)
 	.def	IO_2002_LastReturn			0x4315		16-bit
 	.def	IO_2002_CallCount			0x4317		8-bit
+	.def	IO_2002_SnesScanline		0x4335		16-bit
 
 	// VRAM increment during VramQueue
 	.def	Vram_Queue_PpuAddrInc		0x4325		16-bit
