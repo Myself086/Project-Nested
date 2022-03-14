@@ -42,16 +42,28 @@ Rom_Title:
 
 	// ---------------------------------------------------------------------------
 
-	.mx	0x20
-
 Start__Abort:
 Start__Brk:
 Start__Cop:
 Start__Lock:
 	jmp	$=Start__Lock_1
 Start__Lock_1:
-	rep	#0x34
-	//unlock
+	rep	#0x30
+	.mx	0x00
+
+	// Reset stack if necessary
+	tsc
+	and	#0xf800
+	beq	$+b_1
+		lda	#0x01ff
+		tcs
+b_1:
+
+	// Reset IRQ
+	lda	#0
+	sta	$=IRQ_InterruptInProcess
+
+	unlock
 
 	// Load call address
 	lda	$2,s
