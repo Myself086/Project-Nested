@@ -1203,6 +1203,41 @@ b_loop:
 		bne	$-b_loop
 b_1:
 
+	// Fix SNES return addresses
+	lda	$=StaticRec_OriginCount
+	beq	$+b_loop_exit
+b_loop:
+		// Next (second half)
+		sec
+		sbc	#4
+		tax
+
+		// Do we need to fix this address?
+		lda	$=StaticRec_OriginsB+2,x
+		bpl	$+b_loop_exit
+		tay
+
+		// Fix address
+		lda	$=StaticRec_OriginsB+0,x
+		sec
+		sbc	$.readAddr
+		clc
+		adc	$.writeAddr
+		sta	$=StaticRec_OriginsB+0,x
+		tya								// MSB already in Y register
+		sec
+		sbc	$.readAddr+2
+		clc								// No bank crossing
+		adc	$.writeAddr+2
+		and	#0x00ff						// Validate SNES return address
+		sta	$=StaticRec_OriginsB+2,x
+
+		// Next (first half)
+		txa
+		bne	$-b_loop
+b_loop_exit:
+b_1:
+
 	// Delete memory used
 	.precall	Memory__Trim	=StackPointer, _Length
 	lda	$.heapStackIndex+1
@@ -2746,11 +2781,46 @@ Recompiler__Build_OpcodeType_Jsr_1:
 		rts
 
 Recompiler__Build_OpcodeType_Jsr_Static:
-	// Call interpreter like this:
+	// Call interpreter like this (native return version):
 	// jsr $=Interpret
 	//		0	1	2	3
 	//		jsr	#	#	0x7f
-	lda	#0x7f22
+
+	andbeq	$=RomInfo_StackEmulation, #_RomInfo_StackEmu_NativeReturn, $+b_else
+		// Native return
+
+		// Write long JSR
+		lda	#0x7f22
+		bra	$+b_1
+b_else:
+		// Non-native return
+
+		// Is original opcode a JSR?
+		lda	[$.readAddr]
+		and	#0x00ff
+		cmp	#0x0020
+		bne	$+b_2
+			// Write PEA for pushing original return address
+			lda	#0x00f4
+			sta	[$.writeAddr]
+			ldy	#1
+			lda	$.readAddr
+			clc
+			adc	#2
+			sta	[$.writeAddr],y
+
+			// Add to write address, assume carry clear from previous adc
+			lda	#3
+			adc	$.writeAddr
+			sta	$.writeAddr
+			clc					// writeAddr can overflow
+b_2:
+
+		// Write long JMP
+		lda	#0x7f5c
+b_1:
+
+	//lda	#0x7f22
 	ldy	#2
 	sta	[$.writeAddr]
 	sta	[$.writeAddr],y
@@ -2764,6 +2834,14 @@ Recompiler__Build_OpcodeType_Jsr_Static:
 	lda	$.readAddr
 	adc	#2
 	sta	$=StaticRec_Origins+0,x
+
+	// Write SNES return, assume carry clear from previous adc
+	lda	#3
+	adc	$.writeAddr
+	sta	$=StaticRec_OriginsB+0,x
+	lda	$.writeAddr+2
+	ora	#0x8000					// Validation for fixing the address later
+	sta	$=StaticRec_OriginsB+2,x
 
 	// Write and increment origin count, assume carry clear from previous adc
 	txa

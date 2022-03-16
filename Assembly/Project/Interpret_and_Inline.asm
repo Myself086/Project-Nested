@@ -1047,7 +1047,7 @@ Interpret__Jsr_FakeReturn:
 
 	.mx	0x30
 
-	// Entry: s1[3] = Rewrite address + 2
+	// Entry: s1[3] = Rewrite address + 3
 Interpret__StaticJsr:
 	.vstack		_VSTACK_START
 	.local	.a, .x, .y, .p, =return, =return2
@@ -1067,8 +1067,6 @@ Interpret__StaticJsr:
 	// Copy return bank before changing mode
 	lda	$7,s
 	sta	$_return+2
-	lda	$10,s
-	sta	$_return2+2
 
 	// Change mode
 	rep	#0x31
@@ -1078,16 +1076,18 @@ Interpret__StaticJsr:
 	lda	#_VSTACK_PAGE
 	tcd
 
-	// Copy return2 address
-	lda	$8,s
-	sta	$.return2
-
 	// Copy return address and subtract it by 3, assume carry clear from rep
 	lda	$5,s
 	adc	#_Zero-3
 	sta	$.return
 	sta	$5,s
 	tax
+
+	// Copy return2 address
+	lda	$=StaticRec_OriginsB+0,x
+	sta	$.return2+0
+	lda	$=StaticRec_OriginsB+1,x
+	sta	$.return2+1
 
 	// Call recompiler
 	.precall	Recompiler__CallFunction		_originalFunction
@@ -1097,6 +1097,11 @@ Interpret__StaticJsr:
 	// Keep returned value
 	.local	_functionListIndex
 	sty	$.functionListIndex
+
+	// Are we using non-native return address?
+	andbne	$=RomInfo_StackEmulation, #_RomInfo_StackEmu_NativeReturn, $+b_1
+		jmp	$_Interpret__StaticJsr_Regular
+b_1:
 
 	// Is it followed by a NOP+RTL?
 	ldy	#1

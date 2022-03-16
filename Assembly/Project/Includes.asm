@@ -149,10 +149,12 @@ StaticRec_Tables:
 	// [6] 16-bit recompiler flags
 
 	// ---------------------------------------------------------------------------
-	// Bank c4: Unlinked calls recompiled ahead of time (no static data)
+	// Bank c4 and c5: Unlinked calls recompiled ahead of time (no static data)
 
 	// Origins: [0] = Original return, [2] = Original destination
 	.def	StaticRec_Origins		0xc40000
+	// OriginsB: [0] = SNES return, [3] = Temporary validation
+	.def	StaticRec_OriginsB		0xc50000
 
 	// ---------------------------------------------------------------------------
 

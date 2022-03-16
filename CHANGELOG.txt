@@ -15,6 +15,7 @@ Dev build:
 - Added option to customize the NES palette
 - Improved loop detection for PPUSTATUS ($2002)
 - Removed some outdated settings
+- Optimized non-native return address coupled with AOT compiled code
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size
