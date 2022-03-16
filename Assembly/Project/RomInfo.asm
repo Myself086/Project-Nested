@@ -446,7 +446,7 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Detects PPUSTATUS loop based on timing rather than program counter."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"May cause issues with some games."
-		RomInfo_DefineMac	"public byte ImprovedPpuStatusLoopDetection : Improved PPUSTATUS loop detection.", RomInfo_ImprovedPpuStatusLoop, 0x80
+		RomInfo_DefineMac	"public bool ImprovedPpuStatusLoopDetection : Improved PPUSTATUS loop detection.", RomInfo_ImprovedPpuStatusLoop, 0x80
 
 		RomInfo_SummaryMac	"Determines how many lines to skip after an IRQ hit."
 		RomInfo_DefineMac	"public mapper<4> byte IrqOffset : Mapper IRQ hit offset.", RomInfo_IrqOffset, 0
