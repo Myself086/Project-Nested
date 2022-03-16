@@ -247,20 +247,20 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Emulates indirect load more accurately at the cost of performance."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Forced ON for mappers using PRG bank switching."
-		RomInfo_DefineMac	"public bool MemoryEmulation.Load : Memory emulation, Load", RomInfo_MemoryEmulation, RomInfo_MemEmu_Load
+		RomInfo_DefineMac	"private bool MemoryEmulation.Load : Memory emulation, Load", RomInfo_MemoryEmulation, RomInfo_MemEmu_Load
 
 		RomInfo_SummaryMac	"Emulates indirect store more accurately at the cost of performance."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Forced ON for mappers using SRAM."
-		RomInfo_DefineMac	"public bool MemoryEmulation.Store : Memory emulation, Store", RomInfo_MemoryEmulation, RomInfo_MemEmu_Store
+		RomInfo_DefineMac	"private bool MemoryEmulation.Store : Memory emulation, Store", RomInfo_MemoryEmulation, RomInfo_MemEmu_Store
 
 		RomInfo_SummaryMac	"Emulates direct load more accurately at the cost of performance."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Forced ON for mappers using PRG bank switching."
-		RomInfo_DefineMac	"public bool MemoryEmulation.AbsBank : Memory emulation, Absolute", RomInfo_MemoryEmulation, RomInfo_MemEmu_AbsBank
+		RomInfo_DefineMac	"private bool MemoryEmulation.AbsBank : Memory emulation, Absolute", RomInfo_MemoryEmulation, RomInfo_MemEmu_AbsBank
 
 		RomInfo_SummaryMac	"Emulates direct load crossing bank boundary at a small cost of performance."
-		RomInfo_DefineMac	"public bool MemoryEmulation.AbsCrossBank : Memory emulation, Absolute Cross", RomInfo_MemoryEmulation, RomInfo_MemEmu_AbsCrossBank
+		RomInfo_DefineMac	"private bool MemoryEmulation.AbsCrossBank : Memory emulation, Absolute Cross", RomInfo_MemoryEmulation, RomInfo_MemEmu_AbsCrossBank
 
 		RomInfo_SummaryMac	"Clears RAM upon reset, losing all data that would otherwise carry over."
 		RomInfo_SummaryMac	"Doesn't lose data from saved files."
@@ -396,7 +396,7 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Maximum distance for a JMP to count as being considered in the same function."
 		RomInfo_SummaryMac	"May cause some games to crash."
 		RomInfo_SummaryMac	"Use value -1 for unlimited range."
-		RomInfo_DefineMac	"public short JumpRange : Jump range", RomInfo_JmpRange, 0
+		RomInfo_DefineMac	"private short JumpRange : Jump range", RomInfo_JmpRange, 0
 		RomInfo_DefineMac	"private short JumpRange_x2 : Jump range x2", RomInfo_JmpRange_x2, 0
 
 	RomInfo_DefineMac	"private void Tab_Debug : Debug, turn those off for regular play.", 0, 0

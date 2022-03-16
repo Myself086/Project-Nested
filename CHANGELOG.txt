@@ -14,6 +14,7 @@ Dev build:
 - Removed updating and uploading unchanging unused sprites (no limit only)
 - Added option to customize the NES palette
 - Improved loop detection for PPUSTATUS ($2002)
+- Removed some outdated settings
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size
