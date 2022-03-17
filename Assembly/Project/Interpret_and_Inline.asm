@@ -1285,36 +1285,44 @@ b_2:
 		lda	$.extraCode+1
 		sta	[$.return],y
 
-		// Link return if necessary
-		ldy	$.functionListIndex
-		iny
-		iny
-		iny
-		lda	[$.Recompiler_FunctionList+3],y
-		and	#_Opcode_F_HasReturn
-		beq	$+b_1
-			.precall	JMPi__Add	=originalCall, =newAddr
-			lda	$.return2+1
-			sta	$.Param_newAddr+1
-			lda	$.return2
-			inc	a
-			sta	$.Param_newAddr
-			ldx	$.return
-			lda	$=StaticRec_Origins+0,x
-			inc	a
-			tay
-			and	#0xe000
-			xba
-			tax
-			lda	$_Program_BankNum-1,x
-			sta	$.Param_originalCall+1
-			sty	$.Param_originalCall
-			call
-b_1:
-
 		//jmp	$_Interpret__StaticJsr_Return
 
 Interpret__StaticJsr_Return:
+
+	// Link return if necessary
+	// Is it followed by NOP+RTL?
+	ldy	#1
+	lda	[$.return2],y
+	cmp	#0x6bea
+	beq	$+b_1
+	// Is destination using non-native return?
+	ldy	$.functionListIndex
+	iny
+	iny
+	iny
+	lda	[$.Recompiler_FunctionList+3],y
+	and	#_Opcode_F_HasReturn
+	beq	$+b_1
+		.precall	JMPi__Add	=originalCall, =newAddr
+		lda	$.return2+1
+		sta	$.Param_newAddr+1
+		lda	$.return2
+		beq	$+b_1			// Exit if invalid return
+		inc	a
+		sta	$.Param_newAddr
+		ldx	$.return
+		lda	$=StaticRec_Origins+0,x
+		inc	a
+		tay
+		and	#0xe000
+		xba
+		tax
+		lda	$_Program_BankNum-1,x
+		sta	$.Param_originalCall+1
+		sty	$.Param_originalCall
+		call
+b_1:
+
 	sep	#0x30
 	.mx	0x30
 	// Return
