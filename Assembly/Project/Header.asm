@@ -59,10 +59,6 @@ Start__Lock_1:
 		tcs
 b_1:
 
-	// Reset IRQ
-	lda	#0
-	sta	$=IRQ_InterruptInProcess
-
 	unlock
 
 	// Load call address

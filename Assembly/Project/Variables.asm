@@ -585,6 +585,16 @@ Debug_LastIdleCycles:
 Debug_LastMemoryUsage:
 	.fill	2
 
+	.fill	7
+TrapTest_Stack:
+	.fill	1
+
+TrapTest_A:
+	.fill	2
+
+TrapTest_S:
+	.fill	2
+
 IRQ_VSTACK_START:
 	.def	IRQ_VSTACK_PAGE				0x1d00
 	//.def	IRQ_VSTACK_START

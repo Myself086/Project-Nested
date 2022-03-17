@@ -154,12 +154,53 @@ Gfx__NameTableMirrorChange_Data:
 
 	// Note: IRQ writes 6 bytes to stack
 
+Start__Irq_TrapTest:
+		// Push registers
+		sta	$_TrapTest_A
+		tsc
+		sta	$_TrapTest_S
+		lda	#_TrapTest_Stack
+		tcs
+		// Push the rest of the registers to interrupt stack
+		phx
+		phy
+		phd
+		lda	#_IRQ_VSTACK_PAGE
+		tcd
+
+		// Test main thread
+		Int__TestMainThread		b_trapped, TrapTest_A, TrapTest_S
+
+b_TrapReturn:
+		// Pull from interrupt stack
+		pld
+		ply
+		plx
+
+		// Restore stack pointer and A
+		lda	$_TrapTest_S
+		tcs
+		lda	$_TrapTest_A
+
+		plb
+		rti
+
+b_trapped:
+		stz	$_IRQ_InterruptInProcess
+		bra	$-b_TrapReturn
+
+
 Start__Irq_Out:
 		// Acknowledge IRQ and return
 		bit	$0x4211
 
-		plb
-		rti
+		// Is it time to test main thread?
+		dec	$_BlueScreen_WaitState
+		bmi	$+b_1
+			plb
+			rti
+b_1:
+		jmp	$_Start__Irq_TrapTest
 
 	.mx	0x00
 	.func	Start__Irq_Fast
@@ -284,7 +325,7 @@ b_1:
 	// Test main thread
 	dec	$.BlueScreen_WaitState
 	bpl	$+b_1
-		Int__TestMainThread
+		Int__TestMainThread		b_1, a, s
 b_1:
 
 	// Do debug render
@@ -618,7 +659,7 @@ Gfx__IndirectCallGuiUpdate:
 
 	// ---------------------------------------------------------------------------
 
-	.macro	Int__TestMainThread
+	.macro	Int__TestMainThread		positiveDestination, a, s
 		lda	#59
 		sta	$.BlueScreen_WaitState
 
@@ -631,7 +672,7 @@ Gfx__IndirectCallGuiUpdate:
 		// empty, db, p, pc
 
 		// Get main thread's P and PC
-		ldy	$.s
+		ldy	$.{2}
 		lda	$0x0002,y
 		sta	$.BlueScreen_P
 		lda	$0x0004,y
@@ -672,9 +713,9 @@ b_in__:
 			sta	$.BlueScreen_Y
 			lda	$5,s
 			sta	$.BlueScreen_X
-			lda	$.a
+			lda	$.{1}
 			sta	$.BlueScreen_A
-			lda	$.s
+			lda	$.{2}
 			sta	$.BlueScreen_S
 
 			// Activate blue screen
@@ -682,7 +723,7 @@ b_in__:
 			sta	$.Debug_CodePointer
 			stz	$.Debug_WaitState
 
-			bra	$+out__
+			bra	$+{0}
 b_in2__:
 			jmp	$_Int__TestMainThread_outlined
 out__:
