@@ -133,7 +133,8 @@ namespace Project_Nested.Optimize
 
         private void UpdateUI()
         {
-            lblProgress.Text = $"Progress: {discarded.Count} / {calls.Count + discarded.Count}\n";
+            lblProgress.Text = $"Progress: {discarded.Count} / {calls.Count + discarded.Count}\n" +
+                $"Testing {calls.Count - excludedCalls.Count}";
                 //$"Test fraction: {fraction.numerator} / {fraction.denominator}";
 
             btnNext.Enabled = !awaiting;
