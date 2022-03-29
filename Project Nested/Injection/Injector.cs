@@ -797,7 +797,7 @@ namespace Project_Nested.Injection
                 emu.Execute();
 
                 if (baseAddress == null)
-                    baseAddress = emu.memory.DebugReadTwoByte(0);
+                    baseAddress = emu.memory.DebugReadThreeByte(0);
             }
             emu.memory.ReadROM(OutData);
 

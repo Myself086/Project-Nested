@@ -70,7 +70,7 @@ namespace Project_Nested.Optimize
 
         // --------------------------------------------------------------------
 
-        public List<AsmIL65816> Optimize(CancellationToken? ct, bool keepRecord)
+        public void Optimize(CancellationToken? ct, bool keepRecord)
         {
             // Create a record of changes if requested
             if (keepRecord)
@@ -126,9 +126,27 @@ namespace Project_Nested.Optimize
                         break;
                 }
             }
-
-            return CodeBlock.ConvertToList(code);
         }
+
+        public void MarkReturns(OptimizeGroup sender, byte nesBank)
+        {
+            for (int i = 0; i < this.CodeBlockCount; i++)
+            {
+                CodeBlock block = this.GetCodeBlock(i);
+                for (int u = block.Count - 1; u >= 0; u--)
+                {
+                    var asm = block[u];
+                    if (asm.opcode == InstructionSet.JSR_Nes || asm.opcode == InstructionSet.JSR_Nes_Static)
+                    {
+                        var rtn = asm.originalReturn | (nesBank << 16);
+                        if (sender == null || sender.AddReturnMarker(rtn))
+                            block.Insert(u + 1, new AsmIL65816(InstructionSet.ReturnMarker, rtn), iterationID);
+                    }
+                }
+            }
+        }
+
+        public List<AsmIL65816> GetCode() => CodeBlock.ConvertToList(code);
 
         public void SetBreakPoint(int iterationID, string operationName)
         {

@@ -290,6 +290,7 @@ namespace Project_Nested.Optimize
 
         // Intermediate language starts here    -------------------------------
         Label = 0x800,
+        ReturnMarker,
 
         // Jsr Nes/Emulator
         JSR_Nes, JMP_Nes, JSR_Nes_Static, JMP_Nes_Static,

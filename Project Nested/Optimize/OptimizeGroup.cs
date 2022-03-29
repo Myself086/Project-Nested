@@ -15,11 +15,14 @@ namespace Project_Nested.Optimize
         #region Variables
 
         List<LinkOrigin> linkOrigins = new List<LinkOrigin>();
+        List<int> returnMarkers = new List<int>();
         List<MakeBinary> subroutines;
 
         List<int> calls;
 
         Injector injector;
+
+        bool nativeReturn;
 
         const string PROGRESS_COMPILE_NAME = "Compiling";
         const string PROGRESS_OPTIMIZE_NAME = "Optimizing";
@@ -31,10 +34,11 @@ namespace Project_Nested.Optimize
         // --------------------------------------------------------------------
         #region Constructor
 
-        public OptimizeGroup(Injector injector, List<int> calls, byte staticRanges, IProgress<Tuple<string, int, int>> progress)
+        public OptimizeGroup(Injector injector, List<int> calls, byte staticRanges, bool nativeReturn, IProgress<Tuple<string, int, int>> progress)
         {
             this.injector = injector;
             this.calls = calls.Where(e => (e & 0xffff) >= 0x8000).ToList();
+            this.nativeReturn = nativeReturn;
             this.progress = progress;
         }
 
@@ -83,10 +87,14 @@ namespace Project_Nested.Optimize
 
             // Optimize
             var op = new OptimizeOperator(null, il);
-            var il2 = op.Optimize(ct, false);
+            op.Optimize(ct, false);
+
+            // Mark returns
+            op.MarkReturns(this, (byte)(code.nesAddress >> 16));
 
             // Convert to binary
-            var bin = new MakeBinary(this, code.nesAddress, op.TimeOut ? il : il2, code.compileFlags, true);
+            var il2 = op.GetCode();
+            var bin = new MakeBinary(this, code.nesAddress, op.TimeOut ? il : il2, code.compileFlags, nativeReturn);
 
             // Update progress
             IncrementProgress(PROGRESS_OPTIMIZE_NAME);
@@ -120,11 +128,12 @@ namespace Project_Nested.Optimize
         // --------------------------------------------------------------------
         #region Finalize
 
+        private int baseLinkOrigin;
         public void WriteLinks(c65816 emu)
         {
-            var baseOrigin = injector.AddCallLinks(emu, linkOrigins);
+            baseLinkOrigin = injector.AddCallLinks(emu, linkOrigins);
 
-            if (baseOrigin != 0)
+            if ((baseLinkOrigin & 0xffff) != 0)
                 throw new Exception("Link origins were already initialized.");
 
             emu.AddFunctionCode(subroutines);
@@ -132,6 +141,9 @@ namespace Project_Nested.Optimize
 
         public void FixLinks(c65816 emu)
         {
+            if (baseLinkOrigin == 0 && (linkOrigins.Count != 0 || returnMarkers.Count != 0))
+                throw new Exception("Link origins aren't initialized.");
+
             var memory = emu.memory;
             foreach (var item in subroutines)
             {
@@ -140,6 +152,7 @@ namespace Project_Nested.Optimize
                 var jumpSource = item.jumpSource;
                 var staticCallSource = item.staticCallSource;
                 var labels = item.labels;
+                var returnMarkers = item.returnMarkers;
 
                 foreach (var jmp in jumpSource)
                 {
@@ -162,25 +175,16 @@ namespace Project_Nested.Optimize
                     var destinationObj = subroutines.Find(e => e.nesAddress == destinationAddr);
                     memory.DebugWriteThreeByte(addr, destinationObj.snesAddress);
                 }
-            }
-        }
 
-        #endregion
-        // --------------------------------------------------------------------
-        #region Shared among tasks
-
-        public int AddLinkOrigin(LinkOrigin origin)
-        {
-            lock (linkOrigins)
-            {
-                var index = linkOrigins.FindIndex(e => e.wholeData == origin.wholeData);
-                if (!linkOrigins.Contains(origin))
+                foreach (var mark in returnMarkers)
                 {
-                    linkOrigins.Add(origin);
-                    return linkOrigins.Count - 1;
+                    var index = linkOrigins.FindIndex(e => e.fullRtn == mark.Key);
+                    if (index < 0)
+                        throw new Exception("Invalid return marker.");
+                    var addr = baseLinkOrigin + 0x10000 + index * 4;
+
+                    memory.DebugWriteFourByte(addr, mark.Value + snesAddress);
                 }
-                else
-                    return index;
             }
         }
 
@@ -243,27 +247,38 @@ namespace Project_Nested.Optimize
         #region Link management
 
         /// <summary>
-        /// Adds an open JIT link to AOT code.
-        /// Returns the SNES address where the link is located.
-        /// If the link already exists, it returns the existing link instead of adding a new link.
+        /// Add return marker and returns true when it's new.
         /// </summary>
-        /// <param name="originalReturn"></param>
-        /// <param name="originalCall"></param>
+        /// <param name="nesReturn"></param>
         /// <returns></returns>
-        public int AddCallLink(int originalReturn, int originalCall)
+        public bool AddReturnMarker(int nesReturn)
         {
-            var link = new LinkOrigin(originalReturn, originalCall);
-            int index = 0;
-            lock (this)
+            lock (returnMarkers)
             {
-                index = linkOrigins.FindIndex(e => e == link);
+                var index = returnMarkers.FindIndex(e => e == nesReturn);
                 if (index < 0)
                 {
-                    index = linkOrigins.Count;
-                    linkOrigins.Add(link);
+                    returnMarkers.Add(nesReturn);
+                    return true;
                 }
+                else
+                    return false;
             }
-            return 0x7f0000 + index * 4;
+        }
+
+        public int AddLinkOrigin(LinkOrigin origin)
+        {
+            lock (linkOrigins)
+            {
+                var index = linkOrigins.FindIndex(e => e == origin);
+                if (index < 0)
+                {
+                    linkOrigins.Add(origin);
+                    return linkOrigins.Count - 1;
+                }
+                else
+                    return index;
+            }
         }
 
         public LinkOrigin[] GetAllLinkOrigins() => linkOrigins.ToArray();

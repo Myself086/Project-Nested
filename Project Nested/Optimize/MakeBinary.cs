@@ -17,6 +17,7 @@ namespace Project_Nested.Optimize
         public int[] jumpSource;
         public int[] staticCallSource;
         public Dictionary<int, int> labels;
+        public Dictionary<int, int> returnMarkers;      // <NES address, code offset>
 
         public const byte NO_SNES_BANK_RESERVATION = 0;
         public byte snesBankReservation = NO_SNES_BANK_RESERVATION;
@@ -40,6 +41,7 @@ namespace Project_Nested.Optimize
             List<byte> newCode = new List<byte>();
 
             var labels = new Dictionary<int, int>();
+            var returnMarkers = new Dictionary<int, int>();
             var branchSource = new List<Tuple<int, int>>();
 
             var jumpSource = new List<int>();
@@ -79,12 +81,15 @@ namespace Project_Nested.Optimize
 
                 if (asm.opcode >= InstructionSet.il)        // Intermediate
                 {
-                    int AddLinkOrigin() => sender.AddLinkOrigin(new LinkOrigin(asm.originalReturn, asm.originalCall));
+                    int AddLinkOrigin() => sender.AddLinkOrigin(new LinkOrigin(asm.originalReturn, asm.originalCall, nesAddress >> 16));
 
                     switch (asm.opcode)
                     {
                         case InstructionSet.Label:
                             labels.Add(asm.labelNum, newCode.Count);
+                            break;
+                        case InstructionSet.ReturnMarker:
+                            returnMarkers.Add(asm.operand, newCode.Count - 1);
                             break;
                         case InstructionSet.JSR_Nes:
                             if (nativeReturn)
@@ -102,10 +107,10 @@ namespace Project_Nested.Optimize
                         case InstructionSet.JMP_Nes:
                             {
                                 var originIndex = AddLinkOrigin();
-                                AddCode(InstructionSet.JSR_Jmp24, 0x7f0000 + originIndex * 4, 4); // Dynamic link address
-                                AddCode(InstructionSet.NOP, 0, 1);
-                                AddCode(InstructionSet.RTL, 0, 1);
+                                AddCode(InstructionSet.JMP_Jmp24, 0x7f0000 + originIndex * 4, 4); // Dynamic link address
                             }
+                            AddCode(InstructionSet.NOP, 0, 1);
+                            AddCode(InstructionSet.RTL, 0, 1);
                             break;
                         case InstructionSet.JSR_Nes_Static:
                             if (nativeReturn)
@@ -122,7 +127,7 @@ namespace Project_Nested.Optimize
                             break;
                         case InstructionSet.JMP_Nes_Static:
                             staticCallSource.Add(newCode.Count + 1);
-                            AddCode(InstructionSet.JSR_Jmp24, asm.originalCall, 4);
+                            AddCode(InstructionSet.JMP_Jmp24, asm.originalCall, 4);
                             break;
                         case InstructionSet.JMP_Emu:
                             AddCode(InstructionSet.JMP_Jmp24, Asm65816Dictionary.GetEmuCallByID(asm.operand).address, 4);
@@ -213,6 +218,12 @@ namespace Project_Nested.Optimize
                         if (item > startIndex)
                             jumpSource[i] += byteCount;
                     }
+                    for (int i = 0; i < returnMarkers.Count; i++)
+                    {
+                        var item = returnMarkers.ElementAt(i);
+                        if (item.Value > startIndex)
+                            returnMarkers[item.Key] = item.Value + byteCount;
+                    }
                     done = false;
                 }
 
@@ -275,6 +286,7 @@ namespace Project_Nested.Optimize
             this.jumpSource = jumpSource.ToArray();
             this.staticCallSource = staticCallSource.ToArray();
             this.labels = labels;
+            this.returnMarkers = returnMarkers;
         }
     }
 }

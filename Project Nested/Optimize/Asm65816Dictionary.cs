@@ -585,6 +585,9 @@ namespace Project_Nested.Optimize
             DefineOpcode((int)InstructionSet.JSR_Nes_Static, new OpcodeDescription("JSR!", OperandType.CallNes, usage, change | FlagAndRegs.CanInline));
             DefineOpcode((int)InstructionSet.JMP_Nes_Static, new OpcodeDescription("JMP!", OperandType.CallNes, usage, change | FlagAndRegs.End | FlagAndRegs.CanInline));
 
+            // Return marker
+            DefineOpcode((int)InstructionSet.ReturnMarker, new OpcodeDescription(".returnmark", OperandType.None, FlagAndRegs.None, FlagAndRegs.None));
+
             return opcodes;
 
             void DefineOpcode(int index, OpcodeDescription desc)

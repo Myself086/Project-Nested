@@ -262,7 +262,8 @@ namespace Project_Nested.Optimize
                 if (breakOn)
                     lock (this)
                         op.SetBreakPoint(selectedBreakOn.Item1, selectedBreakOn.Item2);
-                il = op.Optimize(ct, true);
+                op.Optimize(ct, true);
+                il = op.GetCode();
 
                 // Disassemble 'after' code
                 {

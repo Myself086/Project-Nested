@@ -139,7 +139,7 @@ b_1:
 	// ---------------------------------------------------------------------------
 
 	// Entry: short originalReturn, short originalCall
-	// Return: short basePointer
+	// Return: int basePointer
 StaticRec__AddCallLinkForExe:
 	FromExeInit16
 
@@ -159,6 +159,8 @@ StaticRec__AddCallLinkForExe:
 
 	// Return base pointer
 	stx	$0x0000
+	lda	#_StaticRec_Origins/0x10000
+	sta	$0x0002
 
 	stp
 
