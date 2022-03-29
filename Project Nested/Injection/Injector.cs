@@ -473,18 +473,6 @@ namespace Project_Nested.Injection
                 this.AotCompileBanks.SetValueAt(0, (byte)(NewHiRomBank + 1));
                 this.AotCompileBanks.SetValueAt(1, 0xff);
 
-                OptimizeGroup optGroup = null;
-                if (Convert.ToBoolean(GetSetting("Optimize.Enabled")))
-                {
-                    optGroup = new OptimizeGroup(this, calls.Where(e => !excludedCalls.Contains(e)).ToList(), StaticRange.Value, progress);
-#if SYNC_SAVE
-                    optGroup.OptimizeAllSync();
-#else
-                    await optGroup.OptimizeAllAsync(ct);
-#endif
-                    IfCancel();
-                }
-
                 // Build SRAM
                 byte[] sram = new byte[0x4000];
                 {
@@ -525,6 +513,19 @@ namespace Project_Nested.Injection
                     var addr = AddData(emu, patchRanges);
                     SetSetting("Patch.Ranges", addr.ToString());
                     SetSetting("Patch.Ranges.Length", (patchRanges.Length * 4).ToString());
+                }
+
+                OptimizeGroup optGroup = null;
+                if (Convert.ToBoolean(GetSetting("Optimize.Enabled")))
+                {
+                    optGroup = new OptimizeGroup(this, calls.Where(e => !excludedCalls.Contains(e)).ToList(),
+                        StaticRange.Value, Convert.ToBoolean(settings["StackEmulation.NativeReturn"].GetValue()), progress);
+#if SYNC_SAVE
+                    optGroup.OptimizeAllSync();
+#else
+                    await optGroup.OptimizeAllAsync(ct);
+#endif
+                    IfCancel();
                 }
 
                 // Call compiler
