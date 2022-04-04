@@ -470,7 +470,7 @@ namespace Project_Nested.Injection
             // Compile known calls
             {
                 // Bank range
-                this.AotCompileBanks.SetValueAt(0, (byte)(NewHiRomBank + 1));
+                this.AotCompileBanks.SetValueAt(0, (byte)(NewHiRomBank));
                 this.AotCompileBanks.SetValueAt(1, 0xff);
 
                 // Build SRAM
