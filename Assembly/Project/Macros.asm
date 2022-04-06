@@ -421,6 +421,41 @@ b_skip__:
 	CoreCall_DEFINE		CoreCall_Remove			".data8 {0}"		// Remove {0} bytes
 	CoreCall_DEFINE		CoreCall_WriteOriginal	""					// Writes original instruction
 
+	.macro	CoreCall_Use	flags
+		.ifnamecontains	{0}, "A8"
+		{
+			CoreCall_UseA8
+		}
+		.ifnamecontains	{0}, "A16"
+		{
+			CoreCall_UseA16
+		}
+		.ifnamecontains	{0}, "X"
+		{
+			CoreCall_UseX
+		}
+		.ifnamecontains	{0}, "Y"
+		{
+			CoreCall_UseY
+		}
+		.ifnamecontains	{0}, "n"
+		{
+			CoreCall_UseN
+		}
+		.ifnamecontains	{0}, "v"
+		{
+			CoreCall_UseV
+		}
+		.ifnamecontains	{0}, "z"
+		{
+			CoreCall_UseZ
+		}
+		.ifnamecontains	{0}, "c"
+		{
+			CoreCall_UseC
+		}
+	.endm
+
 	.def	CoreCallFlag_PushA		0x0001
 	.def	CoreCallFlag_PushX		0x0002
 	.def	CoreCallFlag_PushY		0x0004
