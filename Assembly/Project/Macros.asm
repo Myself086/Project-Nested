@@ -383,6 +383,12 @@ b_skip__:
 		.endm
 	.endm
 
+	.macro IfSet	address, bitmask, goto
+		.data24	{0}
+		.data8	{1}
+		.data8	{2}
+	.endm
+
 	CoreCall_DEFINE		CoreCall_Begin			""					// Begin prerequisite instruction for calling core function (must be 0x00)
 	CoreCall_DEFINE		CoreCall_End			""					// End prerequisite instruction for calling core function
 	CoreCall_DEFINE		CoreCall_Call			".data16 {0}"		// Long call function
@@ -407,6 +413,8 @@ b_skip__:
 	CoreCall_DEFINE		CoreCall_IfNotFreeP		".data8 {0}"		// If P isn't free, goto {0}
 	CoreCall_DEFINE		CoreCall_IfJit			".data8 {0}"		// If JIT, goto {0}
 	CoreCall_DEFINE		CoreCall_IfAot			".data8 {0}"		// If AOT, goto {0}
+	CoreCall_DEFINE		CoreCall_IfSet			"IfSet {0},{1},{2}"	// If var {0} bit masked with {1} is set, goto {2}
+	CoreCall_DEFINE		CoreCall_IfClear		"IfSet {0},{1},{2}"	// If var {0} bit masked with {1} is clear, goto {2}
 	CoreCall_DEFINE		CoreCall_Jump			".data16 {0}"		// goto {0}
 	CoreCall_DEFINE		CoreCall_Copy			".data16 {0},{1}"	// Copies code from address {0} to {1}-1
 	CoreCall_DEFINE		CoreCall_CopyUpTo		".data8 {0}"		// Copies {0} bytes then resume instructions after the last byte

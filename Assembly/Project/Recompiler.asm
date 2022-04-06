@@ -3699,6 +3699,42 @@ b_branch:
 	case	CoreCall_IfAot
 		Recompiler__Build_CoreCall_IfGoto	=StaticRec_Active, 0x0001, jeq
 
+	case	CoreCall_IfSet
+		.local	=tempPointer
+		lda	[$.src]
+		sta	$.tempPointer+0
+		inc	$.src
+		inc	$.src
+		lda	[$.src]
+		sta	$.tempPointer+2
+		inc	$.src
+		inc	$.src
+
+		xba
+		and	[$.tempPointer]
+		and	#0x00ff
+		jne	$_b_branch
+		inc	$.src
+		break
+
+	case	CoreCall_IfClear
+		lda	[$.src]
+		sta	$.tempPointer+0
+		inc	$.src
+		inc	$.src
+		lda	[$.src]
+		sta	$.tempPointer+2
+		inc	$.src
+		inc	$.src
+
+		xba
+		and	[$.tempPointer]
+		and	#0x00ff
+		jeq	$_b_branch
+		inc	$.src
+		break
+		.unlocal	=tempPointer
+
 	case	CoreCall_Jump
 		lda	[$.src]
 		sta	$.src
