@@ -18,6 +18,7 @@ Dev build:
 - Optimized non-native return address coupled with AOT compiled code
 - Added custom controller input
 - Fixed recompiling massive sub-routines (over 8 KB)
+- Fixed CHR ROM data allocation conflicts during conversion
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size

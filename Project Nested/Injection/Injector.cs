@@ -408,8 +408,7 @@ namespace Project_Nested.Injection
                 OutData.WriteArray(NewHiRomBank_FileAddress + (i & 0x7fff), SrcData.ReadArray(start + i, 0x2000), 0x2000);
             }
             // Cut this bank short
-            if ((i & 0x7fff) != 0)
-                NewHiRomBank++;
+            NewHiRomBank++;
         }
 
         private void WritePrgBankTable()
