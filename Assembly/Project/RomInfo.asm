@@ -154,6 +154,15 @@ RomInfo_PatchRanges:
 RomInfo_PatchRanges_Length:
 	.fill	2
 
+RomInfo_InputFlags:
+	.data8	0
+	.def	RomInfo_Input_Mouse						0x01		// TODO, imagine AVGN playing Top Gun with a Snes mouse
+	.def	RomInfo_Input_SuperScope				0x02		// TODO
+	.def	RomInfo_Input_CustomControl				0x80		// Must be bit 7
+
+RomInfo_InputMap:
+	.data8	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+
 	// ---------------------------------------------------------------------------
 
 	// Version number
@@ -471,6 +480,17 @@ RomInfo_Description:
 		RomInfo_DefineMac	"private hex short[0x40] PaletteDefault", Gfx_PaletteTable+0x80, 0
 
 		RomInfo_DefineMac	"public Button CustomPalette : Custom palette", Zero, 0
+
+	RomInfo_DefineMac	"public void Tab_Input : Controller input.", 0, 0
+
+		RomInfo_SummaryMac	"Use custom inputs but lowers performance by up to 2%."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"May cause some games to be unplayable."
+		RomInfo_DefineMac	"public global bool Input.Enabled : Enable custom input.", RomInfo_InputFlags, RomInfo_Input_CustomControl
+
+		RomInfo_DefineMac	"private global byte[12] Input.Map", RomInfo_InputMap, 0
+
+		RomInfo_DefineMac	"public Button CustomInput : Custom input", Zero, 0
 
 	RomInfo_DefineMac	"public void Tab_Gui : Graphical user interface settings.", 0, 0
 

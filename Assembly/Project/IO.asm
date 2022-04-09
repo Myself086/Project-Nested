@@ -2145,63 +2145,316 @@ b_1:
 	// ---------------------------------------------------------------------------
 	// Input registers
 
-IO__r4016_a:
 IO__r4016_a_i:
 	xba
-	lda	$0x4016
-	sta	$_IO_Temp
-	xba
-	rtl
+	lda	$=RomInfo_InputFlags
+	bmi	$+b_else
+		lda	$0x4016
+		sta	$_IO_Temp
+
+		xba
+		rtl
+b_else:
+		phx
+		ldx	$_Input_OffsetA
+		lda	$_Input_Remap+0,x
+		sta	$_IO_Temp
+		inx
+		inx
+		stx	$_Input_OffsetA
+		plx
+
+		xba
+		rtl
+
+IO__r4016_a:
+	CoreCall_Begin
+	CoreCall_Use	"A8Xzn"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		ldx	$_Input_OffsetA
+		lda	$_Input_Remap+0,x
+		sta	$_IO_Temp
+		inx
+		inx
+		stx	$_Input_OffsetA
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 IO__r4016_a_x:
-	lda	$0x4016,x
-	rtl
+	CoreCall_Begin
+	CoreCall_Use	"Yznvc"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		cpx	#1
+		beq	$+b_else
+		bcs	$+b_1
+			// Controller A
+			ldy	$_Input_OffsetA
+			lda	$_Input_Remap+0,y
+			sta	$_IO_Temp
+			iny
+			iny
+			sty	$_Input_OffsetA
+
+			bra	$+b_1
+b_else:
+			// Controller B
+			ldy	$_Input_OffsetB
+			lda	$_Input_Remap+0,y
+			sta	$_IO_Temp
+			iny
+			iny
+			sty	$_Input_OffsetB
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 IO__r4016_a_y:
-	lda	$0x4016,y
-	rtl
+	CoreCall_Begin
+	CoreCall_Use	"Xznvc"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		cpy	#1
+		beq	$+b_else
+		bcs	$+b_1
+			// Controller A
+			ldx	$_Input_OffsetA
+			lda	$_Input_Remap+0,x
+			sta	$_IO_Temp
+			inx
+			inx
+			stx	$_Input_OffsetA
+
+			bra	$+b_1
+b_else:
+			// Controller B
+			ldx	$_Input_OffsetB
+			lda	$_Input_Remap+0,x
+			sta	$_IO_Temp
+			inx
+			inx
+			stx	$_Input_OffsetB
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 IO__w4016_x:
-	stx	$0x4016
-	rtl
+	CoreCall_Begin
+	CoreCall_Use	"A16zn"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		txa
+b_1:
+	CoreCall_Copy	IO__w4016_CopyStart, IO__w4016_CopyEnd
+	CoreCall_Pull
+	CoreCall_End
 
 IO__w4016_y:
-	sty	$0x4016
-	rtl
+	CoreCall_Begin
+	CoreCall_Use	"A16zn"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tya
+b_1:
+	CoreCall_Copy	IO__w4016_CopyStart, IO__w4016_CopyEnd
+	CoreCall_Pull
+	CoreCall_End
 
 IO__w4016_a:
+	CoreCall_Begin
+	CoreCall_Use	"A16zn"
+	CoreCall_Push
+	CoreCall_Copy	IO__w4016_CopyStart, IO__w4016_CopyEnd
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4016_a_x:
+	CoreCall_Begin
+	CoreCall_Use	"A16znvc"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		cpx	#1
+		bcs	$+b_1
+			jsr	$=IO__w4016_CopyStart
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+IO__w4016_a_y:
+	CoreCall_Begin
+	CoreCall_Use	"A16znvc"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		cpy	#1
+		bcs	$+b_1
+			jsr	$=IO__w4016_CopyStart
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
 IO__w4016_a_i:
-	sta	$0x4016
+	pha
+
+	// Are we using custom controls?
+	lda	$=RomInfo_InputFlags
+	bmi	$+b_1
+		pla
+		sta	$0x4016
+		rtl
+b_1:
+	// Reload A
+	lda	$1,s
+
+	jsr	$=IO__w4016_CopyStart
+	pla
+	rtl
+
+IO__w4016_CopyStart:
+		and	#1
+		beq	$+b_else
+			lda	#26
+			sta	$_Input_OffsetA
+			sta	$_Input_OffsetB
+
+			bra	$+b_1
+b_else:
+b_loop:
+				// Wait for auto-read not busy, likely not needed
+				lda	#1
+				and	$0x4212
+				bne	$-b_loop
+			// Reset input poll
+			lda	#1
+			sta	$0x4016
+			stz	$0x4016
+
+			jsr	$=IO__w4016_ReadInputs
+b_1:
+IO__w4016_CopyEnd:
+	rtl
+
+IO__w4016_ReadInputs:
+	phx
+	rep	#0x20
+	.mx	0x10
+
+	// Read 12 times
+	.macro	IO__w4016_ReadInputs	index
+		lda	$=RomInfo_InputMap+{0}
+		asl	a
+		tax
+		lda	$0x4016
+		sta	$_Input_Remap,x
+	.endm
+	IO__w4016_ReadInputs	0
+	IO__w4016_ReadInputs	1
+	IO__w4016_ReadInputs	2
+	IO__w4016_ReadInputs	3
+	IO__w4016_ReadInputs	4
+	IO__w4016_ReadInputs	5
+	IO__w4016_ReadInputs	6
+	IO__w4016_ReadInputs	7
+	IO__w4016_ReadInputs	8
+	IO__w4016_ReadInputs	9
+	IO__w4016_ReadInputs	10
+	IO__w4016_ReadInputs	11
+
+	// Reset indexes
+	lda	#0x0302
+	sta	$_Input_OffsetA
+
+	sep	#0x20
+	.mx	0x30
+	plx
 	rtl
 
 
-IO__r4017_a:
 IO__r4017_a_i:
 	xba
-	lda	$0x4017
-	sta	$_IO_Temp
-	xba
-	rtl
+	lda	$=RomInfo_InputFlags
+	bmi	$+b_else
+		lda	$0x4017
+		sta	$_IO_Temp
+
+		xba
+		rtl
+b_else:
+		phx
+		ldx	$_Input_OffsetB
+		lda	$_Input_Remap+0,x
+		sta	$_IO_Temp
+		inx
+		inx
+		stx	$_Input_OffsetB
+		plx
+
+		xba
+		rtl
+
+IO__r4017_a:
+	CoreCall_Begin
+	CoreCall_Use	"A8Xzn"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		ldx	$_Input_OffsetB
+		lda	$_Input_Remap+0,x
+		sta	$_IO_Temp
+		inx
+		inx
+		stx	$_Input_OffsetB
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 IO__r4017_a_x:
-	lda	$0x4017,x
-	rtl
+	CoreCall_Begin
+	CoreCall_Use	"Yzn"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		txa
+		bne	$+b_else
+			// Controller B
+			ldy	$_Input_OffsetB
+			lda	$_Input_Remap+0,y
+			sta	$_IO_Temp
+			iny
+			iny
+			sty	$_Input_OffsetB
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 IO__r4017_a_y:
-	lda	$0x4017,y
-	rtl
-
-IO__w4017_x:
-	stx	$0x4017
-	rtl
-
-IO__w4017_y:
-	sty	$0x4017
-	rtl
+	CoreCall_Begin
+	CoreCall_Use	"Xzn"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+		tya
+		bne	$+b_else
+			// Controller B
+			ldx	$_Input_OffsetB
+			lda	$_Input_Remap+0,x
+			sta	$_IO_Temp
+			inx
+			inx
+			stx	$_Input_OffsetB
+b_1:
+	CoreCall_Pull
+	CoreCall_End
 
 IO__w4017_a:
+IO__w4017_x:
+IO__w4017_y:
+IO__w4017_a_x:
+IO__w4017_a_y:
+	// Not supported yet
+	CoreCall_Begin
+	CoreCall_End
+
 IO__w4017_a_i:
-	sta	$0x4017
+	// Not supported yet
 	rtl
 
 

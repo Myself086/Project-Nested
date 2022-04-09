@@ -287,6 +287,15 @@ namespace Project_Nested.Injection
                             form.injector = injector;
                         }
                         break;
+                    case "CustomInput":
+                        if (Convert.ToBoolean(injector.GetSetting("Input.Enabled")))
+                        {
+                            var form = new FrmControllerInput(injector);
+                            form.Show((Control)sender);
+                        }
+                        else
+                            MessageBox.Show("You must enable custom input.");
+                        break;
                     default:
                         MessageBox.Show($"Unknown button behavior for \"{setting.Name}\".");
                         break;

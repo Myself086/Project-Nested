@@ -295,10 +295,15 @@ b_loop:
 	stz	$0x210e
 	stz	$0x210e
 
+	// Enable automatic joypad reading?
+	lda	$=RomInfo_InputFlags
+	asl	a
+	rol	a
+	and	#1
 	// Enable IRQ on scanline 240
 	ldx	#240
 	stx	$0x4209
-	lda	#0x20
+	ora	#0x20
 	sta	$0x4200
 
 	// Enable BG3 in case an error happens, normally this is set by HDMA

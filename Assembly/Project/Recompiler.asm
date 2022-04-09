@@ -1434,10 +1434,13 @@ b_1:
 		// Store instruction
 		jmp	$_Recompiler__Build_OpcodeType_StaAbs_HighRange
 Recompiler__Build_OpcodeType_Abs_SkipSramRange:
-	// Are we reading gamepad inputs?
-	and	#0xfffe
-	cmp	#0x4016
-	jeq	$_Recompiler__Build_OpcodeType_Abs_HighRange
+	andbne	$=RomInfo_InputFlags, #_RomInfo_Input_CustomControl, $+b_1
+		// Are we reading gamepad inputs?
+		lda	[$.readAddr],y
+		and	#0xfffe
+		cmp	#0x4016
+		jeq	$_Recompiler__Build_OpcodeType_Abs_HighRange
+b_1:
 	// Are we in I/O range?
 	lda	[$.readAddr],y
 	bit	#0x6000
@@ -1663,13 +1666,36 @@ b_1:
 
 
 Recompiler__Build_OpcodeType_LdaAbsX:
+	ldx	#_iIOPort_ldax*2
+	bra	$+b_1
 Recompiler__Build_OpcodeType_LdaAbsY:
-	// TODO: Support IO
+	ldx	#_iIOPort_lday*2
+	//bra	$+b_1
+b_1:
 
 	// Preload Y index and write opcode
 	lsr	a
 	sta	[$.writeAddr]
 	ldy	#0x0001
+
+	// Are we in IO range?
+	lda	[$.readAddr],y
+	bmi	$+b_1
+	cmp	#0x2000
+	bcc	$+b_1
+	cmp	#0x5f01			// Accessing PRG RAM via page crossing
+	bcs	$+b_1
+		andbne	$=RomInfo_InputFlags, #_RomInfo_Input_CustomControl, $+b_2
+			// Are we reading gamepad inputs?
+			lda	[$.readAddr],y
+			and	#0xfffe
+			cmp	#0x4016
+			bra	$+b_1
+b_2:
+		// Interprete IO port
+		lda	[$.readAddr],y
+		jmp	$_Recompiler__Build_OpcodeType_Abs_IO
+b_1:
 
 	// Are we using banking emulation?
 	lda	$=RomInfo_MemoryEmulation
@@ -3905,8 +3931,8 @@ b_1:
 		Recompiler__GetIOAccess_Compare		0x4013, bne, Recompiler__GetIOAccess_4013
 		Recompiler__GetIOAccess_Compare		0x4014, bne, Recompiler__GetIOAccess_4014
 		Recompiler__GetIOAccess_Compare		0x4015, bne, Recompiler__GetIOAccess_4015
-		//Recompiler__GetIOAccess_Compare		0x4016, bne, Recompiler__GetIOAccess_4016
-		//Recompiler__GetIOAccess_Compare		0x4017, bne, Recompiler__GetIOAccess_4017
+		Recompiler__GetIOAccess_Compare		0x4016, bne, Recompiler__GetIOAccess_4016
+		Recompiler__GetIOAccess_Compare		0x4017, bne, Recompiler__GetIOAccess_4017
 b_skip4000:
 
 	// Do we have a mapper?
@@ -4217,7 +4243,28 @@ Recompiler__GetIOAccess_4015:
 		caseat	iIOPort_stx		IO__w4015_x
 		caseat	iIOPort_sty		IO__w4015_y
 		caseat	iIOPort_stai	IO__w4015_a_i
-	// TODO: 4016 and 4017
+Recompiler__GetIOAccess_4016:
+	iIOPort_InterfaceSwitch		IO__Error
+		caseat	iIOPort_lda		IO__r4016_a
+		caseat	iIOPort_ldax	IO__r4016_a_x
+		caseat	iIOPort_lday	IO__r4016_a_y
+		caseat	iIOPort_ldai	IO__r4016_a_i
+		caseat	iIOPort_sta		IO__w4016_a
+		caseat	iIOPort_stx		IO__w4016_x
+		caseat	iIOPort_sty		IO__w4016_y
+		caseat	iIOPort_stax	IO__w4016_a_x
+		caseat	iIOPort_stay	IO__w4016_a_y
+		caseat	iIOPort_stai	IO__w4016_a_i
+Recompiler__GetIOAccess_4017:
+	iIOPort_InterfaceSwitch		IO__Error
+		caseat	iIOPort_lda		IO__r4017_a
+		caseat	iIOPort_ldai	IO__r4017_a_i
+		caseat	iIOPort_sta		IO__w4017_a
+		caseat	iIOPort_stx		IO__w4017_x
+		caseat	iIOPort_sty		IO__w4017_y
+		caseat	iIOPort_stax	IO__w4017_a_x
+		caseat	iIOPort_stay	IO__w4017_a_y
+		caseat	iIOPort_stai	IO__w4017_a_i
 
 
 	// ---------------------------------------------------------------------------

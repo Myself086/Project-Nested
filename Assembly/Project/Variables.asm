@@ -21,7 +21,7 @@
 	// 0d = stack high bits for emulating original return addresses
 	// 0e = SNES sprites (Requires even page alignment)
 	// 0f = "
-	// 10 = " + mapper memory + <Unused> + IRQ stack
+	// 10 = " + mapper memory + custom input + <unused> + IRQ stack
 	//*11 = HDMA pointers + CHR banks + sound
 	// 12 = NES palette (with some unused memory, reserved for 4bpp hacks?)
 	// 13 = Function pointer start index, used for the semi-sorted function list (only used while recompiling, could be moved later)
@@ -333,9 +333,14 @@ NameTable_Remap_Irq:
 	.def	Mapper_Memory				0x1020
 
 	// ---------------------------------------------------------------------------
-	// Unused
+	// Custom input
 
 	.addr	0x1040, 0x10df
+
+	// Input remap
+	DefineGlobalVariable	Input_Remap, 48		// 2 dummy bytes 24 valid bytes and 22 zeros
+	DefineGlobalVariable	Input_OffsetA, 1
+	DefineGlobalVariable	Input_OffsetB, 1
 
 	// ---------------------------------------------------------------------------
 	// HDMA pointers, CHR banks and sound (Must all be in the same page because we are using DP shortcuts)
