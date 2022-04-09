@@ -128,7 +128,52 @@ b_1:
 	tya
 	plb
 	return
-	
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
+	.func	Memory__AllocMax
+	// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
+Memory__AllocMax:
+	.local	_bank7e
+
+	// How many bytes are available in bank 0x7e?
+	lda	#0x007e
+	ldx	#0
+	call	Memory__CanAlloc
+	bcs	$+b_1
+		// Can't alloc
+		lda	#0
+b_1:
+	sta	$.bank7e
+
+	// How many bytes are available in bank 0x7f?
+	lda	#0x007f
+	ldx	#0
+	call	Memory__CanAlloc
+	bcs	$+b_1
+		// Can't alloc
+		lda	#0
+b_1:
+
+	// Which bank has the most amount of bytes available?
+	cmp	$.bank7e
+	bcs	$+b_else
+		// 0x7e
+		ldx	$.bank7e
+		lda	#0x007e
+		bra	$+b_1
+b_else:
+		// 0x7f
+		tax
+		lda	#0x007f
+b_1:
+
+	.unlocal	_bank7e
+
+	call	Memory__AllocInBank
+	return
+
 	// ---------------------------------------------------------------------------
 
 	.mx	0x00
@@ -261,7 +306,7 @@ b_trap:
 	.mx	0x00
 	.func	Memory__CanAlloc
 	// Entry: A = Bank number, X = Length
-	// Return: Carry = true when memory can be allocated
+	// Return: A = Bytes available, Carry = true when memory can be allocated
 Memory__CanAlloc:
 	phb
 	// Change bank and set carry for later
@@ -290,7 +335,7 @@ b_return:
 	.mx	0x00
 	.func	Memory__CanAllocCart
 	// Entry: A = Bank number, X = Length
-	// Return: Carry = true when memory can be allocated
+	// Return: A = Bytes available, Carry = true when memory can be allocated
 Memory__CanAllocCart:
 	phb
 	// Change bank and set carry for later

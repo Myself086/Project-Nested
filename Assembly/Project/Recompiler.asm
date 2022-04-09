@@ -190,9 +190,7 @@ b_1:
 
 	// Reserve memory
 	.local	=heapStackIndex
-	lda	#0x007f
-	ldx	#0x2000
-	call	Memory__Alloc
+	call	Memory__AllocMax
 	xba
 	sta	$.heapStackIndex+1
 	sta	$.writeAddr+1
