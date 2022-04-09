@@ -100,6 +100,8 @@ Gfx__NameTableMirrorChange:
 		rtl
 Gfx__NameTableMirrorChange_in:
 
+	sta	$_NameTable_ActiveMap
+
 	tax
 
 	// Load SNES BG mirror
