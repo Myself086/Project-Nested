@@ -58,6 +58,13 @@ namespace Project_Nested
             combo.SelectedIndexChanged += (sender, e) =>
             {
                 injector.SetSetting("Input.Map", boxIndex, combo.SelectedIndex.ToString());
+
+                // Remove any duplicate
+                foreach (var other in comboInput)
+                {
+                    if (other != combo && other.SelectedIndex == combo.SelectedIndex)
+                        other.SelectedIndex = 0;
+                }
             };
         }
     }
