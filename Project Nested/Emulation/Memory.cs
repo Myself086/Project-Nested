@@ -10,15 +10,6 @@ namespace Project_Nested.Emulation
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x1000000)]
         public byte[] mem = new byte[0x1000000];     // 16mb
-        public Int16[] io = new Int16[0x10000];
-        public byte[] vram = new byte[0x10000];      // Video RAM
-        public byte[] oam = new byte[0x400];         // OAM RAM
-        public UInt16[] cgram = new UInt16[0x100];   // Palette RAM
-        public byte[] aram = new byte[0x10000];      // Audio RAM
-        public byte[] aio = new byte[0x100];         // APU I/O
-
-        // Debug memory
-        public byte[] dbg = new byte[0x100000];
 
         // Memory mapping must be accessed using >> 13
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x800)]
@@ -91,15 +82,6 @@ namespace Project_Nested.Emulation
                 unmaptiming[i] = 0;
             for (i = ROMupperbound + 1; i <= mem.GetUpperBound(0); i++)
                 mem[i] = 0;
-            // External memories
-            for (i = 0; i <= io.GetUpperBound(0); i++)
-                io[i] = 0;
-            for (i = 0; i <= vram.GetUpperBound(0); i++)
-                vram[i] = 0;
-            for (i = 0; i <= aram.GetUpperBound(0); i++)
-                aram[i] = 0;
-            for (i = 0; i <= aio.GetUpperBound(0); i++)
-                aio[i] = 0;
         }
 
         void AddSegment(Int32 FirstSegment, Int32 LastSegment, Int32 Timing)
@@ -300,10 +282,6 @@ namespace Project_Nested.Emulation
                     return 0;
                 return this.mem[memaddr];
             }
-            else if (memaddr < 0x2000000)
-            {
-                return this.vram[memaddr & 0xffff];
-            }
             return 0;
         }
 
@@ -347,16 +325,6 @@ namespace Project_Nested.Emulation
                 if (memaddr < 0)
                     return;
                 this.mem[memaddr] = (byte)data;
-            }
-            else if (memaddr < 0x1010000)
-            {
-                // Bank 0x100
-                this.vram[memaddr & 0xffff] = (byte)data;
-            }
-            else if (memaddr < 0x2000000)
-            {
-                // Bank 0x1f0-0x1ff
-                this.dbg[memaddr & 0xfffff] = (byte)data;
             }
         }
 
