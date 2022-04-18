@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Project_Nested.Injection
 {
-    public partial class Injector
+    partial class Injector
     {
         #region ROM data and settings
 

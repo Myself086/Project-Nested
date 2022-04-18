@@ -20,7 +20,7 @@ namespace Project_Nested.Optimize
         private c65816 emu;
 
         private Injector _injector;
-        public Injector injector
+        internal Injector injector
         {
             get => _injector;
             set

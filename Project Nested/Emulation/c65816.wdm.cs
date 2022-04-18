@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Project_Nested.Emulation
 {
-    public partial class c65816
+    partial class c65816
     {
         Stack<byte[]> byteArrays = new Stack<byte[]>();
         Dictionary<int, MakeBinary> funcList = new Dictionary<int, MakeBinary>();

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Project_Nested.Emulation
 {
-    public partial class c65816
+    partial class c65816
     {
         public Memory memory = new Memory();
 

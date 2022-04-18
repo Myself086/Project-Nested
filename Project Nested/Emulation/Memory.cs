@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Project_Nested.Emulation
 {
-    public class Memory
+    class Memory
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x1000000)]
         public byte[] mem = new byte[0x1000000];     // 16mb

@@ -11,10 +11,10 @@ using System.Windows.Forms;
 
 namespace Project_Nested
 {
-    public partial class FrmPatches : Form
+    partial class FrmPatches : Form
     {
-        public Injector _injector;
-        public Injector injector
+        private Injector _injector;
+        internal Injector injector
         {
             get => _injector;
             set

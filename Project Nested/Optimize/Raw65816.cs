@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project_Nested.Optimize
 {
-    public struct Raw65816
+    struct Raw65816
     {
         public int nesAddress;
         public byte[] data;
