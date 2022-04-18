@@ -190,11 +190,13 @@ namespace Project_Nested
 #endif
         }
 
-        private async void btnSaveAndPlay_Click(object sender, EventArgs e)
-        {
 #if SYNC_SAVE
+        private void btnSaveAndPlay_Click(object sender, EventArgs e)
+        {
             var filename = SaveSnesSync();
 #else
+        private async void btnSaveAndPlay_Click(object sender, EventArgs e)
+        {
             var filename = await SaveSnesAsync();
 #endif
 
