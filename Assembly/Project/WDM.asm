@@ -59,6 +59,14 @@
 		wdm	#0x05
 	.endm
 
+	.macro	WDM_AddFeedback
+		// Add a sub-routine address to be recompiled
+		// Entries:
+		//  X = Address
+		//  Y = Address bank
+		wdm	#0x06
+	.endm
+
 	// ---------------------------------------------------------------------------
 	// Debugger WDM instructions
 

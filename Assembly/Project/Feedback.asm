@@ -135,6 +135,8 @@ Feedback__Init_Copy_Loop_Entry:
 	.func	Feedback__Add
 	// Entry: X = Address, Y = Bank number
 Feedback__Add:
+	WDM_AddFeedback
+
 	// Is feedback active?
 	lda	$_Feedback_Active-1
 	bmi	$+b_in

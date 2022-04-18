@@ -14,6 +14,8 @@ namespace Project_Nested.Emulation
         Dictionary<int, MakeBinary> funcList = new Dictionary<int, MakeBinary>();
         MakeBinary lastRequestedFunction;
 
+        public List<int> feedback;
+
         internal void AddFunctionCode(List<MakeBinary> make)
         {
             foreach (var item in make)
@@ -148,6 +150,14 @@ namespace Project_Nested.Emulation
                     //  A = Address
                     //  Y = Address bank
                     lastRequestedFunction.snesAddress = (GetRegA() | (GetRegY() << 16)) & 0xffffff;
+                    break;
+                case 0x06:  // WDM_AddFeedback
+                    // Entries:
+                    //  X = Address
+                    //  Y = Address bank
+                    if (feedback == null)
+                        feedback = new List<int>();
+                    feedback.Add((GetRegX() | (GetRegY() << 16)) & 0xffffff);
                     break;
 
                     // Cases 0xff and descending are reserved for private debugging tools
