@@ -11,6 +11,8 @@ namespace Project_Nested.Emulation
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x1000000)]
         public byte[] mem = new byte[0x1000000];     // 16mb
 
+        public IO io;
+
         // Memory mapping must be accessed using >> 13
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x800)]
         public Int32[] map = new Int32[0x800];
@@ -43,6 +45,7 @@ namespace Project_Nested.Emulation
         public Memory()
         {
             ResetRam(RomSize.ExHiROM);
+            this.io = new IO(this);
         }
 
         // --------------------------------------------------------------------
@@ -363,8 +366,7 @@ namespace Project_Nested.Emulation
         {
             if (addr < 0)
             {
-                //return (Int32)(IO.ReadOneByte(addr));
-                throw new NotImplementedException();
+                return (Int32)(io.ReadOneByte(addr));
             }
             else
             {
@@ -376,8 +378,7 @@ namespace Project_Nested.Emulation
         {
             if (addr < 0)
             {
-                //return (Int32)(IO.ReadOneByte(addr++) + (IO.ReadOneByte(addr++) << 8));
-                throw new NotImplementedException();
+                return (Int32)(io.ReadOneByte(addr++) + (io.ReadOneByte(addr++) << 8));
             }
             else
             {
@@ -389,8 +390,7 @@ namespace Project_Nested.Emulation
         {
             if (addr < 0)
             {
-                //return (Int32)(IO.ReadOneByte(addr++) + (IO.ReadOneByte(addr++) << 8) + (IO.ReadOneByte(addr++) << 16));
-                throw new NotImplementedException();
+                return (Int32)(io.ReadOneByte(addr++) + (io.ReadOneByte(addr++) << 8) + (io.ReadOneByte(addr++) << 16));
             }
             else
             {
@@ -400,11 +400,10 @@ namespace Project_Nested.Emulation
 
         public void WriteOneByte(Int32 addr, Int32 data)
         {
-            //if (addr <= ROMlowerbound || (addr <= ROMupperbound && !DebugWriteRom))
-            if (addr < 0)
+            if (addr < ROMlowerbound || (addr <= ROMupperbound && !DebugWriteRom))
             {
-                //IO.WriteOneByte(addr, (byte)(data >> 0));
-                throw new NotImplementedException();
+                if (addr < 0)
+                    io.WriteOneByte(addr, (byte)(data >> 0));
             }
             else
             {
@@ -414,12 +413,13 @@ namespace Project_Nested.Emulation
 
         public void WriteTwoByte(Int32 addr, Int32 data)
         {
-            //if (addr <= ROMlowerbound || (addr <= ROMupperbound && !DebugWriteRom))
-            if (addr < 0)
+            if (addr < ROMlowerbound || (addr <= ROMupperbound && !DebugWriteRom))
             {
-                //IO.WriteOneByte(addr++, (byte)(data >> 0));
-                //IO.WriteOneByte(addr++, (byte)(data >> 8));
-                throw new NotImplementedException();
+                if (addr < 0)
+                {
+                    io.WriteOneByte(addr++, (byte)(data >> 0));
+                    io.WriteOneByte(addr++, (byte)(data >> 8));
+                }
             }
             else
             {
@@ -430,13 +430,14 @@ namespace Project_Nested.Emulation
 
         public void WriteThreeByte(Int32 addr, Int32 data)
         {
-            //if (addr <= ROMlowerbound || (addr <= ROMupperbound && !DebugWriteRom))
-            if (addr < 0)
+            if (addr < ROMlowerbound || (addr <= ROMupperbound && !DebugWriteRom))
             {
-                //IO.WriteOneByte(addr++, (byte)(data >> 0));
-                //IO.WriteOneByte(addr++, (byte)(data >> 8));
-                //IO.WriteOneByte(addr++, (byte)(data >> 16));
-                throw new NotImplementedException();
+                if (addr < 0)
+                {
+                    io.WriteOneByte(addr++, (byte)(data >> 0));
+                    io.WriteOneByte(addr++, (byte)(data >> 8));
+                    io.WriteOneByte(addr++, (byte)(data >> 16));
+                }
             }
             else
             {

@@ -492,7 +492,7 @@ namespace Project_Nested.Emulation
             if (getflag_i()) return;
             if (!getflag_r()) return;
             setflag_w(0);
-            //setflag_r(0);
+            setflag_r(0);       // Acknowledge IRQ, not proper but doesn't matter for this project
             if (getflag_e())
                 CallInterrupt6502(VECTOR_IRQ_6502);
             else
