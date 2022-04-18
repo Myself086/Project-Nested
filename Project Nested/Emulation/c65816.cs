@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -658,6 +659,58 @@ namespace Project_Nested.Emulation
                 throw new Exception("Emulation error.");
             }
             //#endif
+            return false;
+        }
+
+        public bool ExecuteSteps(int steps)
+        {
+#if DEBUG
+            List<int> pclist = new List<int>();
+#endif
+
+            UInt16 op;
+            DelOpcode callOpcode = null;
+            DelAddrmode callAddrmode;
+            int lastPC = -1;
+
+            setflag_p(0);       // Reset the Pause flag
+            setflag_w(0);       // Reset the Wait flag
+
+            {
+                if (getflag_p())    // Pause flag indicates that emulation is pausing
+                    return false;
+                while (!getflag_w())
+                {
+#if DEBUG
+                    var fullPC = GetRegPC();
+                    /*if (fullPC == 0x81b84f)
+                        Debugger.Break();
+                    // */
+                    pclist.Add(fullPC);
+#endif
+
+                    if (steps-- < 0)
+                        return false;
+
+                    lastPC = r_ePC;
+
+                    op = (UInt16)(memory.mem[r_ePC++] | (r_FLAGS & 0x300));
+                    callAddrmode = Opcode[op].CallAddrmode;
+                    callOpcode = Opcode[op].CallOpcode;
+                    var addr = callAddrmode();
+                    callOpcode(addr);
+
+                    if (lastPC == r_ePC)
+                    {
+                        bool rtn = callOpcode == op___STP;
+                        if (!rtn)
+                        {
+                            throw new Exception("Emulation has stopped with an unknown exception.");
+                        }
+                        return rtn;
+                    }
+                }
+            }
             return false;
         }
 

@@ -145,6 +145,9 @@ RomInfo_CpuSettings:
 	.def	RomInfo_Cpu_IllegalNop					0x0002
 	.def	RomInfo_Cpu_DynamicJsr					0x0004
 
+RomInfo_AutoPlayThreshold:
+	.data16	200
+
 	// Defines whether page range is static, 1 bit per range, 8 ranges in total, bit is set when range is static
 RomInfo_StaticRanges:
 	.data8	0x00
@@ -348,6 +351,12 @@ RomInfo_Description:
 		RomInfo_DefineMac	"public Button Optimize : Debug AOT optimization", Zero, 0
 
 		RomInfo_DefineMac	"private void* EmuCalls.Table", EmuCalls_Table, 0
+
+		RomInfo_SummaryMac	"Attempts to auto-play the game during conversion to raise the number of 'known calls'."
+		RomInfo_SummaryMac	"Attempts won't be made if the number of 'known calls' is equal or greater than the specified amount."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"3 auto-play sessions take place: idle, turbo A+Start, random"
+		RomInfo_DefineMac	"public global short EmuCalls.AutoPlayThreshold : Auto-play threshold", RomInfo_AutoPlayThreshold, 0
 
 	RomInfo_DefineMac	"public void Tab_Stack : Stack related rules.", 0, 0
 

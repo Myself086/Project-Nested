@@ -56,8 +56,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoPlay.cs" />
     <Compile Include="ByteArrayExtension.cs" />
     <Compile Include="Emulation\c65816.wdm.cs" />
+    <Compile Include="Emulation\IO.cs" />
+    <Compile Include="EmulatorPool.cs" />
     <Compile Include="FrmControllerInput.cs">
       <SubType>Form</SubType>
     </Compile>

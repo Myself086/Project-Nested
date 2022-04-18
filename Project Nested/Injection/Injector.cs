@@ -466,6 +466,18 @@ namespace Project_Nested.Injection
             OutData[0x00ffd5] = 0x31;
             OutData[0x40ffd5] = 0x35;
 
+            // Auto-play
+            if (calls.Count < GetSetting("EmuCalls.AutoPlayThreshold").ReadInt())
+            {
+                var autoplay = new AutoPlay(this, progress);
+#if SYNC_SAVE
+                calls = autoplay.PlaySync();
+#else
+                    calls = await autoplay.PlayAsync(ct);
+#endif
+                KnownCallCountChanged?.Invoke();
+            }
+
             // Compile known calls
             {
                 // Bank range

@@ -20,6 +20,7 @@ Dev build:
 - Fixed recompiling massive sub-routines (over 8 KB)
 - Fixed CHR ROM data allocation conflicts during conversion
 - Fixed changing nametable mirror to 1x1
+- Added auto-play for identifying where some of the code is
 
 v1.4.2
 - Fixed loading games that have too many banks in the iNES header compared to file size
