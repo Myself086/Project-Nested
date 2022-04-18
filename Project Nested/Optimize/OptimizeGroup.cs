@@ -22,6 +22,8 @@ namespace Project_Nested.Optimize
 
         Injector injector;
 
+        EmulatorPool emuPool;
+
         bool nativeReturn;
 
         const string PROGRESS_COMPILE_NAME = "Compiling";
@@ -37,6 +39,7 @@ namespace Project_Nested.Optimize
         public OptimizeGroup(Injector injector, List<int> calls, byte staticRanges, bool nativeReturn, IProgress<Tuple<string, int, int>> progress)
         {
             this.injector = injector;
+            this.emuPool = new EmulatorPool(injector.GetOutData(), true);
             this.calls = calls.Where(e => (e & 0xffff) >= 0x8000).ToList();
             this.nativeReturn = nativeReturn;
             this.progress = progress;
@@ -116,7 +119,7 @@ namespace Project_Nested.Optimize
                 lock (progress)
                 {
                     progressMin++;
-                    if (progressMax > 0)
+                    if (progressMax >= 0)
                     {
                         progress?.Report(new Tuple<string, int, int>(name, progressMin, progressMax));
                     }
@@ -153,6 +156,9 @@ namespace Project_Nested.Optimize
                 var staticCallSource = item.staticCallSource;
                 var labels = item.labels;
                 var returnMarkers = item.returnMarkers;
+
+                if (snesAddress == 0)
+                    continue;
 
                 foreach (var jmp in jumpSource)
                 {
@@ -192,36 +198,6 @@ namespace Project_Nested.Optimize
         // --------------------------------------------------------------------
         #region Recompile
 
-        private Stack<c65816> emulatorPool = new Stack<c65816>();
-        private object emuPoolCreateLocker = new object();
-
-        private c65816 PullEmu()
-        {
-            // Safely pull emulator from stack
-            lock (emulatorPool)
-            {
-                if (emulatorPool.Count > 0)
-                    return emulatorPool.Pop();
-            }
-
-            // Stack is empty, create a new emulator
-            c65816 emu = null;
-            lock (emuPoolCreateLocker)
-                // Create new emulator but initialize it after the lock
-                emu = injector.NewEmulatorNoInit(null);
-            emu.ExecuteInit(null);
-            return emu;
-        }
-
-        private void PushEmu(c65816 emu)
-        {
-            // Safely push emulator to stack
-            lock (emulatorPool)
-            {
-                emulatorPool.Push(emu);
-            }
-        }
-
         private async Task<Raw65816> RecompileAsync(CancellationToken? ct, int nesAddr)
         {
             return await Task.Run(() => RecompileSync(nesAddr), ct.Value);
@@ -230,11 +206,11 @@ namespace Project_Nested.Optimize
         private Raw65816 RecompileSync(int nesAddr)
         {
             // Borrow an emulator for this task
-            var emu = PullEmu();
+            var emu = emuPool.PullEmu();
 
             var code = injector.RecompilerBuild(emu, nesAddr);
 
-            PushEmu(emu);
+            emuPool.PushEmu(emu);
 
             // Update progress
             IncrementProgress(PROGRESS_COMPILE_NAME);
