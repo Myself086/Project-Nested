@@ -30,9 +30,6 @@ StaticRec__Init:
 	stz	$_StaticRec_OriginCount
 	trapeq
 
-	// Activate StaticRec mode
-	sta	$_StaticRec_Active
-
 	// Reset call table
 	lda	#_StaticRec_Tables+0x400
 	sta	$_StaticRec_AddFunctionForExe_CallTableOffset
@@ -184,6 +181,10 @@ StaticRec__Main:
 	.local	_lowBits
 	lda	#0x00ff
 	sta	$.lowBits
+
+	// Activate StaticRec mode
+	lda	#1
+	sta	$=StaticRec_Active
 
 	// Address for writing call table
 	.local	=callTableEP

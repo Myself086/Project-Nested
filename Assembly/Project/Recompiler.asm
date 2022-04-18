@@ -82,6 +82,9 @@ b_1:
 Recompiler__BuildForExe:
 	FromExeInit16
 
+	lda	#1
+	sta	$=StaticRec_Active
+
 	lda	$0x0002
 	call	Recompiler__SetBank
 
@@ -98,6 +101,10 @@ Recompiler__BuildForExe:
 	stx	$0x0004
 	stz	$0x0006
 	sty	$0x0008
+
+	lda	#0
+	sta	$=StaticRec_Active
+
 	stp
 
 	// ---------------------------------------------------------------------------
