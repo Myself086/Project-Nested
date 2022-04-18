@@ -563,7 +563,13 @@ namespace Project_Nested
         private void Injector_KnownCallCountChanged()
         {
             // Display known call count
-            lblKnownCalls.Text = $"{injector.GetAllKnownCalls().Length} known calls";
+            if (lblKnownCalls.InvokeRequired)
+            {
+                Action safeAction = delegate { Injector_KnownCallCountChanged(); };
+                lblKnownCalls.Invoke(safeAction);
+            }
+            else
+                lblKnownCalls.Text = $"{injector.GetAllKnownCalls().Length} known calls";
         }
 
         #endregion
