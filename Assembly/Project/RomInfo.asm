@@ -402,7 +402,7 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Can fix some games and break other games."
 		RomInfo_DefineMac	"public bool StackEmulation.Page01 : Stack page 01", RomInfo_StackEmulation, RomInfo_StackEmu_Page01
 
-	RomInfo_DefineMac	"public void Tab_Banks : Bank and range related rules.", 0, 0
+	RomInfo_DefineMac	"private void Tab_Banks : Bank and range related rules.", 0, 0
 
 		RomInfo_SummaryMac	"PRG banks to start on after a reset."
 		RomInfo_DefineMac	"private hex byte[4] PrgBanks : Starting PRG banks", RomInfo_PrgBankNumbers, 0
