@@ -57,7 +57,7 @@
 		.data32	temp__
 	.endm
 
-	.macro	EmuCalls		name, usage, change
+	.macro	EmuCall			name, usage, change
 this__:
 		.pushaddr
 			.addr	EmuCalls_Table_WritePointer
@@ -65,6 +65,18 @@ this__:
 			.data24				this__
 			EmuCalls_Flags		"{1}"
 			EmuCalls_Flags		"{2}"
+EmuCalls_Table_WritePointer:	// Set address for next element
+		.pulladdr
+	.endm
+
+	.macro	EmuCallAt		source, name, usage, change
+		.def	this__		{0}
+		.pushaddr
+			.addr	EmuCalls_Table_WritePointer
+			.string0			"{1}"
+			.data24				this__
+			EmuCalls_Flags		"{2}"
+			EmuCalls_Flags		"{3}"
 EmuCalls_Table_WritePointer:	// Set address for next element
 		.pulladdr
 	.endm

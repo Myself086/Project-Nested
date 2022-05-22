@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project_Nested.Optimize
 {
-    struct Raw65816
+    class Raw65816
     {
         public int nesAddress;
         public byte[] data;
@@ -48,6 +48,10 @@ namespace Project_Nested.Optimize
                         break;
                     case 0xe2:      // SEP
                         mx |= (operand & 0x30) << 4;
+                        break;
+                    case 0xdc: //InstructionSet.JMP_JmpIndLong:
+                        // Hack for indirect JMP
+                        mx = 0x300;
                         break;
                 }
             }
@@ -127,11 +131,9 @@ namespace Project_Nested.Optimize
                             // Is this JSR followed by a JMP marker?
                             bool asmCondition = data[i + 4] == 0xea && data[i + 5] == 0x6b;
                             // Is this destination known and static?
-                            bool rangeCondition = false;        // TODO
-                                /*injector != null
+                            bool rangeCondition = injector != null
                                 && injector.IsRangeStatic(originalReturn.operand, originalCall.operand)
-                                && injector.KnownCallsContainsExclusively(injector.GetStaticBankDestination(originalReturn.operand, originalCall.operand) * 0x10000 + originalCall.operand)
-                                && (target.compileFlags & 0x04) == 0;*/  // TODO: Compile flags enum
+                                && injector.KnownCallsContainsExclusively(injector.GetStaticBankDestination(originalReturn.operand, originalCall.operand) * 0x10000 + originalCall.operand);
                             var nesCallOpcode = (asmCondition ?
                                 (rangeCondition ? InstructionSet.JMP_Nes_Static : InstructionSet.JMP_Nes) :
                                 (rangeCondition ? InstructionSet.JSR_Nes_Static : InstructionSet.JSR_Nes));
@@ -148,6 +150,17 @@ namespace Project_Nested.Optimize
                     else
                         // Emulator call
                         code.Add(new AsmIL65816(InstructionSet.JSR_Emu, call.id));
+                }
+                else if ((opcode & 0xff) == (int)InstructionSet.JMP_Jmp24)
+                {
+                    // Convert to emulator call
+                    var call = Asm65816Dictionary.GetEmuCall(operand);
+                    if (call.IsNesRts)
+                        // Emulator call
+                        code.Add(new AsmIL65816(InstructionSet.JMP_Emu, call.id));
+                    else
+                        // Unknown call
+                        code.Add(il);
                 }
                 else
                     code.Add(il);

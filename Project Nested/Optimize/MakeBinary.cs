@@ -38,6 +38,8 @@ namespace Project_Nested.Optimize
 
         private void ConvertToBinary(OptimizeGroup sender, int nesAddress, List<AsmIL65816> code, int compileFlags, bool nativeReturn)
         {
+            const bool USE_DIRECT_LINKS = false;    // TODO: Direct links
+
             List<byte> newCode = new List<byte>();
 
             var labels = new Dictionary<int, int>();
@@ -113,6 +115,9 @@ namespace Project_Nested.Optimize
                             AddCode(InstructionSet.RTL, 0, 1);
                             break;
                         case InstructionSet.JSR_Nes_Static:
+                            if (!USE_DIRECT_LINKS)
+                                goto case InstructionSet.JSR_Nes;
+
                             if (nativeReturn)
                             {
                                 staticCallSource.Add(newCode.Count + 1);
@@ -126,6 +131,9 @@ namespace Project_Nested.Optimize
                             }
                             break;
                         case InstructionSet.JMP_Nes_Static:
+                            if (!USE_DIRECT_LINKS)
+                                goto case InstructionSet.JMP_Nes;
+
                             staticCallSource.Add(newCode.Count + 1);
                             AddCode(InstructionSet.JMP_Jmp24, asm.originalCall, 4);
                             break;
@@ -172,7 +180,7 @@ namespace Project_Nested.Optimize
                     if ((int)(asm.opcode & InstructionSet.mx) != mx)
                         throw new Exception("Wrong MX flag during code conversion to binary.");
 
-                    // Exceptinos
+                    // Exceptions
                     switch (asm.invariantOpcode)
                     {
                         case InstructionSet.REP_Const:
@@ -180,6 +188,10 @@ namespace Project_Nested.Optimize
                             break;
                         case InstructionSet.SEP_Const:
                             mx |= (asm.operand & 0x30) << 4;
+                            break;
+                        case InstructionSet.JMP_JmpIndLong:
+                            // Hack for indirect JMP
+                            mx = 0x300;
                             break;
                     }
 

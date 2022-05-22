@@ -15,6 +15,8 @@ namespace Project_Nested.Optimize
 
         public const string NES_JSR = "Interpret__Jsr";
         public bool IsNesJsr { get => desc.change.HasFlag(FlagAndRegs.Exception) && name == NES_JSR; }
+        public const string NES_RTS = "RtsNes";
+        public bool IsNesRts { get => desc.change.HasFlag(FlagAndRegs.Exception) && name == NES_RTS; }
 
         public EmulatorCall(string name, int address, FlagAndRegs usage, FlagAndRegs change, int id)
         {

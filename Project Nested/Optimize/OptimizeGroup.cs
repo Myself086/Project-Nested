@@ -16,7 +16,7 @@ namespace Project_Nested.Optimize
 
         List<LinkOrigin> linkOrigins = new List<LinkOrigin>();
         List<int> returnMarkers = new List<int>();
-        List<MakeBinary> subroutines;
+        List<MakeBinary> binSubroutines;
 
         List<int> calls;
 
@@ -28,6 +28,7 @@ namespace Project_Nested.Optimize
 
         const string PROGRESS_COMPILE_NAME = "Compiling";
         const string PROGRESS_OPTIMIZE_NAME = "Optimizing";
+        const string PROGRESS_INLINE_NAME = "Optimizing (inline)";
         int progressMin;
         int progressMax;
         IProgress<Tuple<string, int, int>> progress;
@@ -59,7 +60,7 @@ namespace Project_Nested.Optimize
             await Task.WhenAll(raw);
 
             progressMin = 0;
-            var optimized = new List<Task<MakeBinary>>();
+            var optimized = new List<Task<OptimizeOperator>>();
             foreach (var item in raw)
                 optimized.Add(OptimizeOneAsync(ct, item.Result));
             progressMax = optimized.Count;
@@ -67,37 +68,45 @@ namespace Project_Nested.Optimize
 
             ct?.ThrowIfCancellationRequested();
 
-            subroutines = optimized.Select(e => e.Result).ToList();
+            binSubroutines = optimized.Select(e => ConvertToBinary(e.Result)).ToList();
         }
 
         public void OptimizeAllSync()
         {
-            subroutines = new List<MakeBinary>();
+            List<OptimizeOperator> optimizeSubroutines = new List<OptimizeOperator>();
             foreach (var item in calls)
-                subroutines.Add(OptimizeOneSync(null, RecompileSync(item)));
+                optimizeSubroutines.Add(OptimizeOneSync(null, RecompileSync(item)));
+
+            // Inline (TODO: Fix it)
+            //InlineAllSync(optimizeSubroutines);
+
+            // Convert to binary
+            binSubroutines = optimizeSubroutines.Select(e => ConvertToBinary(e)).ToList();
         }
 
-        private async Task<MakeBinary> OptimizeOneAsync(CancellationToken? ct, Raw65816 code)
+        private async Task<OptimizeOperator> OptimizeOneAsync(CancellationToken? ct, Raw65816 code)
         {
             return await Task.Run(() => OptimizeOneSync(ct, code), ct.Value);
         }
 
-        private MakeBinary OptimizeOneSync(CancellationToken? ct, Raw65816 code)
+        private OptimizeOperator OptimizeOneSync(CancellationToken? ct, Raw65816 code)
         {
             // Convert code to IL
             ct?.ThrowIfCancellationRequested();
             var il = code.ConvertToIL(injector);
 
             // Optimize
-            var op = new OptimizeOperator(null, il);
+            var op = new OptimizeOperator(null, code, injector);
             op.Optimize(ct, false);
 
             // Mark returns
             op.MarkReturns(this, (byte)(code.nesAddress >> 16));
 
+            // Build cache (optional)
+            op.BuildCache();
+
             // Convert to binary
             var il2 = op.GetCode();
-            var bin = new MakeBinary(this, code.nesAddress, op.TimeOut ? il : il2, code.compileFlags, nativeReturn);
 
             // Update progress
             IncrementProgress(PROGRESS_OPTIMIZE_NAME);
@@ -109,7 +118,62 @@ namespace Project_Nested.Optimize
                 Debug.WriteLine($"Optimized {code.nesAddress:x6} in {op.iterationID} iterations.");
 
             // Return result
-            return bin;
+            return op;
+        }
+
+        private void InlineAllSync(List<OptimizeOperator> optimizeSubroutines)
+        {
+            const int BYTE_COUNT_TOTAL_LIMIT = 576 * 1024;  // Limit for estimate
+            const int BYTE_COUNT_TOTAL_MAX = 512 * 1024;    // Actual max for ending the tasks early
+            const int BYTE_COUNT_BANK_LIMIT = 8 * 1024;     // Limit for estimate
+            int byteCount = optimizeSubroutines.Sum(e => e.CountBytes());
+
+            var hasInlineCandidates = optimizeSubroutines.Where(e => e.GetInlineCandidates().Count > 0).ToList();
+
+            progressMin = 0;
+            progressMax = hasInlineCandidates.Count;
+
+            while (hasInlineCandidates.Count > 0 && byteCount < BYTE_COUNT_TOTAL_MAX)
+            {
+                for (int i = hasInlineCandidates.Count - 1; i >= 0; i--)    // Reversed loop because we are removing elements
+                {
+                    var op = hasInlineCandidates[i];
+                    var validCandidates = false;
+                    foreach (var item in op.GetInlineCandidates())
+                    {
+                        // Find target
+                        var target = optimizeSubroutines.Find(e => e.nesAddress == item.callDestination);
+
+                        // Is target inline able?
+                        if (target != null && target.IsInlineAble())
+                        {
+                            validCandidates = true;
+
+                            // Would inline push byte count over the limit?
+                            if ((byteCount + target.CountBytes()) < BYTE_COUNT_TOTAL_LIMIT
+                                && (op.CountBytes() + target.CountBytes()) < BYTE_COUNT_BANK_LIMIT)
+                            {
+                                op.Inline(item, target);
+                                op.Optimize(null, false);
+                                break;
+                            }
+                        }
+                    }
+
+                    // Were all candidates valid?
+                    if (!validCandidates)
+                    {
+                        // Invalid, remove it and increment progress
+                        hasInlineCandidates.RemoveAt(i);
+                        IncrementProgress(PROGRESS_INLINE_NAME);
+                    }
+                }
+            }
+        }
+
+        private MakeBinary ConvertToBinary(OptimizeOperator op)
+        {
+            return new MakeBinary(this, op.nesAddress, op.GetCode(), op.compileFlags, nativeReturn);
         }
 
         private void IncrementProgress(string name)
@@ -139,7 +203,7 @@ namespace Project_Nested.Optimize
             if ((baseLinkOrigin & 0xffff) != 0)
                 throw new Exception("Link origins were already initialized.");
 
-            emu.AddFunctionCode(subroutines);
+            emu.AddFunctionCode(binSubroutines);
         }
 
         public void FixLinks(c65816 emu)
@@ -148,7 +212,7 @@ namespace Project_Nested.Optimize
                 throw new Exception("Link origins aren't initialized.");
 
             var memory = emu.memory;
-            foreach (var item in subroutines)
+            foreach (var item in binSubroutines)
             {
                 var nesAddress = item.nesAddress;
                 var snesAddress = item.snesAddress;
@@ -178,7 +242,7 @@ namespace Project_Nested.Optimize
                     if (destinationAddr < 0)
                         throw new Exception("Incorrect static NES call.");
                     destinationAddr = (destinationAddr << 16) + operand;
-                    var destinationObj = subroutines.Find(e => e.nesAddress == destinationAddr);
+                    var destinationObj = binSubroutines.Find(e => e.nesAddress == destinationAddr);
                     memory.DebugWriteThreeByte(addr, destinationObj.snesAddress);
                 }
 

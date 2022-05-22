@@ -664,6 +664,7 @@ IRQ_VSTACK_START:
 	.def	IO_2002						0x4337
 
 	// Indirect JMP first destination
+	EmuCallAt	JMPiU_Action, "JMPi", "?", "?"
 	.def	JMPiU_Action				0x4355
 
 	// Defines which memory range is represented by register DB, shares a byte with Indirect_Lda_Action

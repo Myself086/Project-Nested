@@ -89,6 +89,7 @@ namespace Project_Nested.Optimize
                 case OperandType.JmpLabel:
                 case OperandType.BrLabel:
                 case OperandType.CallEmu:        // This one has its own flags based on operand
+                case OperandType.JumpEmu:        // This one has its own flags based on operand
                     // No adjustement needed here
                     break;
                 case OperandType.Dp:
@@ -157,8 +158,9 @@ namespace Project_Nested.Optimize
             // Byte count
             switch (type)
             {
-                default:
                 case OperandType.Unknown:
+                default:
+                    throw new NotImplementedException();
                 case OperandType.ConstM:
                 case OperandType.ConstX:
                 case OperandType.Label:
@@ -166,6 +168,8 @@ namespace Project_Nested.Optimize
                     break;
                 case OperandType.None:
                 case OperandType.Return:
+                case OperandType.FlagUsage:
+                case OperandType.FlagChange:
                     byteCount = 1;
                     break;
                 case OperandType.Const8:
@@ -204,6 +208,9 @@ namespace Project_Nested.Optimize
                 case OperandType.CallUseY:
                 case OperandType.CallUseAX:
                 case OperandType.CallUseAY:
+                case OperandType.CallNes:
+                case OperandType.CallEmu:
+                case OperandType.JumpEmu:
                     byteCount = 4;
                     break;
                 case OperandType.BrLabel:   // BrLabel can be 3 or 5 but we use the worst scenario for quick estimations
@@ -234,7 +241,7 @@ namespace Project_Nested.Optimize
         Label, JmpLabel, BrLabel,
         FlagUsage, FlagChange,
         CallUseA, CallUseX, CallUseY, CallUseAX, CallUseAY,
-        CallNes, CallEmu,
+        CallNes, CallEmu, JumpEmu,
     }
     public enum FlagAndRegs
     {
@@ -272,7 +279,10 @@ namespace Project_Nested.Optimize
         IoTemp8 = 0x200000,
         IoTemp16 = 0x400000,
 
-        CanInline = 0x800000,   // Only used by OpcodeDescription.change
+        // CanInline refers to the destination
+        // InlineUnable invalidates source
+        CanInlineDest = 0x800000,   // Only used by OpcodeDescription.change
+        InlineUnableSrc = 0x1000000,// Only used by OpcodeDescription.change
 
         End = -0x80000000,      // Only used by OpcodeDescription.change
 

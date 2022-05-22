@@ -189,6 +189,8 @@ JMPiU__Bank:
 
 	JMPiU__Override		0x2000
 	trap
+
+	EmuCall		"RtsNes", "?", "?"
 	// NOTE: RTS into 0x20xx executes the operand of LDA $2,s which happens to be COP, an unused software interrupt
 JMPiU__FromStack:
 	sta	$_IO_Temp

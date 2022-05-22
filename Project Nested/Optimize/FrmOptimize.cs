@@ -60,7 +60,7 @@ namespace Project_Nested.Optimize
         private void FrmOptimize_Load(object sender, EventArgs e)
         {
             // Dummy optimizer
-            OptimizeOperator op = new OptimizeOperator(null, null);
+            OptimizeOperator op = new OptimizeOperator();
             listOptimizations.Items.AddRange(op.operationNames.ToArray());
             // Check every optimization operator
             for (int i = 0; i < listOptimizations.Items.Count; i++)
@@ -255,7 +255,7 @@ namespace Project_Nested.Optimize
                 }
 
                 // Optimize code
-                var op = new OptimizeOperator(null, il);
+                var op = new OptimizeOperator(null, code, injector);
                 if (ignoreError)
                     lock (this)
                         completedOperator = op;

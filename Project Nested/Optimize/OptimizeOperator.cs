@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_Nested.Injection;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,7 +15,11 @@ namespace Project_Nested.Optimize
 
         public List<string> operationNames = new List<string>();
 
+        Raw65816 rawCode;
         List<CodeBlock> code;
+
+        public int nesAddress { get => rawCode.nesAddress; }
+        public int compileFlags { get => rawCode.compileFlags; }
 
         List<int> labelUsageCount;
         List<List<object>> labelLocks;
@@ -35,11 +40,53 @@ namespace Project_Nested.Optimize
         int breakOnIteration;
         string breakOnOperation;
 
-        public OptimizeOperator(string[] operations, List<AsmIL65816> code)
-        {
-            if (code != null)
-                this.code = CodeBlock.SplitCode(code);
+        bool? isInlineAble;                     // Cached answer for IsInlineAble()
+        bool returnAddressRequired;             // Cached answer for IsReturnAddressRequired()
+        List<CallLocation> inlineCandidates;    // Cached answer for GetInlineCandidates()
+        int? byteCount;                         // Cached answer for CountBytes()
 
+        List<int> inlineExcluded = new List<int>();
+
+        public struct CallLocation
+        {
+            public int block, line, callDestination;
+
+            public CallLocation(int block, int line, int callDestination)
+            {
+                this.block = block;
+                this.line = line;
+                this.callDestination = callDestination;
+            }
+        }
+
+        Injector injector;
+
+        public OptimizeOperator()
+        {
+            Constructor(null);
+        }
+
+        /*public OptimizeOperator(string[] operations, List<CodeBlock> code)
+        {
+            this.code = code;
+
+            Constructor(operations);
+        }*/
+
+        public OptimizeOperator(string[] operations, Raw65816 rawCode, Injector injector)
+        {
+            this.injector = injector;
+
+            // Convert code to IL
+            code = CodeBlock.SplitCode(rawCode.ConvertToIL(injector));
+
+            this.rawCode = rawCode;
+
+            Constructor(operations);
+        }
+
+        private void Constructor(string[] operations)
+        {
             void AddOp<T>(bool forced) where T : OptimizeOperation, new()
             {
                 T op = new T();
@@ -72,6 +119,8 @@ namespace Project_Nested.Optimize
 
         public void Optimize(CancellationToken? ct, bool keepRecord)
         {
+            ResetCache();
+
             // Create a record of changes if requested
             if (keepRecord)
             {
@@ -130,6 +179,8 @@ namespace Project_Nested.Optimize
 
         public void MarkReturns(OptimizeGroup sender, byte nesBank)
         {
+            ResetCache();
+
             for (int i = 0; i < this.CodeBlockCount; i++)
             {
                 CodeBlock block = this.GetCodeBlock(i);
@@ -145,6 +196,233 @@ namespace Project_Nested.Optimize
                 }
             }
         }
+
+        public void Inline(CallLocation call, OptimizeOperator target)
+        {
+            // Get code block that we need to work with
+            var block = GetCodeBlock(call.block);
+
+            // Get call code, the actual line will be removed but accessible through this variable
+            var callCode = block[call.line];
+
+            // Do we need a return address?
+            bool pushReturn;
+            if (callCode.opcode == InstructionSet.JMP_Nes_Static)
+                pushReturn = false;
+            else if (callCode.opcode == InstructionSet.JSR_Nes_Static)
+                pushReturn = target.IsReturnAddressRequired();
+            else
+                throw new InvalidOperationException("Attempted to inline from an invalid source.");
+
+            // Pushing native return isn't supported for inline
+            if (pushReturn && (target.rawCode.compileFlags & 0x4) == 0)
+            {
+                inlineExcluded.Add(call.callDestination);
+                return;
+            }
+
+            // Remove call
+            block.RemoveAt(call.line, iterationID);
+
+            // Add return label
+            var returnLabel = NewLabel();
+            block.Insert(call.line, new AsmIL65816(InstructionSet.Label, returnLabel), iterationID);
+            if (pushReturn)
+                block.InsertRange(call.line + 1,
+                    new AsmIL65816[]
+                    {
+                        // Fix stack (TODO: Add new IL opcode PLZ)
+                        new AsmIL65816(InstructionSet.PHP | InstructionSet.mx),
+                        new AsmIL65816(InstructionSet.STA_Sr | InstructionSet.mx, 2),
+                        new AsmIL65816(InstructionSet.PLA | InstructionSet.mx),
+                        new AsmIL65816(InstructionSet.STA_Sr | InstructionSet.mx, 2),
+                        new AsmIL65816(InstructionSet.PLA | InstructionSet.mx),
+                        new AsmIL65816(InstructionSet.PLP | InstructionSet.mx),
+                    },
+                    iterationID);
+
+            // Push return address if required
+            if (pushReturn)
+            {
+                block.Insert(call.line, new AsmIL65816(InstructionSet.PEA_Abs | InstructionSet.mx, callCode.originalReturn), iterationID);
+                call.line++;
+            }
+
+            // Get target's code
+            var targetCode = target.GetCode();
+
+            // Label translation dictionary
+            var labelDict = new Dictionary<int, int>();         // <target's label number, new label number>
+            int TranslateLabel(int labelNum)
+            {
+                if (labelDict.TryGetValue(labelNum, out int rtn))
+                    return rtn;
+                else
+                {
+                    rtn = NewLabel();
+                    labelDict.Add(labelNum, rtn);
+                    return rtn;
+                }
+            }
+
+            // Fix target's code
+            for (int i = targetCode.Count - 1; i >= 0; i--)     // Reversed because we are removing some lines
+            {
+                var asm = targetCode[i];
+                var desc = asm.GetDescription();
+
+                switch (asm.invariantOpcode)
+                {
+                    case InstructionSet.BCC_Br8:
+                    case InstructionSet.BCS_Br8:
+                    case InstructionSet.BEQ_Br8:
+                    case InstructionSet.BMI_Br8:
+                    case InstructionSet.BNE_Br8:
+                    case InstructionSet.BPL_Br8:
+                    case InstructionSet.BRA_Br8:
+                    case InstructionSet.BVC_Br8:
+                    case InstructionSet.BVS_Br8:
+                    case InstructionSet.JMP_Jmp16:
+                        if (!asm.opcode.HasFlag(InstructionSet.mod))
+                            throw new Exception("Attempting to read unmodified opcode");
+                        goto case InstructionSet.Label;
+                    case InstructionSet.Label:
+                        targetCode[i] = new AsmIL65816(asm.opcode, TranslateLabel(asm.labelNum));
+                        break;
+                    case InstructionSet.JMP_Emu:
+                        {
+                            var emuCall = Asm65816Dictionary.GetEmuCallByID(asm.operand);
+                            if (emuCall.IsNesRts)
+                                goto case InstructionSet.RTL;
+                        }
+                        break;
+                    //case InstructionSet.RTI:
+                    //case InstructionSet.RTS:
+                    case InstructionSet.RTL:
+                        targetCode[i] = new AsmIL65816(InstructionSet.BRA_Label, returnLabel);
+                        break;
+                    case InstructionSet.ReturnMarker:
+                        // Remove this line
+                        targetCode.RemoveAt(i);
+                        break;
+                }
+            }
+
+            // Finish inserting code
+            block.InsertRange(call.line, targetCode, iterationID);
+            SolveInconsistencies();
+
+            // Reset cache before returning
+            ResetCache();
+        }
+
+        // --------------------------------------------------------------------
+
+        public void ExcludeInlineCandidate(int target)
+        {
+            inlineExcluded.Add(target);
+            var list = GetInlineCandidates();
+            list.RemoveAt(list.FindIndex(e => e.callDestination == target));
+        }
+
+        // --------------------------------------------------------------------
+
+        private void ResetCache()
+        {
+            // Reset inline eligibility
+            this.isInlineAble = null;
+            this.inlineCandidates = null;
+            this.byteCount = null;
+        }
+
+        public void BuildCache()
+        {
+            IsInlineAble();
+            IsReturnAddressRequired();
+            GetInlineCandidates();
+            CountBytes();
+        }
+
+        public bool IsInlineAble()
+        {
+            if (isInlineAble != null)
+                return isInlineAble.Value;
+
+            for (int i = 0; i < this.CodeBlockCount; i++)
+            {
+                CodeBlock block = this.GetCodeBlock(i);
+                {
+                    for (int u = 1; u < block.Count; u++)
+                    {
+                        var asm = block[u];
+                        var desc = asm.GetDescription();
+
+                        if (desc.change.HasFlag(FlagAndRegs.InlineUnableSrc))
+                            return (isInlineAble = false).Value;
+                    }
+                }
+            }
+
+            return (isInlineAble = IsReturnConsistent(out returnAddressRequired)).Value;
+        }
+
+        public bool IsReturnAddressRequired()
+        {
+            // TODO: Rebuild this
+            return IsInlineAble() && returnAddressRequired;
+        }
+
+        public List<CallLocation> GetInlineCandidates()
+        {
+            if (inlineCandidates != null)
+                return inlineCandidates;
+            inlineCandidates = new List<CallLocation>();
+
+            for (int i = 0; i < this.CodeBlockCount; i++)
+            {
+                CodeBlock block = this.GetCodeBlock(i);
+                {
+                    for (int u = 1; u < block.Count; u++)
+                    {
+                        var asm = block[u];
+                        var desc = asm.GetDescription();
+
+                        if (desc.change.HasFlag(FlagAndRegs.CanInlineDest))
+                        {
+                            var destination = asm.originalCall + (injector.GetStaticBankDestination(rawCode.nesAddress, asm.originalCall) << 16);
+                            if (!inlineExcluded.Contains(destination))
+                                inlineCandidates.Add(new CallLocation(i, u, destination));
+                        }
+                    }
+                }
+            }
+
+            return inlineCandidates;
+        }
+
+        public int CountBytes()
+        {
+            if (this.byteCount != null)
+                return this.byteCount.Value;
+
+            int byteCount = 0;
+
+            for (int i = 0; i < this.CodeBlockCount; i++)
+            {
+                CodeBlock block = this.GetCodeBlock(i);
+                for (int u = 0; u < block.Count; u++)
+                {
+                    var asm = block[u];
+                    var desc = asm.GetDescription();
+
+                    byteCount += desc.byteCount;
+                }
+            }
+
+            return (this.byteCount = byteCount).Value;
+        }
+
+        // --------------------------------------------------------------------
 
         public List<AsmIL65816> GetCode() => CodeBlock.ConvertToList(code);
 
@@ -194,11 +472,18 @@ namespace Project_Nested.Optimize
 
             void CacheBlockLabels()
             {
+                for (int i = 0; i < labelToBlock.Count; i++)
+                    labelToBlock[i] = -1;
+
                 for (int i = 0; i < code.Count; i++)
                 {
                     var block = code[i];
                     labelToBlock[block[0].labelNum] = i;
                 }
+
+                // Check for error
+                if (labelToBlock[label] < 0)
+                    throw new Exception($"Can't find label {label} in sub-routine 0x{nesAddress:x6}");
             }
 
             // Old, slower code
@@ -384,7 +669,6 @@ namespace Project_Nested.Optimize
                 for (int u = 1; u < block.Count; u++)
                 {
                     var asm = block[u];
-                    var desc = asm.GetDescription();
 
                     // Split block
                     if (asm.opcode == InstructionSet.Label)
@@ -395,12 +679,13 @@ namespace Project_Nested.Optimize
                     }
 
                     // Remove dead code at the end of a block
-                    var nextU = u + 1;
+                    /*var nextU = u + 1;
+                    var desc = asm.GetDescription();
                     if (desc.change.HasFlag(FlagAndRegs.End) && nextU < block.Count)
                     {
                         block.RemoveRange(nextU, block.Count - nextU, iterationID);
                         Log("Found dead code at the end of a block.");
-                    }
+                    }*/
                 }
             }
 
@@ -468,6 +753,157 @@ namespace Project_Nested.Optimize
                     Log("Removed dead code block.");
                 }
             }
+        }
+
+        private bool IsReturnConsistent(out bool outReturnAddressRequired)
+        {
+            const int DEFAULT_STACK_DEPTH = 0x00010000;
+            int[] stackDepthByLabel = new int[0x10000];     // Not optimal size
+            Queue<int> unsolvedLabels = new Queue<int>();
+
+            // Mark entry label
+            UpdateLabel(0, DEFAULT_STACK_DEPTH);
+
+            void UpdateLabel(int label, int stackDepth)
+            {
+                var value = stackDepthByLabel[label];
+                var result = value | stackDepth;
+                if (result != value)
+                {
+                    stackDepthByLabel[label] = result;
+                    if (!unsolvedLabels.Contains(label))
+                        unsolvedLabels.Enqueue(label);
+                }
+            }
+
+            bool returnAddressRequired = outReturnAddressRequired = false;
+
+            while (unsolvedLabels.Count > 0)
+            {
+                int label = unsolvedLabels.Dequeue();
+                var stackDepth = stackDepthByLabel[label];
+
+                var blockNum = FindBlockByLabel(label);
+                var block = GetCodeBlock(blockNum);
+
+                void Pull()
+                {
+                    if ((stackDepth & 0xffff) != 0)
+                        returnAddressRequired = true;
+                }
+
+                bool ValidPush()
+                {
+                    return ((stackDepth & 0x1ffff) == 0);
+                }
+
+                for (int u = 1; u < block.Count; u++)
+                {
+                    var asm = block[u];
+                    var mx = asm.opcode & InstructionSet.mx;
+
+                    switch (asm.invariantOpcode)
+                    {
+                        case InstructionSet.TSX:
+                        case InstructionSet.TXS:
+                            // Code should not be reachable
+                            return false;
+                        case InstructionSet.PEA_Abs:
+                        case InstructionSet.PEI_Dp:
+                        case InstructionSet.PER_Br16:
+                        case InstructionSet.PHD:
+                            stackDepth <<= 2;
+                            if (!ValidPush()) return false;
+                            break;
+                        case InstructionSet.PHB:
+                        case InstructionSet.PHK:
+                        case InstructionSet.PHP:
+                            stackDepth <<= 1;
+                            if (!ValidPush()) return false;
+                            break;
+                        case InstructionSet.PHA:
+                            stackDepth <<= ((int)mx & 0x20) != 0 ? 1 : 2;
+                            if (!ValidPush()) return false;
+                            break;
+                        case InstructionSet.PHX:
+                        case InstructionSet.PHY:
+                            stackDepth <<= ((int)mx & 0x10) != 0 ? 1 : 2;
+                            if (!ValidPush()) return false;
+                            break;
+                        case InstructionSet.PLD:
+                            stackDepth >>= 2;
+                            Pull();
+                            break;
+                        case InstructionSet.PLB:
+                        case InstructionSet.PLP:
+                            stackDepth >>= 1;
+                            Pull();
+                            break;
+                        case InstructionSet.PLA:
+                            stackDepth >>= ((int)mx & 0x20) != 0 ? 1 : 2;
+                            Pull();
+                            break;
+                        case InstructionSet.PLX:
+                        case InstructionSet.PLY:
+                            stackDepth >>= ((int)mx & 0x10) != 0 ? 1 : 2;
+                            Pull();
+                            break;
+                        case InstructionSet.BCC_Br8:
+                        case InstructionSet.BCS_Br8:
+                        case InstructionSet.BEQ_Br8:
+                        case InstructionSet.BMI_Br8:
+                        case InstructionSet.BNE_Br8:
+                        case InstructionSet.BPL_Br8:
+                        case InstructionSet.BRA_Br8:
+                        case InstructionSet.BVC_Br8:
+                        case InstructionSet.BVS_Br8:
+                        case InstructionSet.JMP_Jmp16:
+                            if (!asm.opcode.HasFlag(InstructionSet.mod))
+                                throw new Exception("Attempting to read unmodified opcode");
+                            UpdateLabel(asm.labelNum, stackDepth);
+                            break;
+                        case InstructionSet.JMP_Emu:
+                            {
+                                var call = Asm65816Dictionary.GetEmuCallByID(asm.operand);
+                                if (call.IsNesRts)
+                                    goto case InstructionSet.RTL;
+                            }
+                            break;
+                        //case InstructionSet.RTI:
+                        //case InstructionSet.RTS:
+                        case InstructionSet.RTL:
+                            if (stackDepth != DEFAULT_STACK_DEPTH)
+                                return false;
+                            break;
+                        case InstructionSet.JMP_JmpIndLong:
+                            {
+                                var call = Asm65816Dictionary.GetEmuCall("JMPi");
+                                if (call.address == asm.operand)
+                                    returnAddressRequired = true;
+                            }
+                            break;
+                        case InstructionSet.JMP_Nes:
+                            returnAddressRequired = true;
+                            break;
+                    }
+                }
+
+                // Is this block continuing to the next block?
+                {
+                    var asm = block[block.Count - 1];
+                    var desc = asm.GetDescription();
+                    if (!desc.change.HasFlag(FlagAndRegs.End))
+                    {
+                        var asmNext = GetLineOfCode(blockNum + 1, 0);
+                        if (asmNext.opcode == InstructionSet.Label)
+                            UpdateLabel(asmNext.labelNum, stackDepth);
+                    }
+                }
+            }
+
+            outReturnAddressRequired = returnAddressRequired;
+
+            return true;
         }
 
         // --------------------------------------------------------------------

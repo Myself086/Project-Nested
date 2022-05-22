@@ -708,7 +708,7 @@ Interpret__StaticOriginalReturn:
 	Interpret_Misalign
 	.mx	0x30
 
-	EmuCalls	"Interpret__Jsr", "?", "?"
+	EmuCall		"Interpret__Jsr", "?", "?"
 Interpret__Jsr:
 	//        1   2           3-5     6-7           8-9
 	// Stack: db, p register, return, originalCall, originalReturn

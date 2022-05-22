@@ -29,6 +29,12 @@ namespace Project_Nested.Optimize
             this.operand = operand;
         }
 
+        public AsmIL65816(InstructionSet opcode)
+        {
+            this.opcode = opcode;
+            this.operand = 0;
+        }
+
         public AsmIL65816(InstructionSet opcode, int operand)
         {
             this.opcode = opcode;
@@ -99,6 +105,7 @@ namespace Project_Nested.Optimize
             const string COLOR_ERROR = "/cFAC/";        // Pink
             const string COLOR_JUMP = "/cF91/";         // Orange
             const string COLOR_CALL = "/cF3F/";         // Purple
+            const string COLOR_CALL_EMU = "/cF9F/";     // Light purple
             const string COLOR_RETURN = "/cF22/";       // Red
             const string COLOR_LABEL = "/cFD1/";        // Yellow
             const string COLOR_REG_USAGE = "/c1EF/";    // Cyan (I wanted green but some users are color blind, Cyan+Red are always distinguishable)
@@ -202,7 +209,8 @@ namespace Project_Nested.Optimize
                 case OperandType.CallNes:
                     return AddSuffix($"{COLOR_JUMP}\t{desc.name}\t{COLOR_CALL}${originalReturn:x4} -> ${originalCall:x4}");
                 case OperandType.CallEmu:
-                    return AddSuffix($"{COLOR_JUMP}\t{desc.name}\t{COLOR_CALL}{GetEmulatorCall().name}");
+                case OperandType.JumpEmu:
+                    return AddSuffix($"{COLOR_JUMP}\t{desc.name}\t{COLOR_CALL_EMU}{GetEmulatorCall().name}");
             }
 
             // return MakeString(null, $"", $"");

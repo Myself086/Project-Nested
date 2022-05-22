@@ -471,7 +471,7 @@ namespace Project_Nested.Optimize
             // TCS
             name = "TCS";
             usage = FlagAndRegs.A | FlagAndRegs.Ah;
-            change = FlagAndRegs.SP;
+            change = FlagAndRegs.SP | FlagAndRegs.InlineUnableSrc;
             DefineOpcode(0x1B, new OpcodeDescription(name, OperandType.None, usage, change));
             // TDC
             name = "TDC";
@@ -493,12 +493,12 @@ namespace Project_Nested.Optimize
             // TSC
             name = "TSC";
             usage = FlagAndRegs.SP;
-            change = FlagAndRegs.A | FlagAndRegs.Ah | FlagAndRegs.Negative | FlagAndRegs.Zero;
+            change = FlagAndRegs.A | FlagAndRegs.Ah | FlagAndRegs.Negative | FlagAndRegs.Zero | FlagAndRegs.InlineUnableSrc;
             DefineOpcode(0x3B, new OpcodeDescription(name, OperandType.None, usage, change));
             // TSX
             name = "TSX";
             usage = FlagAndRegs.SP | FlagAndRegs.Index;
-            change = FlagAndRegs.X | FlagAndRegs.Negative | FlagAndRegs.Zero;
+            change = FlagAndRegs.X | FlagAndRegs.Negative | FlagAndRegs.Zero | FlagAndRegs.InlineUnableSrc;
             DefineOpcode(0xBA, new OpcodeDescription(name, OperandType.None, usage, change));
             // TXA
             name = "TXA";
@@ -508,7 +508,7 @@ namespace Project_Nested.Optimize
             // TXS
             name = "TXS";
             usage = FlagAndRegs.X | FlagAndRegs.Index;
-            change = FlagAndRegs.SP;
+            change = FlagAndRegs.SP | FlagAndRegs.InlineUnableSrc;
             DefineOpcode(0x9A, new OpcodeDescription(name, OperandType.None, usage, change));
             // TXY
             name = "TXY";
@@ -576,14 +576,14 @@ namespace Project_Nested.Optimize
             usage = FlagAndRegs.None;
             change = FlagAndRegs.PC;
             DefineOpcode((int)InstructionSet.JSR_Emu, new OpcodeDescription("JSR", OperandType.CallEmu, usage, change));
-            DefineOpcode((int)InstructionSet.JMP_Emu, new OpcodeDescription("JMP", OperandType.CallEmu, usage, change | FlagAndRegs.End));
+            DefineOpcode((int)InstructionSet.JMP_Emu, new OpcodeDescription("JMP", OperandType.JumpEmu, usage, change | FlagAndRegs.End));
             // JsrNes
             usage = FlagAndRegs.None;
-            change = FlagAndRegs.PC;
+            change = FlagAndRegs.PC | FlagAndRegs.InlineUnableSrc;
             DefineOpcode((int)InstructionSet.JSR_Nes, new OpcodeDescription("JSR", OperandType.CallNes, usage, change));
             DefineOpcode((int)InstructionSet.JMP_Nes, new OpcodeDescription("JMP", OperandType.CallNes, usage, change | FlagAndRegs.End));
-            DefineOpcode((int)InstructionSet.JSR_Nes_Static, new OpcodeDescription("JSR!", OperandType.CallNes, usage, change | FlagAndRegs.CanInline));
-            DefineOpcode((int)InstructionSet.JMP_Nes_Static, new OpcodeDescription("JMP!", OperandType.CallNes, usage, change | FlagAndRegs.End | FlagAndRegs.CanInline));
+            DefineOpcode((int)InstructionSet.JSR_Nes_Static, new OpcodeDescription("JSR!", OperandType.CallNes, usage, change | FlagAndRegs.CanInlineDest));
+            DefineOpcode((int)InstructionSet.JMP_Nes_Static, new OpcodeDescription("JMP!", OperandType.CallNes, usage, change | FlagAndRegs.End | FlagAndRegs.CanInlineDest));
 
             // Return marker
             DefineOpcode((int)InstructionSet.ReturnMarker, new OpcodeDescription(".returnmark", OperandType.None, FlagAndRegs.None, FlagAndRegs.None));
@@ -717,8 +717,23 @@ namespace Project_Nested.Optimize
         {
             var rtn = (uint)index < opcodes.Length ? opcodes[index] : new OpcodeDescription();
             if (rtn.type == OperandType.CallEmu)
-                return GetEmuCallByID(operand).desc;
-            return rtn;
+            {
+                var desc = GetEmuCallByID(operand).desc;
+                desc.usage |= rtn.usage;
+                desc.change |= rtn.change;
+                return desc;
+            }
+            else if (rtn.type == OperandType.JumpEmu)
+            {
+                var desc = GetEmuCallByID(operand).desc;
+                desc.usage |= rtn.usage;
+                desc.change |= rtn.change;
+                desc.name = "JMP";
+                desc.type = OperandType.JumpEmu;
+                return desc;
+            }
+            else
+                return rtn;
         }
 
         public static int GetRemoveIndexX(InstructionSet index) => GetRemoveIndexX((int)index);
