@@ -201,7 +201,7 @@ namespace Project_Nested
 
             return (emu) =>
             {
-                return random.Next(0, 0x10000) & 0xfff0;
+                return (1 << random.Next(0, 16)) & 0xfff0;
             };
         }
     }
