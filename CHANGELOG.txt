@@ -1,5 +1,5 @@
 
-Dev build:
+v1.5:
 - Fixed a bug that caused the emulator to pause forever without error screen
 - Fixed patching idle loops
 - Fixed loading SRM file names longer than 32 characters
