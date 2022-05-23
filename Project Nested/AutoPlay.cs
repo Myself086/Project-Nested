@@ -27,6 +27,10 @@ namespace Project_Nested
             this.injector = injector;
             this.emuPool = new EmulatorPool(injector.GetOutData(), false);
             this.progress = progress;
+
+            // Disable native return after copying data
+            var addr = injector.GetSetting("StackEmulation").ReadInt();
+            emuPool.romData[addr & 0x3fffff] = 0;
         }
 
         // --------------------------------------------------------------------
@@ -36,11 +40,11 @@ namespace Project_Nested
             Func<c65816, int>[] playSessions = MakePlaySessions();
 
             progressMin = -1;
+            progressMax = playSessions.Length;
             IncrementProgress(PROGRESS_AUTOPLAY_NAME);
             var plays = new List<Task<List<int>>>();
             foreach (var session in playSessions)
                 plays.Add(PlayOneAsync(ct, session));
-            progressMax = plays.Count;
             await Task.WhenAll(plays);
 
             var plays2 = plays.Select(e => e.Result).ToList();
@@ -118,6 +122,8 @@ namespace Project_Nested
                     {
                         emu.setflag_r(-1);
                         emu.InterruptIRQ();
+
+                        ct?.ThrowIfCancellationRequested();
                     }
 
                     // Has feedback count changed since the previous frame?

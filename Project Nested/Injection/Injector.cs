@@ -473,7 +473,7 @@ namespace Project_Nested.Injection
 #if SYNC_SAVE
                 calls = autoplay.PlaySync();
 #else
-                    calls = await autoplay.PlayAsync(ct);
+                calls = await autoplay.PlayAsync(ct);
 #endif
                 KnownCallCountChanged?.Invoke();
             }

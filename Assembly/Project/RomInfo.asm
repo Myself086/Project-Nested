@@ -360,6 +360,8 @@ RomInfo_Description:
 
 	RomInfo_DefineMac	"public void Tab_Stack : Stack related rules.", 0, 0
 
+		RomInfo_DefineMac	"private void* StackEmulation", RomInfo_StackEmulation, 0
+
 		RomInfo_SummaryMac	"Use native return addresses instead of originals. Greatly improves performance."
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Turn this option OFF to test whether the game has stack emulation issues."

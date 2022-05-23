@@ -263,7 +263,7 @@ namespace Project_Nested.Emulation
 
         // --------------------------------------------------------------------
 
-        public static readonly Int16[] ADDRSTEPLIST = { 1, 0, -1, 0 };
+        public readonly Int16[] ADDRSTEPLIST = { 1, 0, -1, 0 };
         readonly Int16[] XFERUNITLIST =
         {
             // Format is: UnitCount << 8 + (Unit1 << 0) + (Unit2 << 2) + (Unit3 << 4) + (Unit4 << 6)

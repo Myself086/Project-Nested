@@ -10,13 +10,12 @@ namespace Project_Nested
 {
     class EmulatorPool
     {
-        byte[] romData;
+        public byte[] romData;
 
         bool initStaticRec;
 
         // This stack is thread safe
         Stack<c65816> emuList = new Stack<c65816>();
-        object emuPoolCreateLocker = new object();
 
         public EmulatorPool(byte[] romData, bool initStaticRec)
         {
