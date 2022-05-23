@@ -171,7 +171,7 @@ RomInfo_InputMap:
 	// Version number
 	[80ffdB] = 0x04
 	.macro	RomInfo_VersionString
-		.string0	"1.4.2"
+		.string0	"1.5"
 	.endm
 
 RomInfo_Title:
