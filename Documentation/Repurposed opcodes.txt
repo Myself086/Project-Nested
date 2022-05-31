@@ -1,0 +1,31 @@
+There are 12 repurposed opcodes in total, each one overrides an illegal opcode that locks (STOP) an original 6502 so they're guaranteed useless for programming on a 6502. Every opcode with a low nibble of 0 that affects the PC register (ie. 0x60) will change into a STOP if you change the low nibble to a 2.
+
+I use these to patch some games such as Crystalis, Zelda 2, Final Fantasy and Super Mario Bros 3.
+
+These opcodes must use the official patching system, otherwise they trigger "Unsupported opcode" error. If patched code is transferred to PRG RAM ($6000-$7FFF) then a dummy patch must be made to the correct address. For example: "[00:6000] = 00", value is ignored.
+
+
+BRK (0x00) -> COP (0x02) - Not actually using the 65816 COP but behaves similarly. Used to adjust virtual scanline among other things. See COP table below...
+
+JSR (0x20) -> JSL (0x22) - This one works exactly like the 65816 version but is a straight copy. Meaning that it's used to escape emulation for ROM hacking. It was originally implemented for a cross randomizer between a NES and a SNES game but the project never came to be. It was later used for MSU1 support.
+
+RTI (0x40) -> RTLSNES (0x42) - Forces the recompiler to use a native return address. Only effective in native mode.
+
+RTS (0x60) -> RTSNES (0x62) - Forces the recompiler to use a non-native return address. Only effective in native mode.
+
+Bxx (Any conditional branch) -> BRWxx - Conditional branch with Wait4Interrupt if taken, similar to WAI on the 65816. Used to override loops waiting for the next frame. Only effective if "NMI mode, auto detect" is enabled. Allows the emulator to drop partial frames instead of whole frames during slowdown. The game could be running at 90% speed instead of 50%. Additionally, a hidden turbo mode is activated to catch up on up to 3 frames after slowdown.
+
+----------------------------------------------------------------
+
+COP table can be found in the top section of Assembly/Project/Cop.asm
+
+Here's the COP table as of v1.5:
+	Cop__Table		0x00, Cop__Wait4Interrupt
+	Cop__Table		0x01, Cop__Wait4VBlank
+	Cop__Table		0x02, Cop__GetScanline			// A = Scanline
+	Cop__Table		0x03, Cop__SetScanline			// Scanline = A
+	Cop__Table		0x04, Cop__AddScanline			// Scanline += A
+	Cop__Table		0x05, Cop__IncScanline			// Scanline++
+
+More will be added as needed.
+
