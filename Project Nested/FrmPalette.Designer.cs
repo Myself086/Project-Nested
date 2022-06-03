@@ -52,8 +52,8 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(243, 52);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Load any image file with a 16x4 grid.\r\nAny image size.\r\n\r\nColors in your image wi" +
-    "ll be converted to RGB555.";
+            this.label1.Text = "Load .pal or image file with a 16x4 grid.\r\nAny image size.\r\n\r\nColors in your imag" +
+    "e will be converted to RGB555.";
             // 
             // btnLoad
             // 

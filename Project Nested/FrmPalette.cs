@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -98,6 +99,29 @@ namespace Project_Nested
             RenderPalette();
         }
 
+        private void ChangePalette(byte[] paldata)
+        {
+            int[] palette = new int[0x40];
+
+            if (paldata.Length < palette.Length * 3)
+                Array.Resize(ref paldata, palette.Length * 3);
+
+            for (int i = 0; i < palette.Length; i++)
+            {
+                palette[i] =
+                    (paldata[i * 3 + 0] >> 3) << 0 |
+                    (paldata[i * 3 + 1] >> 3) << 5 |
+                    (paldata[i * 3 + 2] >> 3) << 10;
+            }
+
+            // Write new palette to ROM
+            for (int i = 0; i < palette.Length; i++)
+                injector.SetSetting("Palette", i, palette[i].ToString());
+
+            // Show new palette to the user
+            RenderPalette();
+        }
+
         // --------------------------------------------------------------------
 
         private Bitmap paletteImage;
@@ -156,12 +180,18 @@ namespace Project_Nested
         private void btnLoad_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Image file|*.BMP;*.PNG;*.JPG;*.GIF;*.TIFF";
+            fileDialog.Filter = "Palette or Image file|*.BMP;*.PNG;*.JPG;*.GIF;*.TIFF;*.PAL";
             fileDialog.Title = "Select an image File";
 
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
-                ChangePalette(Image.FromFile(fileDialog.FileName) as Bitmap);
+                var dot = fileDialog.FileName.LastIndexOf('.');
+                var extention = dot >= 0 ? fileDialog.FileName.Substring(dot) : "";
+
+                if (extention.ToLowerInvariant() == ".pal")
+                    ChangePalette(File.ReadAllBytes(fileDialog.FileName));
+                else
+                    ChangePalette(Image.FromFile(fileDialog.FileName) as Bitmap);
             }
         }
 
