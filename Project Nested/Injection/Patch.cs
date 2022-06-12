@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace Project_Nested.Injection
 {
+    public enum PatchTypeEnum
+    {
+        NesAddr,
+        FileAddrPlus,
+        FileAddr,
+        GameGenie6,
+        GameGenie8,
+    }
     public class Patch
     {
         // Accepted format for command line
@@ -13,18 +21,23 @@ namespace Project_Nested.Injection
         //   [04:8123] or [bank:addr] where addr represents an address from the NES perspective and bank based on mapper specification
         //   [10123+] where the address is from a headerless file perspective
         //   [10133] where the address is from a headered file perspective
+        //   [APZLGITY] game genie code
         //  Data format (hex only)
         //   [] = 00 01 02 ff FF aA
         //   [] = 0x00, 0x01, 0x02
         //   []=0 0 0 0 0 0 0
 
+        private const string GAME_GENIE_NUMERALS = "APZLGITYEOXUKSVN";
+
+        public PatchTypeEnum PatchType { get; private set; }
         public int NesAddress { get; private set; }
         public int NesBank { get; private set; }
         public byte[] Data { get; private set; }
-        public int Length { get => Data.Length; }
+        public int Length { get => Data != null ? Data.Length : 0; }
 
-        public Patch(int nesAddress, int nesBank, byte[] data)
+        public Patch(int nesAddress, int nesBank, byte[] data, PatchTypeEnum PatchType)
         {
+            this.PatchType = PatchType;
             this.NesAddress = nesAddress;
             this.NesBank = nesBank;
             this.Data = data;
@@ -37,8 +50,10 @@ namespace Project_Nested.Injection
             int bracketEnd = commandLine.IndexOf(']');
             int equalSign = commandLine.IndexOf('=');
 
+            if (bracketEnd < 0) bracketEnd = commandLine.Length;
+
             // Split address and data
-            string address = commandLine.Substring(bracketStart + 1, bracketEnd - bracketStart - 1);
+            string address = commandLine.Substring(bracketStart + 1, bracketEnd - bracketStart - 1).Trim();
             string data = commandLine.Substring(equalSign + 1);
             bool header = address.EndsWith("+");
             if (header)
@@ -46,53 +61,158 @@ namespace Project_Nested.Injection
 
             // Read address based on format (format information at the top of this class)
             string[] addressSplit = address.Split(':');
-            if (addressSplit.Length > 1)
+            var gameGenie = ConvertGameGenieToHex(address);
+            if (gameGenie != null && address.Length == 6)
             {
+                this.PatchType = PatchTypeEnum.GameGenie6;
+                this.NesAddress = gameGenie.Value << 8;
+            }
+            else if (gameGenie != null && address.Length == 8)
+            {
+                this.PatchType = PatchTypeEnum.GameGenie8;
+                this.NesAddress = gameGenie.Value << 0;
+            }
+            else if (addressSplit.Length > 1)
+            {
+                this.PatchType = PatchTypeEnum.NesAddr;
                 this.NesBank = Convert.ToInt32(addressSplit[0], 16);
                 this.NesAddress = Convert.ToInt32(addressSplit[1], 16);
             }
             else
             {
+                this.PatchType = header ? PatchTypeEnum.FileAddrPlus : PatchTypeEnum.FileAddr;
                 this.NesBank = -1;
                 this.NesAddress = Convert.ToInt32(addressSplit[0], 16) + (header ? 0x10 : 0);
             }
 
             // Read data
-            string[] dataSplit = data.Split(new string[] { " ", ",", "0x" }, StringSplitOptions.RemoveEmptyEntries);
-            List<byte> dataList = new List<byte>(dataSplit.Length);
-            foreach (var item in dataSplit)
-                dataList.Add(Convert.ToByte(item, 16));
-            this.Data = dataList.ToArray();
+            if (equalSign >= 0 && gameGenie == null)
+            {
+                string[] dataSplit = data.Split(new string[] { " ", ",", "0x" }, StringSplitOptions.RemoveEmptyEntries);
+                List<byte> dataList = new List<byte>(dataSplit.Length);
+                foreach (var item in dataSplit)
+                    dataList.Add(Convert.ToByte(item, 16));
+                this.Data = dataList.ToArray();
+            }
+        }
+
+        private int? ConvertGameGenieToHex(string str)
+        {
+            int rtn = 0;
+
+            str = str.ToUpperInvariant();
+
+            foreach (var chr in str)
+            {
+                var numeral = GAME_GENIE_NUMERALS.IndexOf(chr);
+
+                // If numeral is invalid, this isn't a game genie cheat
+                if (numeral < 0)
+                    return null;
+
+                rtn = (rtn << 4) | numeral;
+            }
+
+            return rtn;
         }
 
         public void Apply(byte[] rom, int prgSize, int prgBanksTotal)
         {
-            if (NesBank >= 0 && NesAddress < 0x8000)
-                return;
-
-            int addr = NesBank >= 0 ?
-                // bank:addr format
-                (this.NesAddress % prgSize) + ((this.NesBank % prgBanksTotal) * prgSize) + 0x10 :
-                // file address format
-                this.NesAddress;
+            int addr;
+            switch (PatchType)
+            {
+                default: throw new NotImplementedException();
+                case PatchTypeEnum.NesAddr:
+                    if (NesAddress < 0x8000)
+                        return;
+                    addr = (this.NesAddress % prgSize) + ((this.NesBank % prgBanksTotal) * prgSize) + 0x10;
+                    break;
+                case PatchTypeEnum.FileAddrPlus:
+                    addr = this.NesAddress + 0x10;
+                    break;
+                case PatchTypeEnum.FileAddr:
+                    addr = this.NesAddress;
+                    break;
+                case PatchTypeEnum.GameGenie8:
+                case PatchTypeEnum.GameGenie6:
+                    // Not applied here
+                    return;
+            }
 
             rom.WriteArray(addr, this.Data, this.Data.Length);
+        }
+
+        public void ApplyGameGenie(byte[] snesRom, List<int> baseAddresses)
+        {
+            int Nibble(int index) => this.NesAddress >> ((7 - index) * 4);
+
+            switch (PatchType)
+            {
+                // Code from http://tuxnes.sourceforge.net/gamegenie.html
+                case PatchTypeEnum.GameGenie6:
+                    {
+                        var address = 0x8000 +
+                            ((Nibble(3) & 7) << 12)
+                            | ((Nibble(5) & 7) << 8) | ((Nibble(4) & 8) << 8)
+                            | ((Nibble(2) & 7) << 4) | ((Nibble(1) & 8) << 4)
+                            | (Nibble(4) & 7) | (Nibble(3) & 8);
+                        var data =
+                            ((Nibble(1) & 7) << 4) | ((Nibble(0) & 8) << 4)
+                            | (Nibble(0) & 7) | (Nibble(5) & 8);
+
+                        foreach (var item in baseAddresses)
+                            snesRom[item + address] = (byte)data;
+                    }
+                    break;
+                case PatchTypeEnum.GameGenie8:
+                    {
+                        var address = 0x8000 +
+                            ((Nibble(3) & 7) << 12)
+                            | ((Nibble(5) & 7) << 8) | ((Nibble(4) & 8) << 8)
+                            | ((Nibble(2) & 7) << 4) | ((Nibble(1) & 8) << 4)
+                            | (Nibble(4) & 7) | (Nibble(3) & 8);
+
+                        var data =
+                            ((Nibble(1) & 7) << 4) | ((Nibble(0) & 8) << 4)
+                            | (Nibble(0) & 7) | (Nibble(7) & 8);
+
+                        var compare =
+                            ((Nibble(7) & 7) << 4) | ((Nibble(6) & 8) << 4)
+                            | (Nibble(6) & 7) | (Nibble(5) & 8);
+
+                        foreach (var item in baseAddresses)
+                            if (snesRom[item + address] == compare)
+                                snesRom[item + address] = (byte)data;
+                    }
+                    break;
+            }
         }
 
         public int GetNesAddress(int prgSize, int prgBanksTotal, bool end)
         {
             int prgMask = prgSize - 1;
-
             int addr = end ? this.NesAddress + this.Length - 1 : this.NesAddress;
+            int rtn;
 
-            if (NesBank >= 0 && NesAddress < 0x8000)
-                prgMask = 0xffff;
-
-            int rtn = NesBank >= 0 ?
-                // bank:addr format
-                (addr | (prgMask ^ 0xffff)) + ((this.NesBank % prgBanksTotal) << 16) :
-                // file address format
-                ((addr - 0x10) / prgSize * 0x10000) + (((addr - 0x10) | ~prgMask) & 0xffff);
+            switch (PatchType)
+            {
+                default: throw new NotImplementedException();
+                case PatchTypeEnum.NesAddr:
+                    if (NesAddress < 0x8000)
+                        prgMask = 0xffff;
+                    rtn = (addr | (prgMask ^ 0xffff)) + ((this.NesBank % prgBanksTotal) << 16);
+                    break;
+                case PatchTypeEnum.FileAddrPlus:
+                    rtn = (addr / prgSize * 0x10000) + ((addr | ~prgMask) & 0xffff);
+                    break;
+                case PatchTypeEnum.FileAddr:
+                    rtn = ((addr - 0x10) / prgSize * 0x10000) + (((addr - 0x10) | ~prgMask) & 0xffff);
+                    break;
+                case PatchTypeEnum.GameGenie6:
+                case PatchTypeEnum.GameGenie8:
+                    // Not applied here
+                    return -1;
+            }
 
             return rtn;
         }
@@ -100,22 +220,51 @@ namespace Project_Nested.Injection
         public string GetAddressString()
         {
             // Write address based on format (format information at the top of this class)
-            if (NesBank >= 0)
-                return string.Format("{1:x2}:{0:x4}", NesAddress & 0xffff, NesBank & 0xffff);
-            else
-                return string.Format("{0:x6}", NesAddress & 0xffffff);
+            switch (PatchType)
+            {
+                default: throw new NotImplementedException();
+                case PatchTypeEnum.NesAddr:
+                    return string.Format("{1:x2}:{0:x4}", NesAddress & 0xffff, NesBank & 0xffff);
+                case PatchTypeEnum.FileAddrPlus:
+                    return string.Format("{0:x6}+", NesAddress & 0xffffff);
+                case PatchTypeEnum.FileAddr:
+                    return string.Format("{0:x6}", NesAddress & 0xffffff);
+                case PatchTypeEnum.GameGenie6:
+                    return string.Format("{0:x6}", ConvertIntToGameGenie(NesAddress, 6));
+                case PatchTypeEnum.GameGenie8:
+                    return string.Format("{0:x8}", ConvertIntToGameGenie(NesAddress, 8));
+            }
+        }
+
+        private string ConvertIntToGameGenie(int code, int size)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            code = code >> ((8 - size) * 4);
+
+            for (int i = size - 1; i >= 0; i--)
+            {
+                sb.Append(GAME_GENIE_NUMERALS[(code >> (i * 4)) & 0xf]);
+            }
+
+            return sb.ToString();
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("[{0}] = ", GetAddressString());
+            sb.AppendFormat("[{0}]", GetAddressString());
 
-            foreach (var item in Data)
-                sb.Append($"{item:x2} ");
-            // Remove last space
-            sb.Length--;
+            if (Data != null)
+            {
+                sb.Append(" = ");
+
+                foreach (var item in Data)
+                    sb.Append($"{item:x2} ");
+                // Remove last space
+                sb.Length--;
+            }
 
             return sb.ToString();
         }

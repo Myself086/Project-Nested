@@ -466,6 +466,21 @@ namespace Project_Nested.Injection
             OutData[0x00ffd5] = 0x31;
             OutData[0x40ffd5] = 0x35;
 
+            // Apply game genie codes
+            if (patches.Count != null)
+            {
+                var baseAddresses = new List<int>();
+
+                for (int i = 0; i < PrgBanks.Count; i++)
+                {
+                    var item = PrgBanks[i];
+                    baseAddresses.Add(((item & 0x3f) | (((~item) & 0x80) >> 1)) * 0x10000);
+                }
+
+                foreach (var item in patches)
+                    item.Value.ApplyGameGenie(OutData, baseAddresses);
+            }
+
             // Auto-play
             if (calls.Count < GetSetting("EmuCalls.AutoPlayThreshold").ReadInt())
             {

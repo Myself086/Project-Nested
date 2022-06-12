@@ -221,7 +221,7 @@ namespace Project_Nested.Injection
             // Button
             Button button = new Button();
             button.Location = new Point(X + TABULATION, Y);
-            button.Text = "Edit patches";
+            button.Text = "Patches && Game Genie";
             button.AutoSize = true;
             //tip.SetToolTip(label, setting.Summary);
             AddControl(button);
@@ -236,7 +236,7 @@ namespace Project_Nested.Injection
 
             void UpdateLabel()
             {
-                label.Text = string.Format(EDIT_PATCH_TEXT, injector.patches.Count, injector.patches.Sum(f => f.Value.Data.Length));
+                label.Text = string.Format(EDIT_PATCH_TEXT, injector.patches.Count, injector.patches.Sum(f => f.Value.Data != null ? f.Value.Data.Length : 1));
             }
 
             button.Click += (sender, e) =>
