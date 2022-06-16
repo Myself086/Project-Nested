@@ -1,0 +1,8 @@
+If you are a homebrew dev and want to detect Project Nested in your game's code, use the following:
+
+	SED		; No decimal mode on NES, therefore doesn't set D on SNES
+	PHP
+	PLA
+	AND	#$08
+	; Result will be non-zero except on Project Nested
+	; This also works with the interrupt flag
