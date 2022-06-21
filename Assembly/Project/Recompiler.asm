@@ -2926,6 +2926,7 @@ Recompiler__Build_OpcodeType_RtsI:
 	
 	// Add to write address
 	lda	#0x0004
+	clc
 	adc	$.writeAddr
 	sta	$.writeAddr
 	rts
@@ -2937,7 +2938,6 @@ Recompiler__Build_OpcodeType_RtsNes:
 	lda	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
-	clc
 	
 	bra	$-Recompiler__Build_OpcodeType_RtsNes_in
 
