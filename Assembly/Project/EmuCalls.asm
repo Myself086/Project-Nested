@@ -9,7 +9,7 @@
 	.endm
 
 	.macro	EmuCalls_Flags		flagNames
-		// ---- ----  _Tt! *W?P  DBKS HYXA  nvmx dizc
+		// ---- ---@  _Tt! *W?P  DBKS HYXA  nvmx dizc
 		// Notes:
 		//  nvmxdizc = Register P bits
 		//  YXA = Register A, X and Y
@@ -25,7 +25,8 @@
 		//  ! = Nes bank range
 		//  t = IOTemp
 		//  T = IOTemp16
-		//  _ = Can inline
+		//  _ = Can inline destination
+		//  @ = Can't inline source
 		//  - = Unused or undefined
 		.def	temp__		0
 
@@ -53,6 +54,7 @@
 		EmuCalls_SetFlag	"{0}", "t", 0x200000
 		EmuCalls_SetFlag	"{0}", "T", 0x400000
 		EmuCalls_SetFlag	"{0}", "_", 0x800000
+		EmuCalls_SetFlag	"{0}", "@", 0x01000000
 
 		.data32	temp__
 	.endm
