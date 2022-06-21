@@ -177,7 +177,8 @@ namespace Project_Nested.Optimize
                 }
                 else                                        // Regular with mx
                 {
-                    if ((int)(asm.opcode & InstructionSet.mx) != mx)
+                    int flagMask = (((int)desc.usage & 0x30) << 4);
+                    if (((int)asm.opcode & (int)InstructionSet.mx & flagMask) != (mx & flagMask))
                         throw new Exception("Wrong MX flag during code conversion to binary.");
 
                     // Exceptions
