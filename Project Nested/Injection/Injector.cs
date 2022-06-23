@@ -812,7 +812,7 @@ namespace Project_Nested.Injection
         internal int AddCallLinks(c65816 emu, List<LinkOrigin> links)
         {
             if (links.Count == 0)
-                return 0;
+                return emu.memory.DebugReadThreeByte(0);
 
             int? baseAddress = null;
             emu.memory.WriteROM(OutData);
