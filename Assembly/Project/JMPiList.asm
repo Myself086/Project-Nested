@@ -67,6 +67,7 @@ b_loop:
 JMPi__Linker:
 	.vstack		_VSTACK_START
 	.local	_a, _x, _y
+	lock
 
 	// Fix stack and push
 	plp
@@ -86,6 +87,8 @@ JMPi__Linker:
 	// Change dp
 	lda	#_VSTACK_PAGE
 	tcd
+
+	unlock
 
 	// Get function pointer
 	.precall	Recompiler__CallFunction		_originalFunction
