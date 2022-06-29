@@ -13,7 +13,7 @@ JMPi__Listing_Destination:
 			jmp	$=JMPi__Listing_Destination
 b_1:
 JMPi__Listing_Next:
-		jmp	$=JMPi__Linker
+		jmp	$=JMPi__Listing_Next
 JMPi__Listing_End:
 
 	// Incremental step constant
@@ -48,11 +48,15 @@ b_1:
 
 	// Reset pointers to the linker
 	ldx	#0x02fd
+	ldy	#_JMPi__LinkerEntryTable+JMPi__LinkerEntryTable_Inc*0xff
 b_loop:
-		lda	#_JMPi__Linker
-		sta	$=JMPi_Start+0,x
-		lda	#_JMPi__Linker/0x100
+		lda	#_JMPi__LinkerEntryTable/0x100
 		sta	$=JMPi_Start+1,x
+		tya
+		sta	$=JMPi_Start+0,x
+		sec
+		sbc	#_JMPi__LinkerEntryTable_Inc
+		tay
 		dex
 		dex
 		dex
@@ -63,11 +67,31 @@ b_loop:
 
 	// ---------------------------------------------------------------------------
 
-	.mx	0x10
-JMPi__Linker:
 	.vstack		_VSTACK_START
 	.local	_a, _x, _y
+	.mx	0x10
+
+	.def	temp__	0
+	.macro	JMPi__Linker_mac
+		lock
+		sta	$_a
+		lda	#_temp__*0x101
+		jmp	$_JMPi__Linker_in
+		.def	temp__	temp__+1
+	.endm
+
+JMPi__LinkerEntryTable:
+	JMPi__Linker_mac
+b_1:
+	.def	JMPi__LinkerEntryTable_Inc		b_1-JMPi__LinkerEntryTable
+	.repeat		0xff, "JMPi__Linker_mac"
+
+	.mx	0x10
+JMPi__Linker_in:
 	lock
+
+	// Write jump destination's LSB
+	sta	$_JMPiU_Action
 
 	// Fix stack and push
 	plp
@@ -77,7 +101,7 @@ JMPi__Linker:
 	phb
 	stx	$_x
 	sty	$_y
-	sta	$_a
+	//sta	$_a
 	stz	$_a+1
 
 	// Change mode

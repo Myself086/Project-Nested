@@ -202,7 +202,6 @@ JMPiU__FromStack:
 	sta	$_IO_Temp16
 	and	#0xe0ff
 	xba
-	sta	$_JMPiU_Action
 	ora	#_JMPiU_StackPullOffset-1
 	sta	$2,s
 	lda	$_IO_Temp16+1
@@ -223,7 +222,6 @@ JMPiU__FromRti:
 	sta	$_IO_Temp16
 	and	#0xe0ff
 	xba
-	sta	$_JMPiU_Action
 	ora	#_JMPiU_StackPullOffset-1
 	sta	$2,s
 	lda	$_IO_Temp16+1
