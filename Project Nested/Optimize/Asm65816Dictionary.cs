@@ -227,9 +227,9 @@ namespace Project_Nested.Optimize
             change = FlagAndRegs.PC | FlagAndRegs.End;
             DefineOpcode(0x4C, new OpcodeDescription(name, OperandType.Jmp16, usage, change));
             DefineOpcode(0x5C, new OpcodeDescription(name, OperandType.Jmp24, usage, change));
-            DefineOpcode(0x6C, new OpcodeDescription(name, OperandType.JmpInd, usage, change));
-            DefineOpcode(0x7C, new OpcodeDescription(name, OperandType.JmpIndX, usage, change));
-            DefineOpcode(0xDC, new OpcodeDescription(name, OperandType.JmpIndLong, usage, change));
+            DefineOpcode(0x6C, new OpcodeDescription(name, OperandType.JmpInd, usage, change | FlagAndRegs.InlineUnableSrc));
+            DefineOpcode(0x7C, new OpcodeDescription(name, OperandType.JmpIndX, usage, change | FlagAndRegs.InlineUnableSrc));
+            DefineOpcode(0xDC, new OpcodeDescription(name, OperandType.JmpIndLong, usage, change | FlagAndRegs.InlineUnableSrc));
             // JSR (NOTE: SP is used here but assumed to be untouched for the next instruction)
             name = "JSR";
             usage = FlagAndRegs.None;

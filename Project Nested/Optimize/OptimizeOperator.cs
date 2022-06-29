@@ -308,6 +308,10 @@ namespace Project_Nested.Optimize
                 }
             }
 
+            // Jump to target's entry point
+            var entryPoint = TranslateLabel(0);
+            block.Insert(call.line++, new AsmIL65816(InstructionSet.JMP_Label, entryPoint), iterationID);
+
             // Finish inserting code
             block.InsertRange(call.line, targetCode, iterationID);
             SolveInconsistencies();

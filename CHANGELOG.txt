@@ -2,6 +2,7 @@
 Dev build:
 - Added support for .pal file for custom palette
 - Added support for Game Genie codes
+- Added AOT inline for game code (must enable "AOT optimization")
 
 v1.5:
 - Fixed a bug that caused the emulator to pause forever without error screen
