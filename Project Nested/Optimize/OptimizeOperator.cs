@@ -269,7 +269,7 @@ namespace Project_Nested.Optimize
             for (int i = targetCode.Count - 1; i >= 0; i--)     // Reversed because we are removing some lines
             {
                 var asm = targetCode[i];
-                var desc = asm.GetDescription();
+                //var desc = asm.GetDescription();
 
                 switch (asm.invariantOpcode)
                 {
