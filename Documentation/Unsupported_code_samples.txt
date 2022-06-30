@@ -1,0 +1,106 @@
+
+Here are some code samples that are not supported.
+
+Represents Project Nested v1.5 and some of these will be supported in later versions.
+
+----------------------------------------------------------------
+
+	; Timing isn't supported, any attempt to advance the PPU's progress will fail
+	nop		; Doesn't even waste time
+
+----------------------------------------------------------------
+
+	; Doesn't prevent IRQ unless, disable "NMI mode, at vblank" instead
+	sei
+
+----------------------------------------------------------------
+
+	; Flags I and D don't actually set these flags on SNES
+	; PHP pushes the raw value
+	sei
+	sed
+	php	; Pushes with I and D disabled
+
+	; However, PLP forces; M set, X set, I clear and D clear
+
+----------------------------------------------------------------
+
+	; Not supported at all
+	brk
+
+----------------------------------------------------------------
+
+	; Unsupported I/O ports
+	sta	$2003		; No effect
+	sta	$2004		; No effect
+	sta	$4017		; Reading works fine
+	lda	$2002		; Sprite overflow always returns false
+
+----------------------------------------------------------------
+
+	; Activating sprite DMA with direct index addressing mode triggers error
+	ldx	#$14
+	sta	$4000,x
+
+----------------------------------------------------------------
+
+	; Indexed indirect X addressing mode to access I/O is missing
+	lda	#$20
+	sta	$01
+	ldx	#$00
+	stx	$00
+	sta	($00,x)		; Triggers error
+
+----------------------------------------------------------------
+
+	; Zero page wrap
+	ldx	#$ff
+	lda	$02,x		; Reads $0101 instead of $0001
+
+----------------------------------------------------------------
+
+	; Stack wrap
+	ldx	#$ff
+	txs
+	pla			; Pulls $0200 instead of $0100
+	ldx	#$00
+	txs
+	pha
+	pha			; Pushes $00ff instead of $01ff
+
+----------------------------------------------------------------
+
+	; Crossing page $20 (direct)
+	ldx	#$ff
+	sta	$1f01,x		; Writes to $0800 instead of $2000
+
+	; Crossing page $20 (indirect)
+	ldy	#$ff
+	sta	($00),y		; Writes to SNES' $2000 instead of emulating the NES I/O
+
+----------------------------------------------------------------
+
+	; Crossing pages $80, $a0, $c0 and $e0 (indirect)
+	ldy	#$ff
+	lda	($00),y		; May read incorrect bank if pointer LSB is non-zero
+	; Directly crossing these pages works as intended (except I/O)
+	;  but with additional overhead
+
+----------------------------------------------------------------
+
+	; Pulling data for VRAM
+	pla
+	sta	$2007		; Pushes 6 or 7 bytes and may corrupt memory
+	; May corrupt even more bytes if "NMI mode, at vblank" is enabled
+
+----------------------------------------------------------------
+
+NMI:
+	;        1, 2, 3
+	; Stack: p, r, r
+	tsx
+	lda	$0103,x		; Reads a constant unrelated to the actual return address
+	cmp	#$ff		; Compare always fails
+
+----------------------------------------------------------------
+
