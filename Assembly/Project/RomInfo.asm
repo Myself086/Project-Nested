@@ -43,8 +43,7 @@ RomInfo_MemoryEmulation:
 	.def	RomInfo_MemEmu_Store				0x0002
 	.def	RomInfo_MemEmu_AbsBank				0x0004
 	.def	RomInfo_MemEmu_AbsCrossBank			0x0008
-	// TODO
-	.def	RomInfo_MemEmu_IndCrossBank			0x0010
+	.def	RomInfo_MemEmu_IndCrossBank			0x0010		// TODO
 
 	// Initial bank numbers on reset
 RomInfo_PrgBankNumbers:
