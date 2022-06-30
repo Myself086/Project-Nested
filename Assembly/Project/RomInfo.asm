@@ -38,12 +38,13 @@ RomInfo_CartFlags:
 
 	// 16 bits of "Memory emulation" flags
 RomInfo_MemoryEmulation:
-	.data16	0x000f
+	.data16	0x002f
 	.def	RomInfo_MemEmu_Load					0x0001
 	.def	RomInfo_MemEmu_Store				0x0002
 	.def	RomInfo_MemEmu_AbsBank				0x0004
 	.def	RomInfo_MemEmu_AbsCrossBank			0x0008
 	.def	RomInfo_MemEmu_IndCrossBank			0x0010		// TODO
+	.def	RomInfo_MemEmu_StaticSram			0x0020
 
 	// Initial bank numbers on reset
 RomInfo_PrgBankNumbers:

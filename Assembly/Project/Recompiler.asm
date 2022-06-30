@@ -1636,6 +1636,21 @@ b_diff:
 				tay
 				and	#0x00ff
 b_2:
+		// Are we accessing SRAM?
+		cmp	#0x0060
+		bne	$+b_3
+			pha
+			// Are we using static SRAM?
+			andbeq	$=RomInfo_MemoryEmulation, #_RomInfo_MemEmu_StaticSram, $+b_2
+				// Are we processing one of the 16 opcodes that we can extend to 24-bit address?
+				lda	$.thisOpcodeX2
+				and	#0x001e						// Bottom 4 bits
+				eor	#0x001a
+				jeq	$_Recompiler__Build_OpcodeType_LongSram
+b_2:
+			pla
+b_3:
+
 		sta	$.memoryPrefix
 		// Write prefix
 		lda	[$.writeAddr]
@@ -1665,6 +1680,31 @@ b_1:
 
 	// Add to write address, assume carry clear from the 'lsr'
 	lda	#0x0003
+	adc	$.writeAddr
+	sta	$.writeAddr
+	rts
+
+
+Recompiler__Build_OpcodeType_LongSram:
+	// Fix stack
+	pla
+	pla
+
+	// Write long version of this instruction and target bank 0xb0
+	lda	$.thisOpcodeX2
+	lsr	a
+	and	#0x00ff
+	ora	#0xb00f
+	ldy	#2
+	sta	[$.writeAddr]
+	sta	[$.writeAddr],y
+	dey
+	lda	[$.readAddr],y
+	sta	[$.writeAddr],y
+
+	// Add to write address
+	lda	#0x0004
+	clc
 	adc	$.writeAddr
 	sta	$.writeAddr
 	rts
