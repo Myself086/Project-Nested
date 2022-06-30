@@ -1745,7 +1745,7 @@ b_1:
 	// Are we using banking emulation?
 	lda	$=RomInfo_MemoryEmulation
 	bit	#_RomInfo_MemEmu_AbsBank
-	beq	$+Recompiler__Build_OpcodeType_LdaAbsY_Regular
+	jeq	$_Recompiler__Build_OpcodeType_LdaAbsY_Regular
 		// Are we using bank crossing emulation?
 		bit	#_RomInfo_MemEmu_AbsCrossBank
 		beq	$+b_1
@@ -1798,6 +1798,20 @@ b_diff:
 					tay
 					and	#0x00ff
 b_2:
+			// Are we accessing SRAM?
+			cmp	#0x0060
+			bne	$+b_3
+				pha
+				// Are we using static SRAM?
+				andbeq	$=RomInfo_MemoryEmulation, #_RomInfo_MemEmu_StaticSram, $+b_2
+					// Are we processing one of the 16 opcodes that we can extend to 24-bit address?
+					lda	$.thisOpcodeX2
+					and	#0x001e						// Bottom 4 bits
+					eor	#0x001a
+					jeq	$_Recompiler__Build_OpcodeType_LongSram
+b_2:
+				pla
+b_3:
 			sta	$.memoryPrefix
 			lda	[$.writeAddr]
 			pha
@@ -1950,6 +1964,20 @@ b_diff:
 					tay
 					and	#0x00ff
 b_2:
+			// Are we accessing SRAM?
+			cmp	#0x0060
+			bne	$+b_3
+				pha
+				// Are we using static SRAM?
+				andbeq	$=RomInfo_MemoryEmulation, #_RomInfo_MemEmu_StaticSram, $+b_2
+					// Are we processing one of the 16 opcodes that we can extend to 24-bit address?
+					lda	$.thisOpcodeX2
+					and	#0x001e						// Bottom 4 bits
+					eor	#0x001a
+					jeq	$_Recompiler__Build_OpcodeType_LongSram
+b_2:
+				pla
+b_3:
 			sta	$.memoryPrefix
 			lda	[$.writeAddr]
 			pha
