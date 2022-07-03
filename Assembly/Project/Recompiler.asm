@@ -4432,23 +4432,20 @@ Recompiler__AddFunction_SkipQuickFunc2:
 Recompiler__AddQuickFunction:
 	// Only use lower bits
 	and	#0x00ff
-	tay
 	asl	a
 	tax
 
 	// Add 8 to each pointers lower than this value, assume carry always clear during the loop
 	clc
-Recompiler__AddQuickFunction_loop:
-		dey
-		bmi	$+Recompiler__AddQuickFunction_loopEnd
-		dex
-		dex
+	bra	$+b_loop_in
+b_loop:
 		lda	$=QuickFunction,x
 		adc	$.Recompiler_FunctionList+9
 		sta	$=QuickFunction,x
-		bra	$-Recompiler__AddQuickFunction_loop
-
-Recompiler__AddQuickFunction_loopEnd:
+b_loop_in:
+		dex
+		dex
+		bpl	$-b_loop
 
 	return
 	
