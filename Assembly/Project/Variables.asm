@@ -733,12 +733,12 @@ Feedback_Calls_LowerBound:
 	// Delayed VRAM access
 
 	// Dynamic size but static pointer, see RomInfo_VramQBufferSize
-	.def	Vram_Queue					0x7e6800
+	.def	Vram_Queue					Memory_HeapStart_7e
 
 	// ---------------------------------------------------------------------------
 	// WRAM clear, last address to be zeroed
 
-	.def	Wram_Clear_LastAddress		0x7e67ff
+	.def	Wram_Clear_LastAddress		Memory_HeapStart_7e-1
 
 	// ---------------------------------------------------------------------------
 	// Memory allocation constants
