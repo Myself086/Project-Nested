@@ -24,8 +24,8 @@
 	// 10 = " + mapper memory + custom input + <unused> + IRQ stack
 	//*11 = HDMA pointers + CHR banks + sound
 	// 12 = NES palette (with some unused memory, reserved for 4bpp hacks?)
-	// 13 = Function pointer start index, used for the semi-sorted function list (only used while recompiling, could be moved later)
-	// 14 = "
+	// 13 = <Unused>
+	// 14 = <Unused>
 	// 15 = Function pointer lookup table for indirect JMP
 	// 16 = "
 	// 17 = "
@@ -492,12 +492,6 @@ Vram_Queue_Top_2:
 	.def	PaletteNes					0x1200
 
 	// ---------------------------------------------------------------------------
-	// Quick find function pointer
-
-	// 0x200 bytes
-	.def	QuickFunction				0x1300
-
-	// ---------------------------------------------------------------------------
 	// Quick access to JMPi first node
 
 	// 0x300 bytes
@@ -730,6 +724,12 @@ Feedback_Calls_LowerBound:
 	.def	Debug_NameTable				0x7e6000
 
 	// ---------------------------------------------------------------------------
+	// Quick find function pointer
+
+	// 0x200 bytes
+	.def	QuickFunction				0x7e6800
+
+	// ---------------------------------------------------------------------------
 	// Delayed VRAM access
 
 	// Dynamic size but static pointer, see RomInfo_VramQBufferSize
@@ -744,7 +744,7 @@ Feedback_Calls_LowerBound:
 	// Memory allocation constants
 
 	// Constant values for Memory_Bottom of each bank
-	.def	Memory_HeapStart_7e			0x6800
+	.def	Memory_HeapStart_7e			0x6a00
 	.def	Memory_HeapStart_7f			0x0000
 
 	// Constant for the initial HeapStack value (full stack pointer)

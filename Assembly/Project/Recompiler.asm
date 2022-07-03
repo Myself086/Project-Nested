@@ -4443,9 +4443,9 @@ Recompiler__AddQuickFunction_loop:
 		bmi	$+Recompiler__AddQuickFunction_loopEnd
 		dex
 		dex
-		lda	$_QuickFunction,x
+		lda	$=QuickFunction,x
 		adc	$.Recompiler_FunctionList+9
-		sta	$_QuickFunction,x
+		sta	$=QuickFunction,x
 		bra	$-Recompiler__AddQuickFunction_loop
 
 Recompiler__AddQuickFunction_loopEnd:
@@ -4488,7 +4488,7 @@ Recompiler__CallFunction_SkipStatic:
 	and	#0x00ff
 	asl	a
 	tax
-	lda	$_QuickFunction,x
+	lda	$=QuickFunction,x
 	sta	$.add
 	adc	$.base
 	sta	$.Recompiler_FunctionList+3
@@ -4676,7 +4676,7 @@ mac_SkipStatic:
 		and	#0x00ff
 		asl	a
 		tax
-		lda	$_QuickFunction,x
+		lda	$=QuickFunction,x
 		sta	$.add
 		adc	$.Recompiler_FunctionList+3
 		sta	$.Recompiler_FunctionList+3
