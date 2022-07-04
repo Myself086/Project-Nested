@@ -47,8 +47,8 @@ b_else:
 b_1:
 
 	// Reset pointers to the linker
-	ldx	#0x02fd
-	ldy	#_JMPi__LinkerEntryTable+JMPi__LinkerEntryTable_Inc*0xff
+	ldx	#0x08fd
+	ldy	#_JMPi__LinkerEntryTable+JMPi__LinkerEntryTable_Inc*0x2ff
 b_loop:
 		lda	#_JMPi__LinkerEntryTable/0x100
 		sta	$=JMPi_Start+1,x
@@ -68,14 +68,15 @@ b_loop:
 	// ---------------------------------------------------------------------------
 
 	.vstack		_VSTACK_START
-	.local	_a, _x, _y
+	.local	_a, _x, _y, _rawLSB
 	.mx	0x10
 
 	.def	temp__	0
+	.def	temp2__	0
 	.macro	JMPi__Linker_mac
 		lock
 		sta	$_a
-		lda	#_temp__*0x101
+		lda	#_temp__*0x100+temp2__
 		jmp	$_JMPi__Linker_in
 		.def	temp__	temp__+1
 	.endm
@@ -84,14 +85,17 @@ JMPi__LinkerEntryTable:
 	JMPi__Linker_mac
 b_1:
 	.def	JMPi__LinkerEntryTable_Inc		b_1-JMPi__LinkerEntryTable
-	.repeat		0xff, "JMPi__Linker_mac"
+	.repeat		0x0ff, "JMPi__Linker_mac"
+	.def		temp2__		0x01
+	.repeat		0x100, "JMPi__Linker_mac"
+	.repeat		0x100, "JMPi__Linker_mac"
 
 	.mx	0x10
 JMPi__Linker_in:
 	lock
 
 	// Write jump destination's LSB
-	sta	$_JMPiU_Action
+	sta	$_rawLSB
 
 	// Fix stack and push
 	plp
@@ -116,10 +120,13 @@ JMPi__Linker_in:
 
 	// Get function pointer
 	.precall	Recompiler__CallFunction		_originalFunction
-	lda	$_JMPiU_Action
+	lda	$.rawLSB
+	lsr	a				// Carry set when using RtsNes
+	lda	$.rawLSB
 	and	#0xff00
 	ora	$.a
 	xba
+	adc	#0				// Add 1 if RtsNes
 	cmp	$_Recompile_PrgRamTopRange
 	bcc	$+b_else
 		sta	$.Param_originalFunction
@@ -163,6 +170,8 @@ b_else:
 		lda	#_JMPi__Interpreter_FirstIteration/0x100
 		sta	$4,s
 b_1:
+	lda	$.rawLSB
+	lsr	a			// Set carry if RtsNes
 	call
 
 	// Return
@@ -178,8 +187,12 @@ b_1:
 
 	.mx	0x00
 	.func	JMPi__Add	=originalCall, =newAddr
+	// Entry: Carry = true when using non-native RTS
 JMPi__Add:
+	.local	_useRtsNes			// True when negative
 	.local	=nodeAddr, =oldNodeAddr
+
+	ror	$.useRtsNes
 
 	// Reserve another node
 	lda	$=JMPi_EmptyPointer+1
@@ -229,7 +242,23 @@ b_loop:
 	// Get base array offset
 	.local	_temp
 	lda	$.originalCall
-	and	#0x00ff
+	bit	$.useRtsNes
+	bpl	$+b_else
+		dec	a
+		bit	#0x2000
+		beq	$+b_else2
+			// High range
+			and	#0x00ff
+			ora	#0x0200
+			bra	$+b_1
+b_else2:
+			// Low range
+			and	#0x00ff
+			ora	#0x0100
+			bra	$+b_1
+b_else:
+		and	#0x00ff
+b_1:
 	sta	$.temp
 	asl	a
 	adc	$.temp

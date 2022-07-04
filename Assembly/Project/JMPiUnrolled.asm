@@ -145,27 +145,17 @@ JMPiU_Inline_AbsWrap_LastLoad:
 	.endm
 
 	// ---------------------------------------------------------------------------
-	// Code for this whole bank, "ROM" part
+	// Code for this whole bank (first bank), "ROM" part
 
 	.mx	0x10
 	.macro	JMPiU_Mac
-		.align	0x10
+		.align	0x20
 this__:
 		// Indirect JMP
 		.def	this__	this__&0xffff
 		.def	lo__	this__&0xff
 		.def	hi__	this__/0x100
 		and	#0x00ff
-		ora	$_Program_BankNum-1+lo__
-		jmp	[$_JMPi_Start+hi__*3]
-
-this__:
-		.def	JMPiU_StackPullOffset	this__&0x1f
-
-this__:
-		// RTS as indirect jump
-		php
-		rep	#0x20
 		ora	$_Program_BankNum-1+lo__
 		jmp	[$_JMPi_Start+hi__*3]
 	.endm
@@ -183,12 +173,64 @@ JMPiU__Bank:
 		.addr	this__&0xffffe0, this__|0x1f
 	.endm
 
+	.macro	JMPiU__Override2	address
+		.def	temp__	Zero+{0}-1
+		.def	lo__	temp__&0xff
+		.def	hi__	temp__/0x100
+		.def	this__	lo__*0x100+hi__+JMPiU__Bank+0x10000
+		.addr	this__&0xffffe0, this__|0x1f
+		.data8	0
+	.endm
+
 	// ---------------------------------------------------------------------------
 
 	// Interpreted RTS
 
 	JMPiU__Override		0x2000
 	trap
+
+	// ---------------------------------------------------------------------------
+	// ---------------------------------------------------------------------------
+	// Code for this whole bank (second bank), "ROM" part
+
+	.addr	JMPiU__Bank+0x10000, JMPiU__Bank+0x1ffff
+
+	.mx	0x10
+	.macro	JMPiU_Mac2
+		.align	0x20
+this__:
+		// Non-native RTS
+		.def	this__	this__&0xffff
+		.def	lo__	this__&0xff
+		.def	hi__	this__/0x100
+		.def	ex__	lo__*0x8&0x100
+		.data8	0
+		php
+		.if	hi__ == 0xff
+		{
+			.mx	0x30
+			cmp	#.lo__+0x1f
+			beq	$+b_1__
+			.mx	0x10
+		}
+		rep	#0x20
+		ora	$_Program_BankNum-1+lo__
+		jmp	[$_RtsNes_Start+hi__*3+ex__*3]
+		.if	hi__ == 0xff
+		{
+b_1__:
+			rep	#0x20
+			.def	lo__	lo__+0x20
+			.def	lo__	lo__&0xff
+			ora	$_Program_BankNum-1+lo__
+			jmp	[$_RtsNes_Start+hi__*3+ex__*3]
+		}
+	.endm
+	.repeat	0x800, "JMPiU_Mac2"
+
+	// ---------------------------------------------------------------------------
+
+	JMPiU__Override2		0x2001
 
 	EmuCall		"RtsNes", "?", "?"
 	// NOTE: RTS into 0x20xx executes the operand of LDA $2,s which happens to be COP, an unused software interrupt
@@ -198,11 +240,11 @@ JMPiU__FromStack:
 	rep	#0x20
 	.mx	0x10
 	lda	$2,s
-	inc	a
+	//inc	a
 	sta	$_IO_Temp16
 	and	#0xe0ff
 	xba
-	ora	#_JMPiU_StackPullOffset-1
+	//ora	#_JMPiU_StackPullOffset-1
 	sta	$2,s
 	lda	$_IO_Temp16+1
 	plp
@@ -212,17 +254,16 @@ JMPiU__FromStack:
 
 	// Interpreted RTI
 
-	JMPiU__Override		0x2001
-	.data8	0
+	JMPiU__Override2	0x2002
 JMPiU__FromRti:
 	sta	$_IO_Temp
 	rep	#0x20
 	.mx	0x10
 	lda	$2,s
+	dec	a
 	sta	$_IO_Temp16
 	and	#0xe0ff
 	xba
-	ora	#_JMPiU_StackPullOffset-1
 	sta	$2,s
 	lda	$_IO_Temp16+1
 	plp
@@ -235,8 +276,7 @@ JMPiU__FromRti:
 	// Return from NMI at vblank
 	.def	NmiReturn_FakeNesAddress	0x2008
 
-	JMPiU__Override		NmiReturn_FakeNesAddress
-	.fill	JMPiU_StackPullOffset
+	JMPiU__Override2	NmiReturn_FakeNesAddress
 	jmp	$=Start__Irq_NesNmi_NonNativeReturn
 
 	// ---------------------------------------------------------------------------
@@ -244,8 +284,7 @@ JMPiU__FromRti:
 	// Return from IRQ
 	.def	IrqReturn_FakeNesAddress	0x2009
 
-	JMPiU__Override		IrqReturn_FakeNesAddress
-	.fill	JMPiU_StackPullOffset
+	JMPiU__Override2	IrqReturn_FakeNesAddress
 	jmp	$=Hdma__UpdateScrolling_ReturnFromIRQ
 
 	// ---------------------------------------------------------------------------
@@ -253,8 +292,7 @@ JMPiU__FromRti:
 	// Return from NMI auto detect
 	.def	NmiReturn_FakeNesAddress2	0x200a
 
-	JMPiU__Override		NmiReturn_FakeNesAddress2
-	.fill	JMPiU_StackPullOffset
+	JMPiU__Override2	NmiReturn_FakeNesAddress2
 	lda	$_IO_Temp
 	jmp	[$_NmiReturn_ReturnAddress2]
 

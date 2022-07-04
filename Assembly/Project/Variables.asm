@@ -24,15 +24,15 @@
 	// 10 = " + mapper memory + custom input + <unused> + IRQ stack
 	//*11 = HDMA pointers + CHR banks + sound
 	// 12 = NES palette (with some unused memory, reserved for 4bpp hacks?)
-	// 13 = <Unused>
-	// 14 = <Unused>
-	// 15 = Function pointer lookup table for indirect JMP
-	// 16 = "
+	// 13 = Function pointer lookup table for indirect JMP
+	// 14 = "
+	// 15 = "
+	// 16 = Function pointer lookup table for non-native return (must directly follow indirect JMP table)
 	// 17 = "
-	// 18 = <Unused>
-	// 19 = <Unused>
-	// 1a = <Unused>
-	// 1b = <Unused>
+	// 18 = "
+	// 19 = "
+	// 1a = "
+	// 1b = "
 	//*1c = NES sprite remap when reading from pages outside of WRAM
 	//*1d = IRQ data (stack moved before HDMA pointers)
 	//*1e = Main thread
@@ -492,10 +492,13 @@ Vram_Queue_Top_2:
 	.def	PaletteNes					0x1200
 
 	// ---------------------------------------------------------------------------
-	// Quick access to JMPi first node
+	// Quick access to JMPi and RtsNes linked list pointers
 
 	// 0x300 bytes
-	.def	JMPi_Start					0x1500
+	.def	JMPi_Start					0x1300
+
+	// 0x600 bytes
+	.def	RtsNes_Start				0x1600		// Must directly follow indirect JMP table
 
 	// ---------------------------------------------------------------------------
 	// NES sprite remap when reading from pages outside of WRAM

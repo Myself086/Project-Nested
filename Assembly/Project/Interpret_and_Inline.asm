@@ -1000,6 +1000,7 @@ b_else:
 				lda	$_Program_BankNum-1,x
 				sta	$.Param_originalCall+1
 				sty	$.Param_originalCall
+				sec
 				call
 b_1:
 
@@ -1320,6 +1321,7 @@ Interpret__StaticJsr_Return:
 		lda	$_Program_BankNum-1,x
 		sta	$.Param_originalCall+1
 		sty	$.Param_originalCall
+		sec
 		call
 b_1:
 

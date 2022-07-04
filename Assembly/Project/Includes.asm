@@ -57,7 +57,6 @@ Spc_Code_End:
 
 	.include	"Project/Gui.asm"
 	.include	"Project/Gui.StringFormat.asm"
-	.include	"Project/JMPiList.asm"
 	.include	"Project/EmuCalls.asm"
 
 BankEnd_c0:
@@ -92,6 +91,8 @@ BankEnd_80:
 	.include	"Project/Dictionary.asm"
 
 	.include	"Project/DynamicJsr.asm"
+
+	.include	"Project/JMPiList.asm"
 
 	.include	"Project/Feedback.asm"
 
@@ -131,16 +132,16 @@ BankEnd_c1:
 BankEnd_81:
 
 	// ---------------------------------------------------------------------------
-	// Bank c2: Unrolled indirect JMP
+	// Bank c2-c3: Unrolled indirect JMP and non-native return
 
-	.addr	0xc20000, 0xc2ffff
+	.addr	0xc20000, 0xc3ffff
 JMPiU_Start:
 	.include	"Project/JMPiUnrolled.asm"
 
 	// ---------------------------------------------------------------------------
-	// Bank 83: Static recompiler call tables (no static data)
+	// Bank c4: Static recompiler call tables (no static data)
 
-	.addr	0xc30000, 0xc3ffff
+	.addr	0xc40000, 0xc4ffff
 StaticRec_Tables:
 	// 256 arrays containing 16-bit address and 16-bit length
 	// Each sub array contains (same format as known calls in RAM):
@@ -149,17 +150,17 @@ StaticRec_Tables:
 	// [6] 16-bit recompiler flags
 
 	// ---------------------------------------------------------------------------
-	// Bank c4 and c5: Unlinked calls recompiled ahead of time (no static data)
+	// Bank c5-c6: Unlinked calls recompiled ahead of time (no static data)
 
 	// Origins: [0] = Original return, [2] = Original destination
-	.def	StaticRec_Origins		0xc40000
+	.def	StaticRec_Origins		0xc50000
 	// OriginsB: [0] = SNES return, [3] = Temporary validation
-	.def	StaticRec_OriginsB		0xc50000
+	.def	StaticRec_OriginsB		0xc60000
 
 	// ---------------------------------------------------------------------------
 
 	// Final ROM size
-	.finalsize	0x030000
+	.finalsize	0x040000
 
 	// ---------------------------------------------------------------------------
 }
