@@ -282,18 +282,26 @@ RomInfo_Description:
 
 		RomInfo_SummaryMac	"Defines ROM range 0x8000-0x9fff as static."
 		RomInfo_SummaryMac	"May improve compatibility."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Improves performance slightly since v1.5.1"
 		RomInfo_DefineMac	"public bool MemoryEmulation.StaticRange_80 : Static range 8000", RomInfo_StaticRanges, 0x10
 
 		RomInfo_SummaryMac	"Defines ROM range 0xa000-0xbfff as static."
 		RomInfo_SummaryMac	"May improve compatibility."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Improves performance slightly since v1.5.1"
 		RomInfo_DefineMac	"public bool MemoryEmulation.StaticRange_a0 : Static range a000", RomInfo_StaticRanges, 0x20
 
 		RomInfo_SummaryMac	"Defines ROM range 0xc000-0xdfff as static."
 		RomInfo_SummaryMac	"May improve compatibility."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Improves performance slightly since v1.5.1"
 		RomInfo_DefineMac	"public bool MemoryEmulation.StaticRange_c0 : Static range c000", RomInfo_StaticRanges, 0x40
 
 		RomInfo_SummaryMac	"Defines ROM range 0xe000-0xffff as static."
 		RomInfo_SummaryMac	"May improve compatibility."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Improves performance slightly since v1.5.1"
 		RomInfo_DefineMac	"public bool MemoryEmulation.StaticRange_e0 : Static range e000", RomInfo_StaticRanges, 0x80
 
 	RomInfo_DefineMac	"public void Tab_Cartridge : Cartridge settings.", 0, 0

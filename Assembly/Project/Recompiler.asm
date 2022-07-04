@@ -1506,6 +1506,11 @@ Recompiler__Build_OpcodeType_Abs_PassRmw:
 	lda	[$.readAddr],y
 	cmp	#0x6000
 	bcc	$+b_1
+	// Is this range static?
+	tax
+	jsr	$_Recompiler__Build_IsRangeStatic
+	txa
+	bcs	$+b_1
 		// ROM and SRAM range
 		pha
 		xba
@@ -1616,6 +1621,11 @@ b_1:
 	// Are we in either SRAM or ROM range?
 	cmp	#0x6000
 	bcc	$+b_1
+	// Is this range static?
+	tax
+	jsr	$_Recompiler__Build_IsRangeStatic
+	txa
+	bcs	$+b_1
 		// ROM and SRAM range
 		pha
 		xba
@@ -1680,6 +1690,7 @@ b_1:
 
 	// Add to write address, assume carry clear from the 'lsr'
 	lda	#0x0003
+	clc
 	adc	$.writeAddr
 	sta	$.writeAddr
 	rts
@@ -1773,6 +1784,11 @@ b_1:
 		// Are we in either SRAM or ROM range?
 		cmp	#0x5f01
 		bcc	$+Recompiler__Build_OpcodeType_LdaAbsY_Regular
+		// Is this range static?
+		tax
+		jsr	$_Recompiler__Build_IsRangeStatic
+		txa
+		bcs	$+Recompiler__Build_OpcodeType_LdaAbsY_Regular
 			// ROM and SRAM range
 			pha
 			// Page 0x5f?
@@ -1840,6 +1856,7 @@ Recompiler__Build_OpcodeType_LdaAbsY_Regular:
 
 	// Add to write address, assume carry clear from the 'lsr'
 	lda	#0x0003
+	clc
 	adc	$.writeAddr
 	sta	$.writeAddr
 	rts
@@ -1939,6 +1956,11 @@ Recompiler__Build_OpcodeType_StaAbs_HighRange:
 		lda	[$.readAddr],y
 		cmp	#0x5f01
 		bcc	$+b_1
+		// Is this range static?
+		tax
+		jsr	$_Recompiler__Build_IsRangeStatic
+		txa
+		bcs	$+b_1
 			// ROM and SRAM range
 			pha
 			// Page 0x5f?
@@ -2608,6 +2630,11 @@ Recompiler__Build_OpcodeType_JmpI:
 	lda	[$.readAddr],y
 	cmp	#0x6000
 	bcc	$+b_1
+	// Is this range static?
+	tax
+	jsr	$_Recompiler__Build_IsRangeStatic
+	txa
+	bcs	$+b_1
 		// ROM and SRAM range
 		pha
 		xba
