@@ -191,6 +191,7 @@ b_1:
 JMPi__Add:
 	.local	_useRtsNes			// True when negative
 	.local	=nodeAddr, =oldNodeAddr
+	.local	=originalCallCmp
 
 	ror	$.useRtsNes
 
@@ -239,11 +240,18 @@ b_loop:
 		bpl	$-b_loop
 	smx	#0x00
 
+	// Copy original call
+	lda	$.originalCall+1
+	sta	$.originalCallCmp+1
+	lda	$.originalCall
+	sta	$.originalCallCmp
+
 	// Get base array offset
 	.local	_temp
-	lda	$.originalCall
+	//lda	$.originalCall
 	bit	$.useRtsNes
 	bpl	$+b_else
+		dec	$.originalCallCmp
 		dec	a
 		bit	#0x2000
 		beq	$+b_else2
@@ -305,7 +313,7 @@ b_else:
 b_1:
 
 	// Write compare
-	lda	$.originalCall+1
+	lda	$.originalCallCmp+1
 	ldy	#_JMPi__Listing_Compare-JMPi__Listing+1
 	sta	[$.nodeAddr],y
 
