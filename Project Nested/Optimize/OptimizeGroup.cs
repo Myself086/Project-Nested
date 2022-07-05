@@ -155,12 +155,12 @@ namespace Project_Nested.Optimize
                         // Is target inline able?
                         if (target != null && target.IsInlineAble())
                         {
-                            validCandidates = true;
-
                             // Would inline push byte count over the limit?
                             if ((byteCount + target.CountBytes()) < BYTE_COUNT_TOTAL_LIMIT
                                 && (op.CountBytes() + target.CountBytes()) < BYTE_COUNT_BANK_LIMIT)
                             {
+                                validCandidates = true;
+
                                 byteCount += target.CountBytes();
 
                                 op.Inline(item, target);
