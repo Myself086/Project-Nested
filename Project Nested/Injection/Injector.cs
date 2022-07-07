@@ -892,6 +892,17 @@ namespace Project_Nested.Injection
 
         #endregion
         // --------------------------------------------------------------------
+        #region SNES Rom access
+
+        public byte ReadSnesByte(int snesAddr)
+        {
+            var addr = ConvertSnesToFileAddress(snesAddr);
+
+            return OutData[addr];
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
         #region SNES Header reader
 
         public string ReadEmulatorTitle()

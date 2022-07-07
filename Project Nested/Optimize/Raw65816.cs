@@ -26,6 +26,14 @@ namespace Project_Nested.Optimize
 
         public List<AsmIL65816> ConvertToIL(Injector injector)
         {
+            byte ReadData(int index)
+            {
+                if (data != null)
+                    return data[index];
+                else
+                    return injector.ReadSnesByte(index);
+            }
+
             List<AsmIL65816> code = new List<AsmIL65816>();
 
             List<int> labels = new List<int>();
