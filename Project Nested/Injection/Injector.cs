@@ -732,7 +732,7 @@ namespace Project_Nested.Injection
 
         public static int ConvertSnesToFileAddress(int addr)
         {
-            if ((addr & 0x7e0000) == 0x7e0000 || (addr & 0x408000) == 0)
+            if ((addr & 0xfe0000) == 0x7e0000 || (addr & 0x408000) == 0)
                 throw new ArgumentOutOfRangeException();
 
             return ((~addr & 0x800000) >> 1) | (addr & 0x3fffff);
