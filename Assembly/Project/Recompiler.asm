@@ -1384,6 +1384,150 @@ Recompiler__Build_OpcodeType_Plp:
 	jmp	$_Recompiler__Build_Inline
 
 
+	// Entry: A.lo = Page range, A.hi = { 0 = Compare, 1 = Forced }, X = Lookup table address, Y = Lookup table bank
+	// Return: Carry set = Prefix added
+Recompiler__Build_OpcodeType_MemoryPrefix:
+	.local	=memPrefixTable
+	// Write pointer
+	stx	$.memPrefixTable
+	sty	$.memPrefixTable+2
+
+	xba
+	and	#0x00e0
+	tay
+	// Is memory prefix known?
+	ldx	$.memoryPrefix
+	beq	$+b_2
+		// Is it the same memory prefix?
+		cpy	$.memoryPrefix
+		bne	$+b_diff
+			// Same
+			clc
+			rts
+b_diff:
+			// Different
+			ora	#0x0100
+			tay
+			and	#0x00ff
+b_2:
+	sta	$.memoryPrefix
+
+	// Write prefix and preserve 4 written bytes
+	lda	[$.memPrefixTable],y
+	tax
+	ldy	#2
+	lda	[$.writeAddr]
+	pha
+	lda	[$.writeAddr],y
+	pha
+	lda	$.memPrefixTable+2
+	.unlocal	=memPrefixTable
+	jsr	$_Recompiler__Build_Inline2
+
+	// Rewrite 4 bytes that were already written
+	ldy	#2
+	pla
+	sta	[$.writeAddr],y
+	pla
+	sta	[$.writeAddr]
+
+	// Return true
+	sec
+	rts
+
+
+	// Entry: A.lo = Page range, A.hi = { 0 = Compare, 1 = Forced }, X = Lookup table address, Y = Lookup table bank
+	// Return: Carry set = Prefix added
+Recompiler__Build_OpcodeType_MemoryPrefixSram:
+	.local	=memPrefixTable
+	// Write pointer
+	stx	$.memPrefixTable
+	sty	$.memPrefixTable+2
+
+	xba
+	and	#0x00e0
+	tay
+	// Is memory prefix known?
+	ldx	$.memoryPrefix
+	beq	$+b_2
+		// Is it the same memory prefix?
+		cpy	$.memoryPrefix
+		bne	$+b_diff
+			// Same
+			clc
+			rts
+b_diff:
+			// Different
+			ora	#0x0100
+			tay
+			and	#0x00ff
+b_2:
+	// Are we accessing SRAM?
+	cmp	#0x0060
+	bne	$+b_3
+		pha
+		// Are we using static SRAM?
+		andbeq	$=RomInfo_MemoryEmulation, #_RomInfo_MemEmu_StaticSram, $+b_2
+			// Are we processing one of the 16 opcodes that we can extend to 24-bit address?
+			lda	$.thisOpcodeX2
+			and	#0x001e						// Bottom 4 bits
+			eor	#0x001a
+			jeq	$_Recompiler__Build_OpcodeType_LongSram
+b_2:
+		pla
+b_3:
+
+	sta	$.memoryPrefix
+
+	// Write prefix and preserve 4 written bytes
+	lda	[$.memPrefixTable],y
+	tax
+	ldy	#2
+	lda	[$.writeAddr]
+	pha
+	lda	[$.writeAddr],y
+	pha
+	lda	$.memPrefixTable+2
+	.unlocal	=memPrefixTable
+	jsr	$_Recompiler__Build_Inline2
+
+	// Rewrite 4 bytes that were already written
+	ldy	#2
+	pla
+	sta	[$.writeAddr],y
+	pla
+	sta	[$.writeAddr]
+
+	// Return true
+	sec
+	rts
+
+
+Recompiler__Build_OpcodeType_LongSram:
+	// Fix stack
+	pla
+	pla
+
+	// Write long version of this instruction and target bank 0xb0
+	lda	$.thisOpcodeX2
+	lsr	a
+	and	#0x00ff
+	ora	#0xb00f
+	ldy	#2
+	sta	[$.writeAddr]
+	sta	[$.writeAddr],y
+	dey
+	lda	[$.readAddr],y
+	sta	[$.writeAddr],y
+
+	// Add to write address
+	lda	#0x0004
+	clc
+	adc	$.writeAddr
+	sta	$.writeAddr
+	rts
+
+
 Recompiler__Build_OpcodeType_LdaA:
 	ldx	#_iIOPort_lda*2
 	bra	$+Recompiler__Build_OpcodeType_AbsIO
@@ -1512,42 +1656,10 @@ Recompiler__Build_OpcodeType_Abs_PassRmw:
 	txa
 	bcs	$+b_1
 		// ROM and SRAM range
-		pha
-		xba
-		and	#0x00e0
-		tay
-		// Is memory prefix known?
-		ldx	$.memoryPrefix
-		beq	$+b_2
-			// Is it the same memory prefix?
-			cpy	$.memoryPrefix
-			bne	$+b_diff
-				// Same
-				pla
-				bra	$+b_noPrefix
-b_diff:
-				// Different
-				ora	#0x0100
-				tay
-				and	#0x00ff
-b_2:
-		sta	$.memoryPrefix
-		// Write prefix
-		lda	[$.writeAddr]
-		pha
-		tyx
-		lda	$=Inline_StoreDirect_LUT,x
-		tax
-		lda	#_Inline_StoreDirect_LUT/0x10000
-		jsr	$_Recompiler__Build_Inline2
-		// Write original code
-		ldy	#0x0001
-		pla
-		sta	[$.writeAddr]
-		pla
-		sta	[$.writeAddr],y
+		ldx	#_Inline_StoreDirect_LUT
+		ldy	#_Inline_StoreDirect_LUT/0x10000
+		jsr	$_Recompiler__Build_OpcodeType_MemoryPrefix
 b_1:
-b_noPrefix:
 
 	// Write inlined code
 	ldx	#_Inline__RmwToIO
@@ -1627,94 +1739,23 @@ b_1:
 	txa
 	bcs	$+b_1
 		// ROM and SRAM range
-		pha
-		xba
-		and	#0x00e0
-		tay
-		// Is memory prefix known?
-		ldx	$.memoryPrefix
-		beq	$+b_2
-			// Is it the same memory prefix?
-			cpy	$.memoryPrefix
-			bne	$+b_diff
-				// Same
-				pla
-				bra	$+b_noPrefix
-b_diff:
-				// Different
-				ora	#0x0100
-				tay
-				and	#0x00ff
-b_2:
-		// Are we accessing SRAM?
-		cmp	#0x0060
-		bne	$+b_3
-			pha
-			// Are we using static SRAM?
-			andbeq	$=RomInfo_MemoryEmulation, #_RomInfo_MemEmu_StaticSram, $+b_2
-				// Are we processing one of the 16 opcodes that we can extend to 24-bit address?
-				lda	$.thisOpcodeX2
-				and	#0x001e						// Bottom 4 bits
-				eor	#0x001a
-				jeq	$_Recompiler__Build_OpcodeType_LongSram
-b_2:
-			pla
-b_3:
-
-		sta	$.memoryPrefix
-		// Write prefix
-		lda	[$.writeAddr]
-		pha
-		tyx
-		lda	$=Inline_CmdDirect_LUT,x
-		tax
-		lda	#_Inline_CmdDirect_LUT/0x10000
-		jsr	$_Recompiler__Build_Inline2
-		// Write original code
-		ldy	#0x0001
-		pla
-		sta	[$.writeAddr]
-		pla
-		sta	[$.writeAddr],y
-
+		ldx	#_Inline_CmdDirect_LUT
+		ldy	#_Inline_CmdDirect_LUT/0x10000
+		jsr	$_Recompiler__Build_OpcodeType_MemoryPrefixSram
+		bcs	$+b_1
 b_noPrefix:
-		// Add to write address
-		lda	#0x0003
-		clc
-		adc	$.writeAddr
-		sta	$.writeAddr
-		rts
+			// Add to write address
+			lda	#0x0003
+			clc
+			adc	$.writeAddr
+			sta	$.writeAddr
+			rts
 b_1:
 	lda	[$.readAddr],y
 	sta	[$.writeAddr],y
 
 	// Add to write address, assume carry clear from the 'lsr'
 	lda	#0x0003
-	clc
-	adc	$.writeAddr
-	sta	$.writeAddr
-	rts
-
-
-Recompiler__Build_OpcodeType_LongSram:
-	// Fix stack
-	pla
-	pla
-
-	// Write long version of this instruction and target bank 0xb0
-	lda	$.thisOpcodeX2
-	lsr	a
-	and	#0x00ff
-	ora	#0xb00f
-	ldy	#2
-	sta	[$.writeAddr]
-	sta	[$.writeAddr],y
-	dey
-	lda	[$.readAddr],y
-	sta	[$.writeAddr],y
-
-	// Add to write address
-	lda	#0x0004
 	clc
 	adc	$.writeAddr
 	sta	$.writeAddr
@@ -1789,67 +1830,22 @@ b_1:
 		jsr	$_Recompiler__Build_IsRangeStatic
 		txa
 		bcs	$+Recompiler__Build_OpcodeType_LdaAbsY_Regular
-			// ROM and SRAM range
-			pha
 			// Page 0x5f?
 			cmp	#0x6000
 			bcs	$+b_2
 				lda	#0x6000
 b_2:
-			xba
-			and	#0x00e0
-			tay
-			// Is memory prefix known?
-			ldx	$.memoryPrefix
-			beq	$+b_2
-				// Is it the same memory prefix?
-				cpy	$.memoryPrefix
-				bne	$+b_diff
-					// Same
-					pla
-					bra	$+b_noPrefix
-b_diff:
-					// Different
-					ora	#0x0100
-					tay
-					and	#0x00ff
-b_2:
-			// Are we accessing SRAM?
-			cmp	#0x0060
-			bne	$+b_3
-				pha
-				// Are we using static SRAM?
-				andbeq	$=RomInfo_MemoryEmulation, #_RomInfo_MemEmu_StaticSram, $+b_2
-					// Are we processing one of the 16 opcodes that we can extend to 24-bit address?
-					lda	$.thisOpcodeX2
-					and	#0x001e						// Bottom 4 bits
-					eor	#0x001a
-					jeq	$_Recompiler__Build_OpcodeType_LongSram
-b_2:
-				pla
-b_3:
-			sta	$.memoryPrefix
-			lda	[$.writeAddr]
-			pha
-			tyx
-			lda	$=Inline_LoadDirect_LUT,x
-			tax
-			lda	#_Inline_LoadDirect_LUT/0x10000
-			jsr	$_Recompiler__Build_Inline2
-			// Write original code
-			ldy	#0x0001
-			pla
-			sta	[$.writeAddr]
-			pla
-			sta	[$.writeAddr],y
-
-b_noPrefix:
-			// Add to write address
-			lda	#0x0003
-			clc
-			adc	$.writeAddr
-			sta	$.writeAddr
-			rts
+			// ROM and SRAM range
+			ldx	#_Inline_LoadDirect_LUT
+			ldy	#_Inline_LoadDirect_LUT/0x10000
+			jsr	$_Recompiler__Build_OpcodeType_MemoryPrefixSram
+			bcs	$+Recompiler__Build_OpcodeType_LdaAbsY_Regular
+				// Add to write address
+				lda	#0x0003
+				clc
+				adc	$.writeAddr
+				sta	$.writeAddr
+				rts
 Recompiler__Build_OpcodeType_LdaAbsY_Regular:
 	lda	[$.readAddr],y
 	sta	[$.writeAddr],y
@@ -1961,68 +1957,23 @@ Recompiler__Build_OpcodeType_StaAbs_HighRange:
 		jsr	$_Recompiler__Build_IsRangeStatic
 		txa
 		bcs	$+b_1
-			// ROM and SRAM range
-			pha
 			// Page 0x5f?
 			cmp	#0x6000
 			bcs	$+b_2
 				lda	#0x6000
 b_2:
-			xba
-			and	#0x00e0
-			tay
-			// Is memory prefix known?
-			ldx	$.memoryPrefix
-			beq	$+b_2
-				// Is it the same memory prefix?
-				cpy	$.memoryPrefix
-				bne	$+b_diff
-					// Same
-					pla
-					bra	$+b_noPrefix
-b_diff:
-					// Different
-					ora	#0x0100
-					tay
-					and	#0x00ff
-b_2:
-			// Are we accessing SRAM?
-			cmp	#0x0060
-			bne	$+b_3
-				pha
-				// Are we using static SRAM?
-				andbeq	$=RomInfo_MemoryEmulation, #_RomInfo_MemEmu_StaticSram, $+b_2
-					// Are we processing one of the 16 opcodes that we can extend to 24-bit address?
-					lda	$.thisOpcodeX2
-					and	#0x001e						// Bottom 4 bits
-					eor	#0x001a
-					jeq	$_Recompiler__Build_OpcodeType_LongSram
-b_2:
-				pla
-b_3:
-			sta	$.memoryPrefix
-			lda	[$.writeAddr]
-			pha
-			tyx
-			lda	$=Inline_StoreDirect_LUT,x
-			tax
-			lda	#_Inline_StoreDirect_LUT/0x10000
-			jsr	$_Recompiler__Build_Inline2
-			// Write original code
-			ldy	#0x0001
-			pla
-			sta	[$.writeAddr]
-			pla
-			sta	[$.writeAddr],y
 
-b_noPrefix:
-			// Add to write address
-			lda	#0x0003
-			clc
-			adc	$.writeAddr
-			sta	$.writeAddr
-			rts
-
+			// ROM and SRAM range
+			ldx	#_Inline_StoreDirect_LUT
+			ldy	#_Inline_StoreDirect_LUT/0x10000
+			jsr	$_Recompiler__Build_OpcodeType_MemoryPrefixSram
+			bcs	$+b_1
+				// Add to write address
+				lda	#0x0003
+				clc
+				adc	$.writeAddr
+				sta	$.writeAddr
+				rts
 b_1:
 	// Add to write address
 	lda	#0x0003
