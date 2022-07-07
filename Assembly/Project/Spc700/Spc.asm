@@ -736,7 +736,7 @@ mono3:
 
         mov 0xF2,#20h
         mov 0xF3,#7Fh
-        mov 0xF3,#21h
+        mov 0xF2,#21h
         mov 0xF3,#7Fh
 
         bra notimer
