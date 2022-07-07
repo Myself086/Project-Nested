@@ -8,6 +8,7 @@ Dev build:
 - Optimized PRG RAM access by using 24-bit address whenever possible
 - Decoupled indirect JMP and non-native RTS linked lists and double the size for the latter
 - Optimized static ranges by no longer forcing a SNES bank change
+- Added option to enable repurposed opcodes everywhere
 
 v1.5:
 - Fixed a bug that caused the emulator to pause forever without error screen

@@ -389,7 +389,7 @@ Recompiler__Build_loop1_loop_switch_IllegalNop:
 Recompiler__Build_loop1_loop_switch_BranchWait:
 					sty	$.opcodeX2
 					ldx	$.readAddr+0
-					lda	$.nesBank
+					ldy	$.nesBank
 					call	Patch__IsInRange
 					ldy	$.opcodeX2
 					jcc	$_Recompiler__Build_loop1_loop_switch_Error
@@ -567,7 +567,7 @@ b_1:
 Recompiler__Build_loop1_loop_switch_NesReturn:
 					sty	$.opcodeX2
 					ldx	$.readAddr+0
-					lda	$.nesBank
+					ldy	$.nesBank
 					call	Patch__IsInRange
 					ldy	$.opcodeX2
 					bcc	$+Recompiler__Build_loop1_loop_switch_Error
@@ -582,7 +582,7 @@ Recompiler__Build_loop1_loop_switch_NesReturn:
 Recompiler__Build_loop1_loop_switch_SnesReturn:
 					sty	$.opcodeX2
 					ldx	$.readAddr+0
-					lda	$.nesBank
+					ldy	$.nesBank
 					call	Patch__IsInRange
 					ldy	$.opcodeX2
 					bcc	$+Recompiler__Build_loop1_loop_switch_Error
@@ -593,7 +593,7 @@ Recompiler__Build_loop1_loop_switch_SnesReturn:
 Recompiler__Build_loop1_loop_switch_Jsl:
 					sty	$.opcodeX2
 					ldx	$.readAddr+0
-					lda	$.nesBank
+					ldy	$.nesBank
 					call	Patch__IsInRange
 					ldy	$.opcodeX2
 					bcc	$+Recompiler__Build_loop1_loop_switch_Error
@@ -612,7 +612,7 @@ Recompiler__Build_loop1_loop_switch_Return:
 Recompiler__Build_loop1_loop_switch_Cop:
 					sty	$.opcodeX2
 					ldx	$.readAddr+0
-					lda	$.nesBank
+					ldy	$.nesBank
 					call	Patch__IsInRange
 					ldy	$.opcodeX2
 					bcc	$-Recompiler__Build_loop1_loop_switch_Error
@@ -2289,7 +2289,7 @@ b_1:
 Recompiler__Build_OpcodeType_Brw:
 	// This opcode must be in a patch range
 	ldx	$.readAddr+0
-	lda	$.nesBank
+	ldy	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
 	clc
@@ -3030,7 +3030,7 @@ Recompiler__Build_OpcodeType_RtsI:
 Recompiler__Build_OpcodeType_RtsNes:
 	// This opcode must be in a patch range
 	ldx	$.readAddr+0
-	lda	$.nesBank
+	ldy	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
 	
@@ -3040,7 +3040,7 @@ Recompiler__Build_OpcodeType_RtsNes:
 Recompiler__Build_OpcodeType_RtlSnes:
 	// This opcode must be in a patch range
 	ldx	$.readAddr+0
-	lda	$.nesBank
+	ldy	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
 	clc
@@ -3096,7 +3096,7 @@ b_1:
 Recompiler__Build_OpcodeType_Jsl:
 	// This opcode must be in a patch range
 	ldx	$.readAddr+0
-	lda	$.nesBank
+	ldy	$.nesBank
 	call	Patch__IsInRange
 	jcc	$_Recompiler__Build_OpcodeType_None
 	clc
@@ -3325,7 +3325,7 @@ Recompiler__Build_OpcodeType_Pla_SkipPullReturn:
 Recompiler__Build_OpcodeType_Cop:
 	// This opcode must be in a patch range
 	ldx	$.readAddr+0
-	lda	$.nesBank
+	ldy	$.nesBank
 	call	Patch__IsInRange
 	bcc	$+Recompiler__Build_OpcodeType_None
 

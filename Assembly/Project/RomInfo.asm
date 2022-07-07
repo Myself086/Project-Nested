@@ -156,6 +156,8 @@ RomInfo_PatchRanges:
 	.fill	4
 RomInfo_PatchRanges_Length:
 	.fill	2
+RomInfo_PatchRanges_Active:		// Negative when patch ranges are ignored
+	.data8	0x00
 
 RomInfo_InputFlags:
 	.data8	0
@@ -351,6 +353,16 @@ RomInfo_Description:
 		RomInfo_SummaryMac	" E2"
 		RomInfo_SummaryMac	" F4, FA, FC"
 		RomInfo_DefineMac	"public bool Cpu.IllegalNop : Allow illegal NOPs", RomInfo_CpuSettings, RomInfo_Cpu_IllegalNop
+
+		RomInfo_SummaryMac	"Opcodes that stop a 6502 CPU are repurposed for patching games more easily."
+		RomInfo_SummaryMac	"Patched bytes usually don't need this setting active."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"If you are interested in using them, see the documentation folder on GitHub for more info."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Includes the following opcodes:"
+		RomInfo_SummaryMac	" 02, 22, 42, 62"
+		RomInfo_SummaryMac	" 12, 32, 52, 72, 92, B2, D2, F2"
+		RomInfo_DefineMac	"public bool Cpu.RepurposedOpcodes : Allow repurposed opcodes", RomInfo_PatchRanges_Active, 0x80
 
 		RomInfo_SummaryMac	"Improves performance but may be unstable."
 		RomInfo_SummaryMac	"Please report games that behave differently when this is enabled versus disabled."

@@ -3,9 +3,16 @@
 
 	.mx	0x00
 	.func	Patch__IsInRange
-	// Entry: A = Bank, X = Address
+	// Entry: Y = Bank, X = Address
 	// Return: carry = true when address is in a patch range
 Patch__IsInRange:
+	lda	$=RomInfo_PatchRanges_Active-1
+	bpl	$+b_in
+		sec
+		return
+b_in:
+	tya
+
 	phb
 
 	.local	=addr
