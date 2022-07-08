@@ -61,20 +61,26 @@ Chr__Initialize:
 			call	Memory__AllocInBank
 			// Return: A = Bank number, X = Memory address, Y = HeapStack pointer
 			txa
-			smx	#0x20
+			smx	#0x30
 			ora	#0
 			trapne
 			xba
 			sta	$_ChrRam_Page
 
-			// Copy code to RAM
-			ldx	#6
+			// Copy "read" code to RAM
+			ldx	#.ChrRam_Read_End-ChrRam_Read
 b_loop:
 				lda	$=IO__r2007_ChrRamReadCode,x
 				sta	$_ChrRam_Read,x
+				// Next
+				dex
+				bpl	$-b_loop
+
+			// Copy "write" code to RAM
+			ldx	#.ChrRam_Write_End-ChrRam_Write
+b_loop:
 				lda	$=IO__r2007_ChrRamWriteCode,x
 				sta	$_ChrRam_Write,x
-
 				// Next
 				dex
 				bpl	$-b_loop

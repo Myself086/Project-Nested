@@ -520,7 +520,7 @@ IO__w2006_SR2AND38:
 IO__r2007_ChrRamReadCode:
 	// This code is copied to RAM at "ChrRam_Read"
 	lda	$=ChrRam_CONSTBANK
-	jmp	$_IO__r2007_ChrRamCallBack
+	jmp	$=IO__r2007_ChrRamCallBack
 
 IO__r2007_ChrRamWriteCode:
 	// This code is copied to RAM at "ChrRam_Write"
@@ -577,7 +577,7 @@ b_3:
 
 			// Call
 			plx
-			jmp	$_ChrRam_Read
+			jmp	$=ChrRam_Read
 IO__r2007_ChrRamCallBack:
 			// "Return" value
 			sta	$_IO_2007r
@@ -769,7 +769,7 @@ b_3:
 
 			// Call
 			lda	$_IO_Temp
-			jmp	$_ChrRam_Write
+			jmp	$=ChrRam_Write
 b_2:
 
 		pla

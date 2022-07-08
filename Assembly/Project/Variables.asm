@@ -205,18 +205,21 @@ IRQ_SnesPointer:
 
 	// Code for reading CHR RAM
 ChrRam_Read:
-	.fill	7
+	.fill	8
+ChrRam_Read_End:
 	// Code for writing CHR RAM
 ChrRam_Write:
 	.fill	7
+ChrRam_Write_End:
+
+
+	.addr	0x0a87, 0x0a9f
+	// 21/25
+
 	// Page in bank 0x7e
 ChrRam_Page:
 	.fill	1
 	.def	ChrRam_CONSTBANK		0x7e0000
-
-
-	.addr	0x0a87, 0x0a9f
-	// 20/25
 
 	// Data copied from APU's memory
 Sound_DebugAPU:
