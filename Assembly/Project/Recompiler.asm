@@ -3294,6 +3294,34 @@ Recompiler__Build_OpcodeType_Cop:
 
 
 Recompiler__Build_OpcodeType_Brk:
+	andbne	$=RomInfo_StackEmulation, #_RomInfo_StackEmu_NativeReturnInterrupt, $+Recompiler__Build_OpcodeType_None
+
+	// Add prefix if necessary
+	lda	#0xfffe
+	ldx	#_Inline_StoreDirect_LUT
+	ldy	#_Inline_StoreDirect_LUT/0x10000
+	jsr	$_Recompiler__Build_OpcodeType_MemoryPrefix
+
+	// Add interpreted BRK code
+	ldx	#_Interpret__Brk
+	lda	#_Interpret__Brk/0x10000
+	jsr	$_Recompiler__Build_InlineNoInc
+	tyx
+	ldy	#_Interpret__Brk_PushReturn-Interpret__Brk+1
+	lda	$.readAddr
+	inc	a
+	inc	a
+	sta	[$.writeAddr],y
+
+	// Increment write address
+	txa
+	clc
+	adc	$.writeAddr
+	sta	$.writeAddr
+
+	rts
+
+
 Recompiler__Build_OpcodeType_None:
 	ldx	#_Inline__UnsupportedOpcode
 	lda	#_Inline__UnsupportedOpcode/0x10000

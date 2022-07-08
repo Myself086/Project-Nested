@@ -254,9 +254,12 @@ JMPiU__FromStack:
 
 	// Interpreted RTI
 
+	// WARNING: Do not move this to override 0x2001 because page number of JMPiU__FromBRK must be non-zero
+
 	JMPiU__Override2	0x2002
 JMPiU__FromRti:
 	sta	$_IO_Temp
+JMPiU__FromBRK:
 	rep	#0x20
 	.mx	0x10
 	lda	$2,s

@@ -1425,9 +1425,19 @@ Interpret__Rts_Changed:
 	// ---------------------------------------------------------------------------
 
 Interpret__Brk:
-	// TODO
-	nop
-	trap
+Interpret__Brk_PushReturn:
+	pea	$0xcafe			// Coffee break! :D
+	php					// B flag is set
+	pea	$12939			// I don't drink this nor coffee anymore...
+	php
+	sta	$_IO_Temp
+	lda	$0xffff
+	sta	$3,s
+	lda	$0xfffe
+	sta	$2,s
+	jmp	$=JMPiU__FromBRK
+
+	.data8	0
 
 	// ---------------------------------------------------------------------------
 
@@ -1471,8 +1481,16 @@ Interpret__UnsupportedOpcode:
 	rep	#0x30
 	pla
 	ply
+	sep	#0x20
+	ora	#0
+	beq	$+b_brk
+		trap
+		Exception	"Unsupported Opcode{}{}{}The CPU attempted to execute opcode 0x{a:X} at NES address {ah:X}:{Y:X}{}{}Some illegal opcodes are supported but must be activated on the EXE under CPU settings."
+
+b_brk:
 	trap
-	Exception	"Unsupported Opcode{}{}{}The CPU attempted to execute opcode 0x{a:X} at NES address {ah:X}:{Y:X}{}{}Some illegal opcodes are supported but must be activated on the EXE under CPU settings."
+	Exception	"BRK in native mode{}{}{}The CPU attempted to execute opcode BRK at NES address {ah:X}:{Y:X}{}{}Disable 'Stack emulation, Native return from interrupt' on the converter."
+	
 
 	// ---------------------------------------------------------------------------
 
