@@ -965,6 +965,12 @@ IO__w4014_a_i:
 	sta	$_IO_Temp
 	jmp	$=IO__w4014_In
 
+IO__w4014_ind:
+	xba
+	sta	$_IO_Temp
+	jsr	$=IO__w4014_In
+	IO_w40xx_Return
+
 	// ---------------------------------------------------------------------------
 	// Sound registers
 
@@ -994,7 +1000,10 @@ IO__w4000_Switch:
 		caseat	0x11, IO__w4011_ind
 		caseat	0x12, IO__w4012_ind
 		caseat	0x13, IO__w4013_ind
+		caseat	0x14, IO__w4014_ind
 		caseat	0x15, IO__w4015_ind
+		caseat	0x16, IO__w4016_ind
+		caseat	0x17, IO__w4017_ind
 
 	.macro	IO_w40xx		offset, indexReg
 		php
@@ -2083,6 +2092,7 @@ IO__w4015_ind:
 	plx
 	xba
 	sta	$_IO_Temp
+	xba
 	bra	$+IO__w4015_in2
 IO__w4015_x:
 	stx	$_IO_Temp
@@ -2261,6 +2271,11 @@ b_1:
 	CoreCall_Copy	IO__w4016_CopyStart, IO__w4016_CopyEnd
 	CoreCall_Pull
 	CoreCall_End
+
+IO__w4016_ind:
+	xba
+	jsr	$=IO__w4016_a_i
+	IO_w40xx_Return
 
 IO__w4016_a:
 	CoreCall_Begin
@@ -2452,6 +2467,11 @@ IO__w4017_a_y:
 	// Not supported yet
 	CoreCall_Begin
 	CoreCall_End
+
+IO__w4017_ind:
+	// Not supported yet
+	xba
+	IO_w40xx_Return
 
 IO__w4017_a_i:
 	// Not supported yet
