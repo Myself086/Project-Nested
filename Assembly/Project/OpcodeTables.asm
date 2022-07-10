@@ -476,6 +476,12 @@ Opcode__BlockFlag:
 	Opcode__BlockFlag_ValidateMac	0xcc, "cpy addr"
 	Opcode__BlockFlag_ValidateMac	0x24, "bit dp"
 	Opcode__BlockFlag_ValidateMac	0x2c, "bit addr"
+	Opcode__BlockFlag_ValidateMac	0xaa, "tax"
+	Opcode__BlockFlag_ValidateMac	0xa8, "tay"
+	Opcode__BlockFlag_ValidateMac	0x8a, "txa"
+	Opcode__BlockFlag_ValidateMac	0x9b, "txy"
+	Opcode__BlockFlag_ValidateMac	0x98, "tya"
+	Opcode__BlockFlag_ValidateMac	0xbb, "tyx"
 
 	// Bit shift wait loop exception
 	Opcode__BlockFlag_SetMac		0x06, Opcode__BlockFlag_BitShift, "asl dp"
