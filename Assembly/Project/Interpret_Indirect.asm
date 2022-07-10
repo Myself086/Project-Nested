@@ -253,6 +253,86 @@ Interpret_StoreIndirectCmp:
 
 	// ---------------------------------------------------------------------------
 
+	.mx	0x30
+
+Inline_LoadIndirectCross:
+Inline_LoadIndirectCross_LSB:
+		lda	$0xfe
+		beq	$+b_else
+			php
+			clc
+Inline_LoadIndirectCross_AdditionTable:
+			adc	$_Addition|1,y
+			lda	$0xff
+Inline_LoadIndirectCross_AdcZero:
+			adc	#1
+			plp
+			bra	$+b_1
+b_else:
+			lda	$0xff
+b_1:
+		and	#0xe0
+		eor	$_Memory_NesBank
+		beq	$+b_1
+			jsr	$=Interpret_LoadIndirect
+b_1:
+		.data8	0
+
+
+Inline_CmdIndirectCross:
+		xba
+Inline_CmdIndirectCross_LSB:
+		lda	$0xfe
+		beq	$+b_else
+			php
+			clc
+Inline_CmdIndirectCross_AdditionTable:
+			adc	$_Addition|1,y
+			lda	$0xff
+Inline_CmdIndirectCross_AdcZero:
+			adc	#1
+			plp
+			bra	$+b_1
+b_else:
+			lda	$0xff
+b_1:
+		and	#0xe0
+		eor	$_Memory_NesBank
+		beq	$+b_1
+Inline_CmdIndirectCross_Call:
+			jsr	$=Interpret_LoadIndirect
+b_1:
+		xba
+		.data8	0
+
+
+Inline_StoreIndirectCross:
+		php
+		xba
+Inline_StoreIndirectCross_LSB:
+		lda	$0xfe
+		beq	$+b_else
+			clc
+Inline_StoreIndirectCross_AdditionTable:
+			adc	$_Addition|1,y
+			lda	$0xff
+Inline_StoreIndirectCross_AdcZero:
+			adc	#1
+			bra	$+b_1
+b_else:
+			lda	$0xff
+b_1:
+		and	#0xe0
+		cmp	$_Memory_NesBank
+		beq	$+b_1
+			jsr	$=Interpret_StoreIndirectCmp
+b_1:
+		xba
+		plp
+		.data8	0
+
+	// ---------------------------------------------------------------------------
+
 Interpret_IndirectIO_trap:
 	trap
 	Exception	"Indirect IO Access Fail{}{}{}Unable to find target address."

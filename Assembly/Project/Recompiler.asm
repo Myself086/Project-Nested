@@ -1987,66 +1987,178 @@ Recompiler__Build_OpcodeType_Ind:
 Recompiler__Build_OpcodeType_IndY:
 	// Do we have memory emulation turned on?
 	lda	$=RomInfo_MemoryEmulation
-	and	#_RomInfo_MemEmu_Load
-	beq	$+Recompiler__Build_OpcodeType_Zpg
+	bit	#_RomInfo_MemEmu_Load
+	jeq	$_Recompiler__Build_OpcodeType_Zpg
 		stz	$.memoryPrefix
-		lda	[$.readAddr]
-		xba
-		tay
-		iny
-		ldx	#_Inline_CmdIndirect
-		lda	#_Inline_CmdIndirect/0x10000
-		jsr	$_Recompiler__Build_Inline2NoInc
-		phy
+		bit	#_RomInfo_MemEmu_IndCrossBank
+		bne	$+b_else
+			// Without cross bank
+			lda	[$.readAddr]
+			xba
+			tay
+			iny
+			ldx	#_Inline_CmdIndirect
+			lda	#_Inline_CmdIndirect/0x10000
+			jsr	$_Recompiler__Build_Inline2NoInc
+			phy
 
-		// Fix call page
-		lda	[$.readAddr]
-		and	#0x00e0
-		lsr	a
-		lsr	a
-		lsr	a
-		lsr	a
-		tax
-		lda	$=Interpret__IndirectIO_PageTable,x
-		ldy	#_Inline_CmdIndirect_Call-Inline_CmdIndirect+1
-		sta	[$.writeAddr],y
+			// Fix call page
+			lda	[$.readAddr]
+			and	#0x00e0
+			lsr	a
+			lsr	a
+			lsr	a
+			lsr	a
+			tax
+			lda	$=Interpret__IndirectIO_PageTable,x
+			ldy	#_Inline_CmdIndirect_Call-Inline_CmdIndirect+1
+			sta	[$.writeAddr],y
 
-		// Add to write address, assume carry clear from LSR
-		pla
-		adc	$.writeAddr
-		sta	$.writeAddr
+			// Add to write address, assume carry clear from LSR
+			pla
+			adc	$.writeAddr
+			sta	$.writeAddr
+			jmp	$_Recompiler__Build_OpcodeType_Zpg
+b_else:
+			// With cross bank
+			lda	[$.readAddr]
+			xba
+			tay
+			iny
+			ldx	#_Inline_CmdIndirectCross
+			lda	#_Inline_CmdIndirectCross/0x10000
+			jsr	$_Recompiler__Build_Inline2NoInc
+			phy
 
-		bra	$+Recompiler__Build_OpcodeType_Zpg
+			// Fix call page
+			lda	[$.readAddr]
+			and	#0x00e0
+			lsr	a
+			lsr	a
+			lsr	a
+			lsr	a
+			tax
+			lda	$=Interpret__IndirectIO_PageTable,x
+			ldy	#_Inline_CmdIndirectCross_Call-Inline_CmdIndirectCross+1
+			sta	[$.writeAddr],y
+
+			// Change some parameters
+			lda	[$.readAddr]
+			smx	#0x30
+			lda	#0
+			ldy	#.Inline_CmdIndirectCross_AdditionTable-Inline_CmdIndirectCross+1
+			sta	[$.writeAddr],y
+			ldy	#.Inline_CmdIndirectCross_AdcZero-Inline_CmdIndirectCross+1
+			sta	[$.writeAddr],y
+			xba
+			ldy	#.Inline_CmdIndirectCross_LSB-Inline_CmdIndirectCross+1
+			sta	[$.writeAddr],y
+
+			// Add to write address
+			rep	#0x31
+			.mx	0x00
+			pla
+			adc	$.writeAddr
+			sta	$.writeAddr
+			jmp	$_Recompiler__Build_OpcodeType_Zpg
 
 Recompiler__Build_OpcodeType_LdaIndY:
 	// Do we have memory emulation turned on?
 	lda	$=RomInfo_MemoryEmulation
-	and	#_RomInfo_MemEmu_Load
-	beq	$+Recompiler__Build_OpcodeType_Zpg
+	bit	#_RomInfo_MemEmu_Load
+	jeq	$_Recompiler__Build_OpcodeType_Zpg
 		stz	$.memoryPrefix
-		lda	[$.readAddr]
-		xba
-		tay
-		iny
-		ldx	#_Inline_LoadIndirect
-		lda	#_Inline_LoadIndirect/0x10000
-		jsr	$_Recompiler__Build_Inline2
-		bra	$+Recompiler__Build_OpcodeType_Zpg
+		bit	#_RomInfo_MemEmu_IndCrossBank
+		bne	$+b_else
+			// Without cross bank
+			lda	[$.readAddr]
+			xba
+			tay
+			iny
+			ldx	#_Inline_LoadIndirect
+			lda	#_Inline_LoadIndirect/0x10000
+			jsr	$_Recompiler__Build_Inline2
+			jmp	$_Recompiler__Build_OpcodeType_Zpg
+b_else:
+			// With cross bank
+			lda	[$.readAddr]
+			xba
+			tay
+			iny
+			ldx	#_Inline_LoadIndirectCross
+			lda	#_Inline_LoadIndirectCross/0x10000
+			jsr	$_Recompiler__Build_Inline2NoInc
+			tyx
+
+			// Change some parameters
+			lda	[$.readAddr]
+			smx	#0x30
+			lda	#0
+			ldy	#.Inline_LoadIndirectCross_AdditionTable-Inline_LoadIndirectCross+1
+			sta	[$.writeAddr],y
+			ldy	#.Inline_LoadIndirectCross_AdcZero-Inline_LoadIndirectCross+1
+			sta	[$.writeAddr],y
+			xba
+			ldy	#.Inline_LoadIndirectCross_LSB-Inline_LoadIndirectCross+1
+			sta	[$.writeAddr],y
+
+			// Add to write address
+			rep	#0x31
+			.mx	0x00
+			txa
+			adc	$.writeAddr
+			sta	$.writeAddr
+			jmp	$_Recompiler__Build_OpcodeType_Zpg
+
 
 Recompiler__Build_OpcodeType_StaIndY:
 	// Do we have memory emulation turned on?
 	lda	$=RomInfo_MemoryEmulation
-	and	#_RomInfo_MemEmu_Store
-	beq	$+Recompiler__Build_OpcodeType_Zpg
+	bit	#_RomInfo_MemEmu_Store
+	jeq	$_Recompiler__Build_OpcodeType_Zpg
 		stz	$.memoryPrefix
-		lda	[$.readAddr]
-		xba
-		tay
-		iny
-		ldx	#_Inline_StoreIndirect
-		lda	#_Inline_StoreIndirect/0x10000
-		jsr	$_Recompiler__Build_Inline2
-		//bra	$+Recompiler__Build_OpcodeType_Zpg
+		bit	#_RomInfo_MemEmu_IndCrossBank
+		bne	$+b_else
+			// Without cross bank
+			lda	[$.readAddr]
+			xba
+			tay
+			iny
+			ldx	#_Inline_StoreIndirect
+			lda	#_Inline_StoreIndirect/0x10000
+			jsr	$_Recompiler__Build_Inline2
+			jmp	$_Recompiler__Build_OpcodeType_Zpg
+b_else:
+			// With cross bank
+			lda	[$.readAddr]
+			xba
+			tay
+			iny
+			ldx	#_Inline_StoreIndirectCross
+			lda	#_Inline_StoreIndirectCross/0x10000
+			jsr	$_Recompiler__Build_Inline2NoInc
+			tyx
+
+			// Change some parameters
+			lda	[$.readAddr]
+			smx	#0x30
+			lda	#0
+			ldy	#.Inline_StoreIndirectCross_AdditionTable-Inline_StoreIndirectCross+1
+			sta	[$.writeAddr],y
+			ldy	#.Inline_StoreIndirectCross_AdcZero-Inline_StoreIndirectCross+1
+			sta	[$.writeAddr],y
+			xba
+			ldy	#.Inline_StoreIndirectCross_LSB-Inline_StoreIndirectCross+1
+			sta	[$.writeAddr],y
+
+			// Add to write address
+			rep	#0x31
+			.mx	0x00
+			txa
+			adc	$.writeAddr
+			sta	$.writeAddr
+			bra	$+Recompiler__Build_OpcodeType_Zpg
+
 
 Recompiler__Build_OpcodeType_Const:
 Recompiler__Build_OpcodeType_Zpg:

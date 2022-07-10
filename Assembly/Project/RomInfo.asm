@@ -43,7 +43,7 @@ RomInfo_MemoryEmulation:
 	.def	RomInfo_MemEmu_Store				0x0002
 	.def	RomInfo_MemEmu_AbsBank				0x0004
 	.def	RomInfo_MemEmu_AbsCrossBank			0x0008
-	.def	RomInfo_MemEmu_IndCrossBank			0x0010		// TODO
+	.def	RomInfo_MemEmu_IndCrossBank			0x0010
 	.def	RomInfo_MemEmu_StaticSram			0x0020
 
 	// Initial bank numbers on reset
@@ -275,6 +275,9 @@ RomInfo_Description:
 
 		RomInfo_SummaryMac	"Emulates direct load crossing bank boundary at a small cost of performance."
 		RomInfo_DefineMac	"private bool MemoryEmulation.AbsCrossBank : Memory emulation, Absolute Cross", RomInfo_MemoryEmulation, RomInfo_MemEmu_AbsCrossBank
+
+		RomInfo_SummaryMac	"Emulates indirect load crossing bank boundary at a cost of performance."
+		RomInfo_DefineMac	"public bool MemoryEmulation.IndCrossBank : Indirect bank crossing", RomInfo_MemoryEmulation, RomInfo_MemEmu_IndCrossBank
 
 		RomInfo_SummaryMac	"Clears RAM upon reset, losing all data that would otherwise carry over."
 		RomInfo_SummaryMac	"Doesn't lose data from saved files."

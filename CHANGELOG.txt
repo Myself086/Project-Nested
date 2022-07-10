@@ -13,6 +13,7 @@ Dev build:
 - Fixed CHR RAM clone
 - Added opcode BRK
 - Fixed writing to $4014-$4017 with direct indexed addressing mode
+- Added option to emulate bank crossing for indirect indexed addressing mode
 
 v1.5:
 - Fixed a bug that caused the emulator to pause forever without error screen
