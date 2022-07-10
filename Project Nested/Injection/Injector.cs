@@ -261,7 +261,7 @@ namespace Project_Nested.Injection
             if (StaticRange_e0.Value) StaticRangeData[3] = GetBankData(PrgBankLut_e0[PrgBankNumbers[3]], 0xe000);
 
             // Copy static data to every bank
-            foreach (var bank in PrgBanks)
+            void CopyData(byte bank)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -273,6 +273,14 @@ namespace Project_Nested.Injection
                     }
                 }
             }
+
+            foreach (var bank in PrgBanks)
+                CopyData(bank);
+
+            // Force mirrors to the PRG RAM bank (0xb0)
+            var startbank = StartBankPrg.Value;
+            foreach (var bank in new byte[] { 0x80, 0x90, 0xb0 })
+                if (startbank <= bank) CopyData(bank);
         }
 
         public void MergeRoms()
@@ -579,6 +587,10 @@ namespace Project_Nested.Injection
 
             if (!TruncateRom.Value)
                 finalRomSize = finalRomSize.RoundToPowerOf2();
+
+            // ROM size must be at least 2MB for properly mirroring PRG RAM to NES LoROM banks
+            if (finalRomSize < 0x200000)
+                finalRomSize = 0x200000;
 
             // Write ROM size into the header (1024 << n)
             {
