@@ -161,6 +161,7 @@ Interpret__IndirectIO_PageTable:
 	.pushaddr
 		.macro	Interpret_WriteWithinSegment	addr
 			.addr	{0}, {0}|0x1f
+			.def	{0}	{0}|0x1f		// Prevent further uses of this segment
 		.endm
 
 		.mx	0x30
