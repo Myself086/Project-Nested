@@ -1997,8 +1997,8 @@ Recompiler__Build_OpcodeType_IndY:
 			xba
 			tay
 			iny
-			ldx	#_Inline_CmdIndirect
-			lda	#_Inline_CmdIndirect/0x10000
+			ldx	#_Inline_CmdIndirectY
+			lda	#_Inline_CmdIndirectY/0x10000
 			jsr	$_Recompiler__Build_Inline2NoInc
 			phy
 
@@ -2010,8 +2010,8 @@ Recompiler__Build_OpcodeType_IndY:
 			lsr	a
 			lsr	a
 			tax
-			lda	$=Interpret__IndirectIO_PageTable,x
-			ldy	#_Inline_CmdIndirect_Call-Inline_CmdIndirect+1
+			lda	$=Interpret__IndirectYIO_PageTable,x
+			ldy	#_Inline_CmdIndirectY_Call-Inline_CmdIndirectY+1
 			sta	[$.writeAddr],y
 
 			// Add to write address, assume carry clear from LSR
@@ -2025,8 +2025,8 @@ b_else:
 			xba
 			tay
 			iny
-			ldx	#_Inline_CmdIndirectCross
-			lda	#_Inline_CmdIndirectCross/0x10000
+			ldx	#_Inline_CmdIndirectYCross
+			lda	#_Inline_CmdIndirectYCross/0x10000
 			jsr	$_Recompiler__Build_Inline2NoInc
 			phy
 
@@ -2038,20 +2038,20 @@ b_else:
 			lsr	a
 			lsr	a
 			tax
-			lda	$=Interpret__IndirectIO_PageTable,x
-			ldy	#_Inline_CmdIndirectCross_Call-Inline_CmdIndirectCross+1
+			lda	$=Interpret__IndirectYIO_PageTable,x
+			ldy	#_Inline_CmdIndirectYCross_Call-Inline_CmdIndirectYCross+1
 			sta	[$.writeAddr],y
 
 			// Change some parameters
 			lda	[$.readAddr]
 			smx	#0x30
 			lda	#0
-			ldy	#.Inline_CmdIndirectCross_AdditionTable-Inline_CmdIndirectCross+1
+			ldy	#.Inline_CmdIndirectYCross_AdditionTable-Inline_CmdIndirectYCross+1
 			sta	[$.writeAddr],y
-			ldy	#.Inline_CmdIndirectCross_AdcZero-Inline_CmdIndirectCross+1
+			ldy	#.Inline_CmdIndirectYCross_AdcZero-Inline_CmdIndirectYCross+1
 			sta	[$.writeAddr],y
 			xba
-			ldy	#.Inline_CmdIndirectCross_LSB-Inline_CmdIndirectCross+1
+			ldy	#.Inline_CmdIndirectYCross_LSB-Inline_CmdIndirectYCross+1
 			sta	[$.writeAddr],y
 
 			// Add to write address
@@ -2075,8 +2075,8 @@ Recompiler__Build_OpcodeType_LdaIndY:
 			xba
 			tay
 			iny
-			ldx	#_Inline_LoadIndirect
-			lda	#_Inline_LoadIndirect/0x10000
+			ldx	#_Inline_LoadIndirectY
+			lda	#_Inline_LoadIndirectY/0x10000
 			jsr	$_Recompiler__Build_Inline2
 			jmp	$_Recompiler__Build_OpcodeType_Zpg
 b_else:
@@ -2085,8 +2085,8 @@ b_else:
 			xba
 			tay
 			iny
-			ldx	#_Inline_LoadIndirectCross
-			lda	#_Inline_LoadIndirectCross/0x10000
+			ldx	#_Inline_LoadIndirectYCross
+			lda	#_Inline_LoadIndirectYCross/0x10000
 			jsr	$_Recompiler__Build_Inline2NoInc
 			tyx
 
@@ -2094,12 +2094,12 @@ b_else:
 			lda	[$.readAddr]
 			smx	#0x30
 			lda	#0
-			ldy	#.Inline_LoadIndirectCross_AdditionTable-Inline_LoadIndirectCross+1
+			ldy	#.Inline_LoadIndirectYCross_AdditionTable-Inline_LoadIndirectYCross+1
 			sta	[$.writeAddr],y
-			ldy	#.Inline_LoadIndirectCross_AdcZero-Inline_LoadIndirectCross+1
+			ldy	#.Inline_LoadIndirectYCross_AdcZero-Inline_LoadIndirectYCross+1
 			sta	[$.writeAddr],y
 			xba
-			ldy	#.Inline_LoadIndirectCross_LSB-Inline_LoadIndirectCross+1
+			ldy	#.Inline_LoadIndirectYCross_LSB-Inline_LoadIndirectYCross+1
 			sta	[$.writeAddr],y
 
 			// Add to write address
@@ -2124,8 +2124,8 @@ Recompiler__Build_OpcodeType_StaIndY:
 			xba
 			tay
 			iny
-			ldx	#_Inline_StoreIndirect
-			lda	#_Inline_StoreIndirect/0x10000
+			ldx	#_Inline_StoreIndirectY
+			lda	#_Inline_StoreIndirectY/0x10000
 			jsr	$_Recompiler__Build_Inline2
 			jmp	$_Recompiler__Build_OpcodeType_Zpg
 b_else:
@@ -2134,8 +2134,8 @@ b_else:
 			xba
 			tay
 			iny
-			ldx	#_Inline_StoreIndirectCross
-			lda	#_Inline_StoreIndirectCross/0x10000
+			ldx	#_Inline_StoreIndirectYCross
+			lda	#_Inline_StoreIndirectYCross/0x10000
 			jsr	$_Recompiler__Build_Inline2NoInc
 			tyx
 
@@ -2143,12 +2143,12 @@ b_else:
 			lda	[$.readAddr]
 			smx	#0x30
 			lda	#0
-			ldy	#.Inline_StoreIndirectCross_AdditionTable-Inline_StoreIndirectCross+1
+			ldy	#.Inline_StoreIndirectYCross_AdditionTable-Inline_StoreIndirectYCross+1
 			sta	[$.writeAddr],y
-			ldy	#.Inline_StoreIndirectCross_AdcZero-Inline_StoreIndirectCross+1
+			ldy	#.Inline_StoreIndirectYCross_AdcZero-Inline_StoreIndirectYCross+1
 			sta	[$.writeAddr],y
 			xba
-			ldy	#.Inline_StoreIndirectCross_LSB-Inline_StoreIndirectCross+1
+			ldy	#.Inline_StoreIndirectYCross_LSB-Inline_StoreIndirectYCross+1
 			sta	[$.writeAddr],y
 
 			// Add to write address
@@ -2344,7 +2344,25 @@ Recompiler__Build_OpcodeType_XInd:
 		iny
 		ldx	#_Inline_CmdIndirectX
 		lda	#_Inline_CmdIndirectX/0x10000
-		jsr	$_Recompiler__Build_Inline2
+		jsr	$_Recompiler__Build_Inline2NoInc
+		phy
+
+		// Fix call page
+		lda	[$.readAddr]
+		and	#0x00e0
+		lsr	a
+		lsr	a
+		lsr	a
+		lsr	a
+		tax
+		lda	$=Interpret__IndirectXIO_PageTable,x
+		ldy	#_Inline_CmdIndirectX_Call-Inline_CmdIndirectX+1
+		sta	[$.writeAddr],y
+
+		// Add to write address, assume carry clear from LSR
+		pla
+		adc	$.writeAddr
+		sta	$.writeAddr
 b_1:
 	jmp	$_Recompiler__Build_OpcodeType_Zpg
 

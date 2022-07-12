@@ -119,7 +119,7 @@ IO_BG_MIRRORS:
 
 
 	.addr	0x0a27, 0x0a3f
-	// 17/25
+	// 23/25
 
 	// IO_4014_SpriteSize contains flags for how the sprite transfer was handled
 	//  bit 7: set = 8x16, clear = 8x8
@@ -163,17 +163,6 @@ PPU_SCROLL_X:
 PPU_SCROLL_Y:
 	.fill	2
 
-Recompile_PrgRamTopRange:
-	.fill	2
-
-
-	.addr	0x0a47, 0x0a5f
-	// 14/25
-
-	// Identifying when to send sprite 0 hit
-Sprite0Line:
-	.fill	2
-
 
 	// Performance counter out of 57640 cycles per frame
 Idle_CycleCounter:
@@ -185,19 +174,49 @@ Idle_FrameCount:
 Idle_CyclesTotal:
 	.fill	4
 
+
+	.addr	0x0a47, 0x0a5f
+	// 22/25
+
+Recompile_PrgRamTopRange:
+	.fill	2
+
+	// Identifying when to send sprite 0 hit
+Sprite0Line:
+	.fill	2
+
 	// Fast access mapper number
 Mapper_x2:
 	.fill	2
 
 
+	// Indirect memory access meant for indirect IO but every indirect opcode needs its own action pointer
+IndirectX_Ora_Action:
+	.fill	2
+IndirectX_And_Action:
+	.fill	2
+IndirectX_Eor_Action:
+	.fill	2
+IndirectX_Adc_Action:
+	.fill	2
+IndirectX_Cmp_Action:
+	.fill	2
+IndirectX_Sbc_Action:
+	.fill	2
+IndirectX_Lda_Action:
+	.fill	2
+IndirectX_Sta_Action:
+	.fill	2
+
+
 	.addr	0x0a67, 0x0a7f
 	// 25/25
-	
+
 NMI_NesBank:
 	.fill	2
 NMI_SnesPointer:
 	.fill	3
-	
+
 IRQ_NesBank:
 	.fill	2
 IRQ_SnesPointer:
@@ -233,17 +252,17 @@ InterpretIO_Action:
 	.fill	3
 
 	// Indirect memory access meant for indirect IO but every indirect opcode needs its own action pointer
-Indirect_Ora_Action:
+IndirectY_Ora_Action:
 	.fill	2
-Indirect_And_Action:
+IndirectY_And_Action:
 	.fill	2
-Indirect_Eor_Action:
+IndirectY_Eor_Action:
 	.fill	2
-Indirect_Adc_Action:
+IndirectY_Adc_Action:
 	.fill	2
-Indirect_Cmp_Action:
+IndirectY_Cmp_Action:
 	.fill	2
-Indirect_Sbc_Action:
+IndirectY_Sbc_Action:
 	.fill	2
 
 	// Pointer+1 to list of banks that can be used as extra heap
@@ -667,11 +686,11 @@ IRQ_VSTACK_START:
 	EmuCallAt	JMPiU_Action, "JMPi", "?", "?"
 	.def	JMPiU_Action				0x4355
 
-	// Defines which memory range is represented by register DB, shares a byte with Indirect_Lda_Action
+	// Defines which memory range is represented by register DB, shares a byte with IndirectY_Lda_Action
 	.def	Memory_NesBank				0x4365
 	// Indirect load/store, indirect 16-bit JMP destinations
-	.def	Indirect_Lda_Action			0x4365
-	.def	Indirect_Sta_Action			0x4375
+	.def	IndirectY_Lda_Action		0x4365
+	.def	IndirectY_Sta_Action		0x4375
 
 	// ---------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------

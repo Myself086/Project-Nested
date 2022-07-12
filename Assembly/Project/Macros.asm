@@ -482,7 +482,7 @@ this__:
 		.pulladdr
 	.endm
 
-	.macro	Segment
+	.macro	SegmentNext
 this__:
 		// Uncap address limit temporarily so we can align to the next segment
 		.addr		this__

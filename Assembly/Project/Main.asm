@@ -321,8 +321,10 @@ b_loop:
 
 	// Prepare indirect load/store
 	.macro	Main_SetIndirectOpcode		OpcodeName
-		lda	#.Interpret__{0}Indirect_Page/0x100
-		sta	$_Indirect_{0}_Action+1
+		lda	#.Interpret__{0}IndirectY_Page/0x100
+		sta	$_IndirectY_{0}_Action+1
+		lda	#.Interpret__{0}IndirectX_Page/0x100
+		sta	$_IndirectX_{0}_Action+1
 	.endm
 	Main_SetIndirectOpcode	Ora
 	Main_SetIndirectOpcode	And

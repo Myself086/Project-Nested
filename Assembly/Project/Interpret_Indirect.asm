@@ -6,9 +6,9 @@
 
 	// ---------------------------------------------------------------------------
 
-	.macro	Interpret_Indirect_Switch		OpcodeName, IsLda
+	.macro	Interpret_Indirect_Switch		OpcodeName, IsLda, IndexRegister
 		.align	0x100
-Interpret__{0}Indirect_Page:
+Interpret__{0}Indirect{2}_Page:
 		// Break this page into segments of 0x20 bytes
 		SegmentStart	0x20
 			.if {1} == 0
@@ -17,22 +17,22 @@ Interpret__{0}Indirect_Page:
 			}
 			rtl
 
-Interpret__{0}Indirect_Main:
+Interpret__{0}Indirect{2}_Main:
 			// Flags NZ don't matter here
 			eor	$_Memory_NesBank
-			sta	$_Indirect_{0}_Action
-			jmp	($_Indirect_{0}_Action)
+			sta	$_Indirect{2}_{0}_Action
+			jmp	($_Indirect{2}_{0}_Action)
 b_{0}_00_e:
 
-		Segment
-			jmp	$_Interpret__IndirectIO_{0}
+		SegmentNext
+			jmp	$_Interpret__Indirect{2}IO_{0}
 b_{0}_20_e:
 
-		Segment
-			jmp	$_Interpret__IndirectIO_{0}
+		SegmentNext
+			jmp	$_Interpret__Indirect{2}IO_{0}
 b_{0}_40_e:
 
-		Segment
+		SegmentNext
 			.if {1} == 0
 			{
 				sta	$_Memory_NesBank
@@ -43,7 +43,7 @@ b_{0}_40_e:
 			rtl
 b_{0}_60_e:
 
-		Segment
+		SegmentNext
 			.if {1} == 0
 			{
 				sta	$_Memory_NesBank
@@ -54,7 +54,7 @@ b_{0}_60_e:
 			rtl
 b_{0}_80_e:
 
-		Segment
+		SegmentNext
 			.if {1} == 0
 			{
 				sta	$_Memory_NesBank
@@ -65,7 +65,7 @@ b_{0}_80_e:
 			rtl
 b_{0}_a0_e:
 
-		Segment
+		SegmentNext
 			.if {1} == 0
 			{
 				sta	$_Memory_NesBank
@@ -76,7 +76,7 @@ b_{0}_a0_e:
 			rtl
 b_{0}_c0_e:
 
-		Segment
+		SegmentNext
 			.if {1} == 0
 			{
 				sta	$_Memory_NesBank
@@ -90,34 +90,34 @@ b_{0}_e0_e:
 		SegmentEnd
 	.endm
 
-	Interpret_Indirect_Switch	Ora, 0
-	Interpret_Indirect_Switch	And, 0
-	Interpret_Indirect_Switch	Eor, 0
-	Interpret_Indirect_Switch	Adc, 0
-	Interpret_Indirect_Switch	Lda, 1
-	Interpret_Indirect_Switch	Cmp, 0
-	Interpret_Indirect_Switch	Sbc, 0
+	Interpret_Indirect_Switch	Ora, 0, "Y"
+	Interpret_Indirect_Switch	And, 0, "Y"
+	Interpret_Indirect_Switch	Eor, 0, "Y"
+	Interpret_Indirect_Switch	Adc, 0, "Y"
+	Interpret_Indirect_Switch	Lda, 1, "Y"
+	Interpret_Indirect_Switch	Cmp, 0, "Y"
+	Interpret_Indirect_Switch	Sbc, 0, "Y"
 
 	// ---------------------------------------------------------------------------
 
 	.align	0x100
 
-Interpret__StaIndirect_Page:
+Interpret__StaIndirectY_Page:
 	// Break this page into segments of 0x20 bytes
 	SegmentStart	0x20
 		sta	$_Memory_NesBank
 		rtl
 b_sta_00_e:
 
-	Segment
-		jmp	$_Interpret__IndirectIO_sta
+	SegmentNext
+		jmp	$_Interpret__IndirectYIO_sta
 b_sta_20_e:
 
-	Segment
-		jmp	$_Interpret__IndirectIO_sta
+	SegmentNext
+		jmp	$_Interpret__IndirectYIO_sta
 b_sta_40_e:
 
-	Segment
+	SegmentNext
 		sta	$_Memory_NesBank
 		lda	#0xb0
 		pha
@@ -125,35 +125,100 @@ b_sta_40_e:
 		rtl
 b_sta_60_e:
 
-	Segment
-		jmp	$_Interpret__IndirectIO_sta
+	SegmentNext
+		jmp	$_Interpret__IndirectYIO_sta
 b_sta_80_e:
 
-	Segment
-		jmp	$_Interpret__IndirectIO_sta
+	SegmentNext
+		jmp	$_Interpret__IndirectYIO_sta
 b_sta_a0_e:
 
-	Segment
-		jmp	$_Interpret__IndirectIO_sta
+	SegmentNext
+		jmp	$_Interpret__IndirectYIO_sta
 b_sta_c0_e:
 
-	Segment
-		jmp	$_Interpret__IndirectIO_sta
+	SegmentNext
+		jmp	$_Interpret__IndirectYIO_sta
 b_sta_e0_e:
 
 	SegmentEnd
 
 	// ---------------------------------------------------------------------------
 
-Interpret__IndirectIO_PageTable:
-	.data16	Interpret__OraIndirect_Main
-	.data16	Interpret__AndIndirect_Main
-	.data16	Interpret__EorIndirect_Main
-	.data16	Interpret__AdcIndirect_Main
+	Interpret_Indirect_Switch	Ora, 0, "X"
+	Interpret_Indirect_Switch	And, 0, "X"
+	Interpret_Indirect_Switch	Eor, 0, "X"
+	Interpret_Indirect_Switch	Adc, 0, "X"
+	Interpret_Indirect_Switch	Lda, 1, "X"
+	Interpret_Indirect_Switch	Cmp, 0, "X"
+	Interpret_Indirect_Switch	Sbc, 0, "X"
+
+	// ---------------------------------------------------------------------------
+
+	.align	0x100
+
+Interpret__StaIndirectX_Page:
+	// Break this page into segments of 0x20 bytes
+	SegmentStart	0x20
+		sta	$_Memory_NesBank
+		rtl
+b_sta_00_e:
+
+	SegmentNext
+		jmp	$_Interpret__IndirectXIO_sta
+b_sta_20_e:
+
+	SegmentNext
+		jmp	$_Interpret__IndirectXIO_sta
+b_sta_40_e:
+
+	SegmentNext
+		sta	$_Memory_NesBank
+		lda	#0xb0
+		pha
+		plb
+		rtl
+b_sta_60_e:
+
+	SegmentNext
+		jmp	$_Interpret__IndirectXIO_sta
+b_sta_80_e:
+
+	SegmentNext
+		jmp	$_Interpret__IndirectXIO_sta
+b_sta_a0_e:
+
+	SegmentNext
+		jmp	$_Interpret__IndirectXIO_sta
+b_sta_c0_e:
+
+	SegmentNext
+		jmp	$_Interpret__IndirectXIO_sta
+b_sta_e0_e:
+
+	SegmentEnd
+
+	// ---------------------------------------------------------------------------
+
+Interpret__IndirectYIO_PageTable:
+	.data16	Interpret__OraIndirectY_Main
+	.data16	Interpret__AndIndirectY_Main
+	.data16	Interpret__EorIndirectY_Main
+	.data16	Interpret__AdcIndirectY_Main
 	.data16	0
-	.data16	Interpret__LdaIndirect_Main
-	.data16	Interpret__CmpIndirect_Main
-	.data16	Interpret__SbcIndirect_Main
+	.data16	Interpret__LdaIndirectY_Main
+	.data16	Interpret__CmpIndirectY_Main
+	.data16	Interpret__SbcIndirectY_Main
+
+Interpret__IndirectXIO_PageTable:
+	.data16	Interpret__OraIndirectX_Main
+	.data16	Interpret__AndIndirectX_Main
+	.data16	Interpret__EorIndirectX_Main
+	.data16	Interpret__AdcIndirectX_Main
+	.data16	0
+	.data16	Interpret__LdaIndirectX_Main
+	.data16	Interpret__CmpIndirectX_Main
+	.data16	Interpret__SbcIndirectX_Main
 
 	// ---------------------------------------------------------------------------
 
@@ -167,12 +232,12 @@ Interpret__IndirectIO_PageTable:
 		.mx	0x30
 
 		Interpret_WriteWithinSegment	b_sta_00_e
-Inline_LoadIndirect:
+Inline_LoadIndirectY:
 		lda	$0xff
 		and	#0xe0
 		eor	$_Memory_NesBank
 		beq	$+b_1
-			jsr	$=Interpret_LoadIndirect
+			jsr	$=Interpret_LoadIndirectY
 b_1:
 		.data8	0
 
@@ -181,20 +246,20 @@ Inline_LoadIndirectX:
 		and	#0xe0
 		eor	$_Memory_NesBank
 		beq	$+b_1
-			jsr	$=Interpret_LoadIndirect
+			jsr	$=Interpret_LoadIndirectX
 b_1:
 		.data8	0
 
 
 		Interpret_WriteWithinSegment	b_sta_20_e
-Inline_CmdIndirect:
+Inline_CmdIndirectY:
 		xba
 		lda	$0xff
 		and	#0xe0
 		eor	$_Memory_NesBank
 		beq	$+b_1
-Inline_CmdIndirect_Call:
-			jsr	$=Interpret_LoadIndirect
+Inline_CmdIndirectY_Call:
+			jsr	$=Interpret_LoadIndirectY
 b_1:
 		xba
 		.data8	0
@@ -207,33 +272,34 @@ Inline_CmdIndirectX:
 		and	#0xe0
 		eor	$_Memory_NesBank
 		beq	$+b_1
-			jsr	$=Interpret_LoadIndirect
+Inline_CmdIndirectX_Call:
+			jsr	$=Interpret_LoadIndirectX
 b_1:
 		xba
 		.data8	0
 
 
 		Interpret_WriteWithinSegment	b_sta_60_e
-Interpret_LoadIndirect:
+Interpret_LoadIndirectY:
 		// Flags NZ don't matter here
 		eor	$_Memory_NesBank
-Interpret_LoadIndirectCmp:
+Interpret_LoadIndirectYCmp:
 		sta	$_Memory_NesBank
-		//sta	$_Indirect_Lda_Action
-		jmp	($_Indirect_Lda_Action)
+		//sta	$_IndirectY_Lda_Action
+		jmp	($_IndirectY_Lda_Action)
 
 
 		.mx	0x30
 
 		Interpret_WriteWithinSegment	b_sta_80_e
-Inline_StoreIndirect:
+Inline_StoreIndirectY:
 		php
 		xba
 		lda	$0xff
 		and	#0xe0
 		cmp	$_Memory_NesBank
 		beq	$+b_1
-			jsr	$=Interpret_StoreIndirectCmp
+			jsr	$=Interpret_StoreIndirectYCmp
 b_1:
 		xba
 		plp
@@ -241,13 +307,23 @@ b_1:
 
 
 		Interpret_WriteWithinSegment	b_sta_a0_e
-Interpret_StoreIndirect:
+Interpret_StoreIndirectY:
 		// Flags NZ don't matter here
 		eor	$_Memory_NesBank
-Interpret_StoreIndirectCmp:
+Interpret_StoreIndirectYCmp:
 		//sta	$_Memory_NesBank		// Writing this was moved to individual cases because it isn't necessary for IO ranges
-		sta	$_Indirect_Sta_Action
-		jmp	($_Indirect_Sta_Action)
+		sta	$_IndirectY_Sta_Action
+		jmp	($_IndirectY_Sta_Action)
+
+
+		Interpret_WriteWithinSegment	b_sta_c0_e
+Interpret_LoadIndirectX:
+		// Flags NZ don't matter here
+		eor	$_Memory_NesBank
+Interpret_LoadIndirectXCmp:
+		//sta	$_Memory_NesBank		// Writing this was moved to individual cases because it isn't necessary for IO ranges
+		sta	$_IndirectX_Lda_Action
+		jmp	($_IndirectX_Lda_Action)
 
 		// Done placing code between segments
 	.pulladdr
@@ -256,16 +332,16 @@ Interpret_StoreIndirectCmp:
 
 	.mx	0x30
 
-Inline_LoadIndirectCross:
-Inline_LoadIndirectCross_LSB:
+Inline_LoadIndirectYCross:
+Inline_LoadIndirectYCross_LSB:
 		lda	$0xfe
 		beq	$+b_else
 			php
 			clc
-Inline_LoadIndirectCross_AdditionTable:
+Inline_LoadIndirectYCross_AdditionTable:
 			adc	$_Addition|1,y
 			lda	$0xff
-Inline_LoadIndirectCross_AdcZero:
+Inline_LoadIndirectYCross_AdcZero:
 			adc	#1
 			plp
 			bra	$+b_1
@@ -275,22 +351,22 @@ b_1:
 		and	#0xe0
 		eor	$_Memory_NesBank
 		beq	$+b_1
-			jsr	$=Interpret_LoadIndirect
+			jsr	$=Interpret_LoadIndirectY
 b_1:
 		.data8	0
 
 
-Inline_CmdIndirectCross:
+Inline_CmdIndirectYCross:
 		xba
-Inline_CmdIndirectCross_LSB:
+Inline_CmdIndirectYCross_LSB:
 		lda	$0xfe
 		beq	$+b_else
 			php
 			clc
-Inline_CmdIndirectCross_AdditionTable:
+Inline_CmdIndirectYCross_AdditionTable:
 			adc	$_Addition|1,y
 			lda	$0xff
-Inline_CmdIndirectCross_AdcZero:
+Inline_CmdIndirectYCross_AdcZero:
 			adc	#1
 			plp
 			bra	$+b_1
@@ -300,24 +376,24 @@ b_1:
 		and	#0xe0
 		eor	$_Memory_NesBank
 		beq	$+b_1
-Inline_CmdIndirectCross_Call:
-			jsr	$=Interpret_LoadIndirect
+Inline_CmdIndirectYCross_Call:
+			jsr	$=Interpret_LoadIndirectY
 b_1:
 		xba
 		.data8	0
 
 
-Inline_StoreIndirectCross:
+Inline_StoreIndirectYCross:
 		php
 		xba
-Inline_StoreIndirectCross_LSB:
+Inline_StoreIndirectYCross_LSB:
 		lda	$0xfe
 		beq	$+b_else
 			clc
-Inline_StoreIndirectCross_AdditionTable:
+Inline_StoreIndirectYCross_AdditionTable:
 			adc	$_Addition|1,y
 			lda	$0xff
-Inline_StoreIndirectCross_AdcZero:
+Inline_StoreIndirectYCross_AdcZero:
 			adc	#1
 			bra	$+b_1
 b_else:
@@ -326,7 +402,7 @@ b_1:
 		and	#0xe0
 		cmp	$_Memory_NesBank
 		beq	$+b_1
-			jsr	$=Interpret_StoreIndirectCmp
+			jsr	$=Interpret_StoreIndirectYCmp
 b_1:
 		xba
 		plp
@@ -364,16 +440,35 @@ Interpret_IndirectIO_trap:
 					jmp	$_Interpret_IndirectIO_trap
 b_1:
 
-		// Load ZP address and adjust return address in order to skip the indirect access
+		// Increment one more time to point to the operand and adjust return address in order to skip the indirect access
 		inc16dp	0x07
-		lda	[$0x07]
-		tax
 
-		// Get target address
-		rmx	#0x01
-		tya
-		adc	$0x0000,x
-		tax
+		.def	temp__		Zero+{0}
+		.if		temp__&0x10 == 0
+		{
+			// Load ZP address
+			txa
+			clc
+			adc	[$0x07]
+			tax
+
+			// Get target address
+			rmx	#0x01
+			lda	$0x0000,x
+			tax
+		}
+		.else
+		{
+			// Load ZP address
+			lda	[$0x07]
+			tax
+
+			// Get target address
+			rmx	#0x01
+			tya
+			adc	$0x0000,x
+			tax
+		}
 
 		.if {1} != 0
 		{
@@ -421,43 +516,84 @@ b_1:
 
 	// ---------------------------------------------------------------------------
 
-Interpret__IndirectIO_Ora:
+Interpret__IndirectYIO_Ora:
 	Interpret_IndirectIO	0x11, 0
 	ora	$_IO_Temp
 	rtl
 
-Interpret__IndirectIO_And:
+Interpret__IndirectYIO_And:
 	Interpret_IndirectIO	0x31, 0
 	and	$_IO_Temp
 	rtl
 
-Interpret__IndirectIO_Eor:
+Interpret__IndirectYIO_Eor:
 	Interpret_IndirectIO	0x51, 0
 	eor	$_IO_Temp
 	rtl
 
-Interpret__IndirectIO_Adc:
+Interpret__IndirectYIO_Adc:
 	Interpret_IndirectIO	0x71, 0
 	adc	$_IO_Temp
 	rtl
 
-Interpret__IndirectIO_Sta:
+Interpret__IndirectYIO_Sta:
 	Interpret_IndirectIO	0x91, 1
 	rtl
 
-Interpret__IndirectIO_Lda:
+Interpret__IndirectYIO_Lda:
 	Interpret_IndirectIO	0xb1, 0
 	lda	$_IO_Temp
 	stz	$_Memory_NesBank			// Clear memory range represented by DB
 	rtl
 
-Interpret__IndirectIO_Cmp:
+Interpret__IndirectYIO_Cmp:
 	Interpret_IndirectIO	0xd1, 0
 	cmp	$_IO_Temp
 	rtl
 
-Interpret__IndirectIO_Sbc:
+Interpret__IndirectYIO_Sbc:
 	Interpret_IndirectIO	0xf1, 0
+	sbc	$_IO_Temp
+	rtl
+
+	// ---------------------------------------------------------------------------
+
+Interpret__IndirectXIO_Ora:
+	Interpret_IndirectIO	0x01, 0
+	ora	$_IO_Temp
+	rtl
+
+Interpret__IndirectXIO_And:
+	Interpret_IndirectIO	0x21, 0
+	and	$_IO_Temp
+	rtl
+
+Interpret__IndirectXIO_Eor:
+	Interpret_IndirectIO	0x41, 0
+	eor	$_IO_Temp
+	rtl
+
+Interpret__IndirectXIO_Adc:
+	Interpret_IndirectIO	0x61, 0
+	adc	$_IO_Temp
+	rtl
+
+Interpret__IndirectXIO_Sta:
+	Interpret_IndirectIO	0x81, 1
+	rtl
+
+Interpret__IndirectXIO_Lda:
+	Interpret_IndirectIO	0xa1, 0
+	lda	$_IO_Temp
+	rtl
+
+Interpret__IndirectXIO_Cmp:
+	Interpret_IndirectIO	0xc1, 0
+	cmp	$_IO_Temp
+	rtl
+
+Interpret__IndirectXIO_Sbc:
+	Interpret_IndirectIO	0xe1, 0
 	sbc	$_IO_Temp
 	rtl
 
