@@ -416,6 +416,10 @@ Interpret_IndirectIO_trap:
 
 	.macro	Interpret_IndirectIO	OpcodeInput, FixStack
 		.mx	0x30
+		.if {1} == 0
+		{
+			lock
+		}
 		phd
 		phy
 		phx
@@ -511,6 +515,10 @@ b_1:
 		.if {1} != 0
 		{
 			plp
+		}
+		.else
+		{
+			unlock
 		}
 	.endm
 
