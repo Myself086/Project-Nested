@@ -24,6 +24,8 @@ namespace Project_Nested.Injection
         public bool IsResizable { get; private set; }
         public bool IsHex { get; private set; }
 
+        private string DefaultValue;
+
         private List<int> validMappers;
         public bool IsValidMapper(int mapper) => validMappers == null || validMappers.Contains(mapper);
 
@@ -182,6 +184,9 @@ namespace Project_Nested.Injection
                 // Set title if we have one, otherwise it was set to the variable's internal name
                 if (parts.Length > 1)
                     this.Title = parts[1];
+
+                // Set default value
+                SetAsDefaultValue();
             }
         }
 
@@ -265,6 +270,9 @@ namespace Project_Nested.Injection
             }
         }
 
+        public void SetAsDefaultValue() => DefaultValue = ToValueString();
+        public bool IsDefaultValue() => DefaultValue == ToValueString();
+
         public void SetValue(string value)
         {
             if (value.IndexOf('{') >= 0)
@@ -347,15 +355,16 @@ namespace Project_Nested.Injection
             action?.Invoke(this);
         }
 
-        public override string ToString()
+        public override string ToString() => Name + " = " + ToValueString();
+        public string ToValueString()
         {
             if (Length == 1)
-                return Name + " = " + GetValue();
+                return GetValue();
             else if (type == SettingType.Char)
-                return Name + " = \"" + GetValue() + "\"";
+                return "\"" + GetValue() + "\"";
             else
             {
-                return Name + " = { " + GetValues() + " }";
+                return "{ " + GetValues() + " }";
             }
         }
     }

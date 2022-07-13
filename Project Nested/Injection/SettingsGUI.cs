@@ -109,6 +109,20 @@ namespace Project_Nested.Injection
             controls.Add(control);
         }
 
+        private Control AddNonDefaultIndicator(bool visible)
+        {
+            Label label = new Label();
+            label.Location = new Point(X, Y);
+            label.Text = "*";
+            label.Font = new Font(label.Font, FontStyle.Bold);
+            label.AutoSize = true;
+            label.Visible = visible;
+            tip.SetToolTip(label, "This setting was changed compared to its default value.");
+            AddControl(label);
+
+            return label;
+        }
+
         private void CreateLabel(Setting setting, bool tab)
         {
             // Label
@@ -128,6 +142,8 @@ namespace Project_Nested.Injection
         {
             bool busy = false;
 
+            var nonDefaultIndicator = setting.IsGlobal ? null : AddNonDefaultIndicator(!setting.IsDefaultValue());
+
             // Checkbox
             CheckBox box = new CheckBox();
             box.Location = new Point(X + TABULATION, Y);
@@ -142,6 +158,9 @@ namespace Project_Nested.Injection
                     busy = true;
 
                     setting.SetValue(box.Checked.ToString());
+
+                    if (nonDefaultIndicator != null)
+                        nonDefaultIndicator.Visible = !setting.IsDefaultValue();
 
                     busy = false;
                 }
@@ -162,6 +181,8 @@ namespace Project_Nested.Injection
         private void CreateTextbox(Setting setting, bool enabled)
         {
             bool busy = false;
+
+            var nonDefaultIndicator = setting.IsGlobal ? null : AddNonDefaultIndicator(!setting.IsDefaultValue());
 
             // Label
             Label label = new Label();
@@ -190,6 +211,9 @@ namespace Project_Nested.Injection
                     try
                     {
                         setting.SetValues(textbox.Text);
+
+                        if (nonDefaultIndicator != null)
+                            nonDefaultIndicator.Visible = !setting.IsDefaultValue();
                     }
                     catch (Exception)
                     {

@@ -181,14 +181,20 @@ namespace Project_Nested.Injection
             {
                 if (initialChanges)
                     foreach (var item in bools)
+                    {
                         item.SetValue(true);
+                        item.SetAsDefaultValue();
+                    }
             }
 
             void ClearInitialBooleans(params SettingWrapper<bool>[] bools)
             {
                 if (initialChanges)
                     foreach (var item in bools)
+                    {
                         item.SetValue(false);
+                        item.SetAsDefaultValue();
+                    }
             }
 
             // Mapper specific settings

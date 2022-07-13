@@ -283,6 +283,7 @@ namespace Project_Nested.Injection
             public T GetValueAt(int index) => this[index];
             public void SetValue(T value) => Value = value;
             public void SetValueAt(int index, T value) => this[index] = value;
+            public void SetAsDefaultValue() => varObj.SetAsDefaultValue();
 
             public SettingWrapper(Dictionary<string, Setting> settings, string varName)
             {
