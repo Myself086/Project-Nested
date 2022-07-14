@@ -148,6 +148,8 @@ interpreter__Execute_Switch_Trap:
 	ror	a
 	rep	#0x30
 	.mx	0x00
+	ldx	$.pc
+	dex
 	unlock
 	trap
 	Exception	"Interpreter Failed{}{}{}The interpreter is not fully supported in this version. It attempted to execute opcode 0x{a:X} at address 0x{X:X}.{}{}This form of emulation is used for code located in WRAM."
