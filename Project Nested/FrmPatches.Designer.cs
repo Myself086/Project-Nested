@@ -41,11 +41,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox1.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.textBox1.Location = new System.Drawing.Point(11, 82);
+            this.textBox1.Location = new System.Drawing.Point(11, 96);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(473, 316);
+            this.textBox1.Size = new System.Drawing.Size(473, 302);
             this.textBox1.TabIndex = 0;
             // 
             // label1
@@ -54,10 +54,11 @@
             this.label1.Font = new System.Drawing.Font("Courier New", 8.25F);
             this.label1.Location = new System.Drawing.Point(8, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(385, 70);
+            this.label1.Size = new System.Drawing.Size(385, 84);
             this.label1.TabIndex = 1;
-            this.label1.Text = "File address format:\r\nHeader skipped file address format:\r\nNES address format:\r\nG" +
-    "ame Genie code:\r\nEach entry can be separated by new line or semi colon.\r\n";
+            this.label1.Text = "File address format:\r\nHeader skipped file address format:\r\nNES address format:\r\nC" +
+    "onditional patch:\r\nGame Genie code:\r\nEach entry can be separated by new line or " +
+    "semi colon.";
             // 
             // label2
             // 
@@ -65,9 +66,10 @@
             this.label2.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(261, 9);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(126, 56);
+            this.label2.Size = new System.Drawing.Size(154, 70);
             this.label2.TabIndex = 2;
-            this.label2.Text = "[00800e] = 00 80\r\n[007ffe+] = 00 80\r\n[00:fffe] = 00 80\r\nZEXPYGLA";
+            this.label2.Text = "[00800e] = 00 80\r\n[007ffe+] = 00 80\r\n[00:fffe] = 00 80\r\n<Any> = ff ff ? 00 80\r\nZE" +
+    "XPYGLA";
             // 
             // btnOk
             // 

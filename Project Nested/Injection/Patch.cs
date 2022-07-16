@@ -34,13 +34,16 @@ namespace Project_Nested.Injection
         public int NesBank { get; private set; }
         public byte[] Data { get; private set; }
         public int Length { get => Data != null ? Data.Length : 0; }
+        public byte[] Compare { get; private set; }
+        public int CompareLength { get => Compare != null ? Compare.Length : 0; }
 
-        public Patch(int nesAddress, int nesBank, byte[] data, PatchTypeEnum PatchType)
+        public Patch(int nesAddress, int nesBank, byte[] data, byte[] compare, PatchTypeEnum PatchType)
         {
             this.PatchType = PatchType;
             this.NesAddress = nesAddress;
             this.NesBank = nesBank;
             this.Data = data;
+            this.Compare = compare;
         }
 
         public Patch(string commandLine)
@@ -88,11 +91,31 @@ namespace Project_Nested.Injection
             // Read data
             if (equalSign >= 0 && gameGenie == null)
             {
-                string[] dataSplit = data.Split(new string[] { " ", ",", "0x" }, StringSplitOptions.RemoveEmptyEntries);
-                List<byte> dataList = new List<byte>(dataSplit.Length);
-                foreach (var item in dataSplit)
-                    dataList.Add(Convert.ToByte(item, 16));
-                this.Data = dataList.ToArray();
+                // Split compare and data
+                var cmpData = data.Split('?');
+                string compare = null;
+                if (cmpData.Length > 2)
+                    throw new Exception("Too many question marks");
+                else if (cmpData.Length == 2)
+                {
+                    compare = cmpData[0];
+                    data = cmpData[1];
+                }
+
+                byte[] ReadBytes(string str)
+                {
+                    if (str == null)
+                        return null;
+
+                    string[] split = str.Split(new string[] { " ", ",", "0x" }, StringSplitOptions.RemoveEmptyEntries);
+                    List<byte> list = new List<byte>(split.Length);
+                    foreach (var item in split)
+                        list.Add(Convert.ToByte(item, 16));
+                    return list.ToArray();
+                }
+
+                this.Data = ReadBytes(data);
+                this.Compare = ReadBytes(compare);
             }
         }
 
@@ -139,7 +162,21 @@ namespace Project_Nested.Injection
                     return;
             }
 
-            rom.WriteArray(addr, this.Data, this.Data.Length);
+            bool CompareData()
+            {
+                if (Compare == null)
+                    return true;
+
+                for (int i = 0; i < Compare.Length; i++)
+                {
+                    if (rom[addr + i] != Compare[i])
+                        return false;
+                }
+                return true;
+            }
+
+            if (CompareData())
+                rom.WriteArray(addr, this.Data, this.Data.Length);
         }
 
         public void ApplyGameGenie(byte[] snesRom, List<int> baseAddresses)
@@ -259,6 +296,13 @@ namespace Project_Nested.Injection
             if (Data != null)
             {
                 sb.Append(" = ");
+
+                if (Compare != null && Compare.Length > 0)
+                {
+                    foreach (var item in Compare)
+                        sb.Append($"{item:x2} ");
+                    sb.Append("? ");
+                }
 
                 foreach (var item in Data)
                     sb.Append($"{item:x2} ");
