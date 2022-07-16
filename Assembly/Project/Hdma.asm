@@ -247,9 +247,9 @@ Hdma__UpdateScrolling_RecursiveCall:
 		cmp	#0xf0
 		bcc	$+b_else
 			inc	$_IO_SCROLL_Y+1
-			sec
 			sbc	$.Scanline_HDMA
-			sbc	#0x0f
+			sec
+			sbc	#0x10
 			bra	$+b_2
 b_else:
 			sec
