@@ -244,11 +244,19 @@ Hdma__UpdateScrolling_RecursiveCall:
 	bne	$+b_1
 		// Adjust scroll value
 		lda	$_IO_SCROLL_Y
-		sec
-		sbc	$.Scanline_HDMA
-		bcs	$+b_2
+		cmp	#0xf0
+		bcc	$+b_else
 			inc	$_IO_SCROLL_Y+1
+			sec
+			sbc	$.Scanline_HDMA
 			sbc	#0x0f
+			bra	$+b_2
+b_else:
+			sec
+			sbc	$.Scanline_HDMA
+			bcs	$+b_2
+				inc	$_IO_SCROLL_Y+1
+				sbc	#0x0f
 b_2:
 		sta	$_IO_SCROLL_Y
 b_1:

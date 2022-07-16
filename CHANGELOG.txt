@@ -18,6 +18,7 @@ Dev build:
 - Added thread safety to indirect I/O access
 - Added indicator for which settings were changed compared to default
 - Added mention to the compatibility list on step 2
+- Fixed Y scroll value when it is pointing into the attribute table
 
 v1.5:
 - Fixed a bug that caused the emulator to pause forever without error screen
