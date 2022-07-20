@@ -156,54 +156,6 @@ Gfx__NameTableMirrorChange_Data:
 
 	// Note: IRQ writes 6 bytes to stack
 
-Start__Irq_TrapTest:
-		// Push registers
-		sta	$_TrapTest_A
-		tsc
-		sta	$_TrapTest_S
-		lda	#_TrapTest_Stack
-		tcs
-		// Push the rest of the registers to interrupt stack
-		phx
-		phy
-		phd
-		lda	#_IRQ_VSTACK_PAGE
-		tcd
-
-		// Test main thread
-		Int__TestMainThread		b_trapped, TrapTest_A, TrapTest_S
-
-b_TrapReturn:
-		// Pull from interrupt stack
-		pld
-		ply
-		plx
-
-		// Restore stack pointer and A
-		lda	$_TrapTest_S
-		tcs
-		lda	$_TrapTest_A
-
-		plb
-		rti
-
-b_trapped:
-		stz	$_IRQ_InterruptInProcess
-		bra	$-b_TrapReturn
-
-
-Start__Irq_Out:
-		// Acknowledge IRQ and return
-		bit	$0x4211
-
-		// Is it time to test main thread?
-		dec	$_BlueScreen_WaitState
-		bmi	$+b_1
-			plb
-			rti
-b_1:
-		jmp	$_Start__Irq_TrapTest
-
 	.mx	0x00
 	.func	Start__Irq_Fast
 Start__Irq_Fast:
@@ -217,10 +169,6 @@ Start__Irq_Fast:
 
 	// Change mode, clear decimal and carry
 	rep	#0x39
-
-	// Is interrupt already in process?
-	bit	$_IRQ_InterruptInProcess
-	bmi	$-Start__Irq_Out
 
 	// Push A and S to Vstack
 	sta	$_a
@@ -237,10 +185,6 @@ Start__Irq_Fast:
 	// Change mode
 	.mx	0x10
 	sep	#0x10
-
-	// Interrupt in process
-	ldx	#0x80
-	stx	$_IRQ_InterruptInProcess+1
 
 	// Are we in Vblank? Also acknowledge IRQ at the same time
 	lda	$0x4211
@@ -352,9 +296,6 @@ b_else:
 b_1:
 
 Start__Irq_Return:
-	// Interrupt no longer in process
-	stz	$.IRQ_InterruptInProcess
-
 	// Restore stack pointer (top half)
 	lda	$.s
 
@@ -371,27 +312,9 @@ Start__Irq_Return:
 	plb
 	rti
 
-	.macro	Start__Irq_Return
-		// Pull from interrupt stack
-		pld
-		ply
-		plx
-
-		// Restore stack pointer and A
-		lda	$_s
-		tcs
-		lda	$_a
-
-		// Interrupt no longer in process
-		stz	$_IRQ_InterruptInProcess
-
-		plb
-		rti
-	.endm
-
 
 Start__Irq_NesNmi:
-	.local	_stack
+	//.local	_stack
 	//.local	.keepNesBank
 	//.local	_keepIOTemp16
 	//.local	.keepIOTemp
@@ -440,19 +363,35 @@ Start__Irq_NesNmi:
 		jsr	$_Start__Irq_NewNesNmi
 b_1:
 
+	// Pull from interrupt stack and copy some registers
+	pla
+	sta	$_NmiReturn_DP
+	ply
+	sty	$_NmiReturn_Y
+	plx
+	stx	$_NmiReturn_X
+	lda	$_a
+	sta	$_NmiReturn_A
+	lda	$_s
+	sta	$_NmiReturn_Stack
+	tcs
+
+	// Fix DP
+	lda	#0
+	tcd
+
 	// Are we using native return from interrupt?
 	lda	$=RomInfo_StackEmulation
 	and	#_RomInfo_StackEmu_NativeReturnInterrupt
 	beq	$+Start__Irq_NesNmi_NonNative
 
-		// Fix registers and call
-		tsc
-		sta	$_stack
-		lda	#0
-		tcd
-		lda	$_s
-		tcs
 		sep	#0x30
+		// Push default data bank for static range optimizations
+		lda	$=RomInfo_StartBankPRG
+		pha
+		plb
+		// Fix A
+		lda	$_NmiReturn_A
 		// Push fake return (Final Fantasy 1 fix)
 		phk
 		pea	$_Start__Irq_NesNmi_FakeReturn-1
@@ -463,15 +402,6 @@ b_1:
 		jmp	[$_NMI_SnesPointer]
 
 Start__Irq_NesNmi_NonNative:
-	// Pull from interrupt stack and copy some registers
-	pld
-	tdc
-	sta	$_NmiReturn_DP
-	ply
-	sty	$_NmiReturn_Y
-	plx
-	stx	$_NmiReturn_X
-
 	// Restore stack pointer
 	lda	$_s
 	tcs
@@ -513,6 +443,8 @@ Start__Irq_NesNmi_NonNative:
 
 	.mx	0x30
 Start__Irq_NesNmi_Return:
+	lock
+
 	// Fix DB
 	phk
 	plb
@@ -531,14 +463,24 @@ Start__Irq_NesNmi_Return:
 	lda	$_NmiReturn_JMPiU
 	sta	$_JMPiU_Action
 
-	// Fix stack and go to proper return
-	lda	$_stack
+	// Fix registers and return
+	lda	$_NmiReturn_Stack
 	tcs
-	Start__Irq_Return
+	lda	$_NmiReturn_DP
+	tcd
+	lda	$_NmiReturn_A
+	ldx	$_NmiReturn_X
+	ldy	$_NmiReturn_Y
+	plb
+	rti
+
+	//Start__Irq_Return
 
 
 	.mx	0x30
 Start__Irq_NesNmi_FakeReturn:
+	lock
+
 	// Fix DB
 	phk
 	plb
@@ -557,20 +499,14 @@ Start__Irq_NesNmi_FakeReturn:
 	lda	$_NmiReturn_JMPiU
 	sta	$_JMPiU_Action
 
-	// Fix stack
-	lda	$_stack
-	tcs
-
-	// Interrupt no longer in process
-	stz	$_IRQ_InterruptInProcess
-
-	// Pull from interrupt stack
-	pld
-	ply
-	plx
+	// Restore some registers
+	lda	$_NmiReturn_DP
+	tcd
+	ldy	$_NmiReturn_Y
+	ldx	$_NmiReturn_X
 
 	// Restore stack and bank
-	lda	$_s
+	lda	$_NmiReturn_Stack
 	tcs
 	plb
 
@@ -592,7 +528,7 @@ Start__Irq_NesNmi_FakeReturn:
 Start__Irq_NesNmi_NonNativeReturn:
 	// Get return address (part 1)
 	.mx	0x00
-	sep	#0x30
+	sep	#0x34						// Also lock thread until fully returned to avoid rare lag frame
 	lda	$_NmiReturn_ReturnAddress+2
 	pha
 
@@ -608,9 +544,6 @@ Start__Irq_NesNmi_NonNativeReturn:
 	lda	$_NmiReturn_JMPiU
 	sta	$_JMPiU_Action
 
-	// Interrupt no longer in process
-	stz	$_IRQ_InterruptInProcess
-
 	// Get return address (part 2)
 	lda	$_NmiReturn_ReturnAddress+0
 	pha
@@ -620,13 +553,14 @@ Start__Irq_NesNmi_NonNativeReturn:
 	tcd
 	lda	$_NmiReturn_DB	// DB+P
 	pha
-	plb
 
 	ldy	$_NmiReturn_Y
 	ldx	$_NmiReturn_X
 	lda	$_NmiReturn_A
 
 	stz	$_NmiReturn_Busy
+
+	plb
 	rti
 
 
@@ -737,7 +671,6 @@ Int__TestMainThread_outlined:
 	lda	#0x0000
 	sta	[$.Vram_Queue_Top]
 	stz	$.BlueScreen_WaitState
-	stz	$.IRQ_InterruptInProcess
 	ldx	$.s
 	txs
 	lda	$=RomInfo_VramQBufferSize

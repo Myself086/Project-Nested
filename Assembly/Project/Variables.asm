@@ -272,7 +272,7 @@ Memory__CartBanks:
 
 
 	.addr	0x0aa7, 0x0abf
-	// 23/25
+	// 25/25
 
 NmiReturn_Busy:		// Negative when data below is in use, must be followed by any NmiReturn data due to 16-bit STZ
 	.fill	1
@@ -299,6 +299,8 @@ NmiReturn_DB:		// DB must be above P, they are copied together
 NmiReturn_P:
 	.fill	1
 NmiReturn_DP:
+	.fill	2
+NmiReturn_Stack:
 	.fill	2
 
 
@@ -542,9 +544,6 @@ Vram_Queue_Top_2:
 	// IRQ thread
 
 	.addr	0x1d06, 0x1d7f
-
-IRQ_InterruptInProcess:
-	.fill	2
 
 Nmi_Count:
 	.fill	2
