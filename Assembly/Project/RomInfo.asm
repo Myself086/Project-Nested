@@ -129,7 +129,7 @@ RomInfo_StackResetRange:
 	.data8	0xff, 0x00
 
 RomInfo_VramQBufferSize:
-	.data16	0x1000
+	.data16	0x0800
 
 	// Negative when using CHR RAM clone
 RomInfo_ChrRamClone:
