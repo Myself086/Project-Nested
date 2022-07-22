@@ -1,5 +1,5 @@
 
-Dev build:
+v1.6:
 - Added support for .pal file for custom palette
 - Added support for Game Genie codes
 - Added AOT inline for game code (must enable "AOT optimization")
