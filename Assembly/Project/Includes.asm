@@ -46,15 +46,6 @@ temp__:
 
 	.include	"Project/RomInfo.asm"
 
-	// Sound
-Spc_Code_Start:
-	.fix "Sound"
-	.offsetfrom		0x0400
-	.includeSPC	"Project/Spc700/Spc.asm"
-	.offsetend
-	.fix "Stuff"
-Spc_Code_End:
-
 	.include	"Project/Gui.asm"
 	.include	"Project/Gui.StringFormat.asm"
 	.include	"Project/EmuCalls.asm"
@@ -103,6 +94,15 @@ BankEnd_80:
 
 	// Low level emulation
 	.include	"Project/Interpreter.asm"
+
+	// Sound
+Spc_Code_Start:
+	.fix "Sound"
+	.offsetfrom		0x0400
+	.includeSPC	"Project/Spc700/Spc.asm"
+	.offsetend
+	.fix "Stuff"
+Spc_Code_End:
 
 BankEnd_c1:
 
