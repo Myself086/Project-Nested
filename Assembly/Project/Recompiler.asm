@@ -2330,8 +2330,24 @@ b_1:
 		rts
 
 
-Recompiler__Build_OpcodeType_LdaXInd:
 Recompiler__Build_OpcodeType_StaXInd:
+	// Do we have memory emulation turned on?
+	lda	$=RomInfo_MemoryEmulation
+	and	#_RomInfo_MemEmu_Store
+	beq	$+b_1
+		stz	$.memoryPrefix
+		lda	[$.readAddr]
+		xba
+		tay
+		iny
+		ldx	#_Inline_StoreIndirectX
+		lda	#_Inline_StoreIndirectX/0x10000
+		jsr	$_Recompiler__Build_Inline2
+b_1:
+	jmp	$_Recompiler__Build_OpcodeType_Zpg
+
+
+Recompiler__Build_OpcodeType_LdaXInd:
 Recompiler__Build_OpcodeType_XInd:
 	// Do we have memory emulation turned on?
 	lda	$=RomInfo_MemoryEmulation

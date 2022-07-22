@@ -307,6 +307,20 @@ b_1:
 
 
 		Interpret_WriteWithinSegment	b_sta_a0_e
+Inline_StoreIndirectX:
+		php
+		xba
+		lda	$0xff,X
+		and	#0xe0
+		eor	$_Memory_NesBank
+		beq	$+b_1
+			jsr	$=Interpret_StoreIndirectX
+b_1:
+		xba
+		plp
+		.data8	0
+
+
 Interpret_StoreIndirectY:
 		// Flags NZ don't matter here
 		eor	$_Memory_NesBank
@@ -324,6 +338,15 @@ Interpret_LoadIndirectXCmp:
 		//sta	$_Memory_NesBank		// Writing this was moved to individual cases because it isn't necessary for IO ranges
 		sta	$_IndirectX_Lda_Action
 		jmp	($_IndirectX_Lda_Action)
+
+
+Interpret_StoreIndirectX:
+		// Flags NZ don't matter here
+		eor	$_Memory_NesBank
+Interpret_StoreIndirectXCmp:
+		//sta	$_Memory_NesBank		// Writing this was moved to individual cases because it isn't necessary for IO ranges
+		sta	$_IndirectX_Sta_Action
+		jmp	($_IndirectX_Sta_Action)
 
 		// Done placing code between segments
 	.pulladdr
