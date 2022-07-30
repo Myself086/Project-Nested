@@ -1,4 +1,7 @@
 
+Dev build:
+- Fixed "Header skipped file address format" from incrementing each time you press Ok
+
 v1.6:
 - Added support for .pal file for custom palette
 - Added support for Game Genie codes

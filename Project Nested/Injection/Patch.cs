@@ -85,7 +85,7 @@ namespace Project_Nested.Injection
             {
                 this.PatchType = header ? PatchTypeEnum.FileAddrPlus : PatchTypeEnum.FileAddr;
                 this.NesBank = -1;
-                this.NesAddress = Convert.ToInt32(addressSplit[0], 16) + (header ? 0x10 : 0);
+                this.NesAddress = Convert.ToInt32(addressSplit[0], 16);
             }
 
             // Read data
