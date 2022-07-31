@@ -37,7 +37,7 @@ b_1:
 Cop__Wait4VBlank:
 	.vstack		_VSTACK_START
 	CoreCall_Begin
-	CoreCall_UseA16
+	CoreCall_Use	"A8nz"
 	CoreCall_Push
 	CoreCall_CopyUpTo	+b_1
 b_loop:
@@ -62,9 +62,7 @@ b_1:
 Cop__SetScanline:
 	.vstack		_VSTACK_START
 	CoreCall_Begin
-	CoreCall_UseA16
-	CoreCall_UseX
-	CoreCall_UseY
+	CoreCall_Use	"A16XYnvzc"
 	CoreCall_Push
 	CoreCall_CopyUpTo	+b_1
 		sta	$_Scanline
@@ -84,9 +82,7 @@ b_1:
 Cop__AddScanline:
 	.vstack		_VSTACK_START
 	CoreCall_Begin
-	CoreCall_UseA16
-	CoreCall_UseX
-	CoreCall_UseY
+	CoreCall_Use	"A16XYnvzc"
 	CoreCall_Push
 	CoreCall_CopyUpTo	+b_1
 		clc
@@ -106,9 +102,7 @@ b_1:
 Cop__IncScanline:
 	.vstack		_VSTACK_START
 	CoreCall_Begin
-	CoreCall_UseA16
-	CoreCall_UseX
-	CoreCall_UseY
+	CoreCall_Use	"A16XYnvzc"
 	CoreCall_Push
 	CoreCall_CopyUpTo	+b_1
 		lda	$_Scanline_HDMA
