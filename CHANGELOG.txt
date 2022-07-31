@@ -1,6 +1,7 @@
 
 Dev build:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok
+- Fixed some registers when using NMI at vblank with non-native return from interrupt (bug from v1.6)
 
 v1.6:
 - Added support for .pal file for custom palette

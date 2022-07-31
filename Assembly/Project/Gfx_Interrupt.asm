@@ -402,9 +402,9 @@ b_1:
 		jmp	[$_NMI_SnesPointer]
 
 Start__Irq_NesNmi_NonNative:
-	// Restore stack pointer
-	lda	$_s
-	tcs
+	// Stack    1  2  3  4  5
+	// Before: db, p, r, r, r
+	// After:         p  r  r
 
 	// Copy return
 	lda	$3,s
@@ -416,15 +416,9 @@ Start__Irq_NesNmi_NonNative:
 	lda	#_NmiReturn_FakeNesAddress
 	sta	$4,s
 
-	// Copy A
-	lda	$_a
-	sta	$_NmiReturn_A
-
 	// Copy DB and P
-	lda	$1,s
+	pla
 	sta	$_NmiReturn_DB
-	plb
-	plp
 	// Fix P
 	sep	#0x30
 	.mx	0x30
@@ -433,8 +427,14 @@ Start__Irq_NesNmi_NonNative:
 	and	#0xf3
 	sta	$1,s
 
-	// Fix A
+	// Push default data bank for static range optimizations
+	lda	$=RomInfo_StartBankPRG
+	pha
+	plb
+
+	// Fix A and copy it
 	lda	$_a
+	sta	$_NmiReturn_A
 
 	// Call NMI
 	unlock
