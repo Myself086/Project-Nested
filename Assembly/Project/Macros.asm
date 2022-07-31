@@ -389,37 +389,38 @@ b_skip__:
 		.data8	{2}
 	.endm
 
-	CoreCall_DEFINE		CoreCall_Begin			""					// Begin prerequisite instruction for calling core function (must be 0x00)
-	CoreCall_DEFINE		CoreCall_End			""					// End prerequisite instruction for calling core function
-	CoreCall_DEFINE		CoreCall_Call			".data16 {0}"		// Long call function
-	CoreCall_DEFINE		CoreCall_Lock			""					// Surrounds call with SEI+CLI, takes priority over PHP
-	CoreCall_DEFINE		CoreCall_UseA8			""					// Surrounds call with XBA+XBA if A is used
-	CoreCall_DEFINE		CoreCall_UseA16			""					// Surrounds call with PHA+PLA if A is used
-	CoreCall_DEFINE		CoreCall_UseX			""					// Surrounds call with PHX+PLX if X is used
-	CoreCall_DEFINE		CoreCall_UseY			""					// Surrounds call with PHY+PLY if Y is used
-	CoreCall_DEFINE		CoreCall_UseN			""					// Surrounds call with PHP+PLP if P.n is used
-	CoreCall_DEFINE		CoreCall_UseV			""					// Surrounds call with PHP+PLP if P.v is used
-	CoreCall_DEFINE		CoreCall_UseZ			""					// Surrounds call with PHP+PLP if P.z is used
-	CoreCall_DEFINE		CoreCall_UseC			""					// Surrounds call with PHP+PLP if P.c is used
-	CoreCall_DEFINE		CoreCall_Push			""					// Push every register used by both caller and callee
-	CoreCall_DEFINE		CoreCall_Pull			""					// Pull every register used by both caller and callee
-	CoreCall_DEFINE		CoreCall_IfFreeA		".data8 {0}"		// If A is free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfNotFreeA		".data8 {0}"		// If A isn't free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfFreeX		".data8 {0}"		// If X is free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfNotFreeX		".data8 {0}"		// If X isn't free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfFreeY		".data8 {0}"		// If Y is free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfNotFreeY		".data8 {0}"		// If Y isn't free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfFreeP		".data8 {0}"		// If P is free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfNotFreeP		".data8 {0}"		// If P isn't free, goto {0}
-	CoreCall_DEFINE		CoreCall_IfJit			".data8 {0}"		// If JIT, goto {0}
-	CoreCall_DEFINE		CoreCall_IfAot			".data8 {0}"		// If AOT, goto {0}
-	CoreCall_DEFINE		CoreCall_IfSet			"IfSet {0},{1},{2}"	// If var {0} bit masked with {1} is set, goto {2}
-	CoreCall_DEFINE		CoreCall_IfClear		"IfSet {0},{1},{2}"	// If var {0} bit masked with {1} is clear, goto {2}
-	CoreCall_DEFINE		CoreCall_Jump			".data16 {0}"		// goto {0}
-	CoreCall_DEFINE		CoreCall_Copy			".data16 {0},{1}"	// Copies code from address {0} to {1}-1
-	CoreCall_DEFINE		CoreCall_CopyUpTo		".data8 {0}"		// Copies {0} bytes then resume instructions after the last byte
-	CoreCall_DEFINE		CoreCall_Remove			".data8 {0}"		// Remove {0} bytes
-	CoreCall_DEFINE		CoreCall_WriteOriginal	""					// Writes original instruction
+	CoreCall_DEFINE		CoreCall_Begin				""					// Begin prerequisite instruction for calling core function (must be 0x00)
+	CoreCall_DEFINE		CoreCall_End				""					// End prerequisite instruction for calling core function
+	CoreCall_DEFINE		CoreCall_Call				".data16 {0}"		// Long call function
+	CoreCall_DEFINE		CoreCall_Lock				""					// Surrounds call with SEI+CLI, takes priority over PHP
+	CoreCall_DEFINE		CoreCall_UseA8				""					// Surrounds call with XBA+XBA if A is used
+	CoreCall_DEFINE		CoreCall_UseA16				""					// Surrounds call with PHA+PLA if A is used
+	CoreCall_DEFINE		CoreCall_UseX				""					// Surrounds call with PHX+PLX if X is used
+	CoreCall_DEFINE		CoreCall_UseY				""					// Surrounds call with PHY+PLY if Y is used
+	CoreCall_DEFINE		CoreCall_UseN				""					// Surrounds call with PHP+PLP if P.n is used
+	CoreCall_DEFINE		CoreCall_UseV				""					// Surrounds call with PHP+PLP if P.v is used
+	CoreCall_DEFINE		CoreCall_UseZ				""					// Surrounds call with PHP+PLP if P.z is used
+	CoreCall_DEFINE		CoreCall_UseC				""					// Surrounds call with PHP+PLP if P.c is used
+	CoreCall_DEFINE		CoreCall_Push				""					// Push every register used by both caller and callee
+	CoreCall_DEFINE		CoreCall_Pull				""					// Pull every register used by both caller and callee
+	CoreCall_DEFINE		CoreCall_IfFreeA			".data8 {0}"		// If A is free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfNotFreeA			".data8 {0}"		// If A isn't free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfFreeX			".data8 {0}"		// If X is free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfNotFreeX			".data8 {0}"		// If X isn't free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfFreeY			".data8 {0}"		// If Y is free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfNotFreeY			".data8 {0}"		// If Y isn't free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfFreeP			".data8 {0}"		// If P is free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfNotFreeP			".data8 {0}"		// If P isn't free, goto {0}
+	CoreCall_DEFINE		CoreCall_IfJit				".data8 {0}"		// If JIT, goto {0}
+	CoreCall_DEFINE		CoreCall_IfAot				".data8 {0}"		// If AOT, goto {0}
+	CoreCall_DEFINE		CoreCall_IfSet				"IfSet {0},{1},{2}"	// If var {0} bit masked with {1} is set, goto {2}
+	CoreCall_DEFINE		CoreCall_IfClear			"IfSet {0},{1},{2}"	// If var {0} bit masked with {1} is clear, goto {2}
+	CoreCall_DEFINE		CoreCall_Jump				".data16 {0}"		// goto {0}
+	CoreCall_DEFINE		CoreCall_Copy				".data16 {0},{1}"	// Copies code from address {0} to {1}-1
+	CoreCall_DEFINE		CoreCall_CopyUpTo			".data8 {0}"		// Copies {0} bytes then resume instructions after the last byte
+	CoreCall_DEFINE		CoreCall_Remove				".data8 {0}"		// Remove {0} bytes
+	CoreCall_DEFINE		CoreCall_WriteOriginal		""					// Writes original instruction
+	CoreCall_DEFINE		CoreCall_ResetMemoryPrefix	""					// Resets memory prefix assumption when recompiling
 
 	.macro	CoreCall_Use	flags
 		.ifnamecontains	{0}, "A8"

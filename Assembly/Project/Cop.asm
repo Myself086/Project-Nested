@@ -62,6 +62,7 @@ b_1:
 Cop__SetScanline:
 	.vstack		_VSTACK_START
 	CoreCall_Begin
+	CoreCall_ResetMemoryPrefix
 	CoreCall_Use	"A16XYnvzc"
 	CoreCall_Push
 	CoreCall_CopyUpTo	+b_1
@@ -82,6 +83,7 @@ b_1:
 Cop__AddScanline:
 	.vstack		_VSTACK_START
 	CoreCall_Begin
+	CoreCall_ResetMemoryPrefix
 	CoreCall_Use	"A16XYnvzc"
 	CoreCall_Push
 	CoreCall_CopyUpTo	+b_1
@@ -102,6 +104,7 @@ b_1:
 Cop__IncScanline:
 	.vstack		_VSTACK_START
 	CoreCall_Begin
+	CoreCall_ResetMemoryPrefix
 	CoreCall_Use	"A16XYnvzc"
 	CoreCall_Push
 	CoreCall_CopyUpTo	+b_1

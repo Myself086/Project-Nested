@@ -128,10 +128,14 @@ b_1:
 		//and	#0x01			// Top 7 bits are open bus
 		sta	$_IO_2002_SnesScanline+1
 	.endm
+
 IO__r2002_a:
+	CoreCall_Begin
+	CoreCall_ResetMemoryPrefix
+	CoreCall_Call		IO__r2002_a_i
+	CoreCall_End
+
 IO__r2002_a_i:
-IO__r2002_x:
-IO__r2002_y:
 	php
 	pha
 

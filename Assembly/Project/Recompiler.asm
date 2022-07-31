@@ -4086,6 +4086,10 @@ b_exit:
 
 		break
 
+	case	CoreCall_ResetMemoryPrefix
+		stz	$.memoryPrefix
+		break
+
 	.unlocal	_pushFlags, _freeRegs, =src
 
 	// ---------------------------------------------------------------------------
