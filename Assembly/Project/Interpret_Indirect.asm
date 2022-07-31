@@ -434,6 +434,7 @@ b_1:
 	// ---------------------------------------------------------------------------
 
 Interpret_IndirectIO_trap:
+	unlock
 	trap
 	Exception	"Indirect IO Access Fail{}{}{}Unable to find target address."
 
