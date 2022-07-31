@@ -197,6 +197,9 @@ b_in:
 			sep	#0x34
 			.mx	0x30
 
+			// Reset memory range
+			stz	$_Memory_NesBank
+
 			IO__r2002_SaveScanline
 
 			ply

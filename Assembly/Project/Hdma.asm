@@ -111,7 +111,7 @@ Hdma__InitChannels:
 Hdma__UpdateScrolling_ReturnFromIRQ:
 	nop
 
-	// Restore mode, DP, DB
+	// Restore mode, DP
 	rep	#0x30
 	.mx	0x00
 	lda	#_HDMA_VSTACK_PAGE
@@ -121,6 +121,9 @@ Hdma__UpdateScrolling_ReturnFromIRQ:
 	// Change mode
 	sep	#0x20
 	.mx	0x20
+
+	// Reset memory range
+	stz	$_Memory_NesBank
 
 	pla
 	cmp	$.Scanline_IRQ
