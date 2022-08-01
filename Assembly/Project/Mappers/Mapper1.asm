@@ -366,6 +366,7 @@ b_2:
 
 Mapper1__we000_a:
 	CoreCall_Begin
+	CoreCall_ResetMemoryPrefix
 	CoreCall_CopyUpTo	+b_1
 		bit	#0x80
 		bne	$+b_reset

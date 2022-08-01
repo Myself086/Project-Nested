@@ -5,6 +5,7 @@ Dev build:
 - Fixed memory range emulation after returning from some interrupts
 - Fixed pushing P register during some COP (for patching)
 - Fixed memory range assumption after potential software interrupts
+- Fixed memory range assumption after PRG bank switching
 
 v1.6:
 - Added support for .pal file for custom palette

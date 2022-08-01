@@ -421,6 +421,8 @@ b_skip__:
 	CoreCall_DEFINE		CoreCall_Remove				".data8 {0}"		// Remove {0} bytes
 	CoreCall_DEFINE		CoreCall_WriteOriginal		""					// Writes original instruction
 	CoreCall_DEFINE		CoreCall_ResetMemoryPrefix	""					// Resets memory prefix assumption when recompiling
+	//CoreCall_DEFINE	CoreCall_Continue			""					// Alias for Call+Pull+End
+	//CoreCall_DEFINE	CoreCall_ContinueAt			".data16 {0}"		// Alias for Call+Pull+End
 
 	.macro	CoreCall_Use	flags
 		.ifnamecontains	{0}, "A8"
@@ -455,6 +457,24 @@ b_skip__:
 		{
 			CoreCall_UseC
 		}
+	.endm
+
+	.macro	CoreCall_Continue
+src__:
+		CoreCall_Call	0x0000
+		CoreCall_Pull
+		CoreCall_End
+dest__:
+		.pushaddr
+			.addr	src__+1
+			.data16	dest__
+		.pulladdr
+	.endm
+
+	.macro	CoreCall_ContinueAt		dest
+		CoreCall_Call	{0}
+		CoreCall_Pull
+		CoreCall_End
 	.endm
 
 	.def	CoreCallFlag_PushA		0x0001

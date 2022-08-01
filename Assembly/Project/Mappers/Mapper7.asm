@@ -31,18 +31,27 @@ Mapper7__Error:
 Mapper7__8000:
 	iIOPort_InterfaceSwitch		Mapper7__Error
 		case	iIOPort_sty
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			php
 			phx
 			tyx
 			bra	$+b_in
 		case	iIOPort_stx
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			php
 			phx
 			bra	$+b_in
 		case	iIOPort_sta
-		case	iIOPort_stai
 		case	iIOPort_stax
 		case	iIOPort_stay
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
+		case	iIOPort_stai
 			php
 			phx
 			tax

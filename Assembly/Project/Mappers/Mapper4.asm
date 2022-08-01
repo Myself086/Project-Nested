@@ -81,16 +81,28 @@ b_else__:
 Mapper4__8000:
 	iIOPort_InterfaceSwitch		Mapper4__Error
 		case	iIOPort_stax
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			Mapper4__DirectIndexed0	x, Mapper4__8000_stai, Mapper4__8001_stai
 		case	iIOPort_stay
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			Mapper4__DirectIndexed0	y, Mapper4__8000_stai, Mapper4__8001_stai
 		case	iIOPort_sty
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			php
 			xba
 			sty	$_IO_temp
 			tya
 			bra	$+b_in
 		case	iIOPort_stx
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			php
 			xba
 			stx	$_IO_temp
@@ -164,6 +176,7 @@ b_1:
 			rtl
 		case	iIOPort_sta
 			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
 			CoreCall_UseN
 			CoreCall_UseZ
 			CoreCall_Push
@@ -268,18 +281,33 @@ b_1:
 Mapper4__8001:
 	iIOPort_InterfaceSwitch		Mapper4__Error
 		case	iIOPort_stax
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			Mapper4__DirectIndexed1	x, Mapper4__8000_stai, Mapper4__8001_stai
 		case	iIOPort_stay
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			Mapper4__DirectIndexed1	y, Mapper4__8000_stai, Mapper4__8001_stai
 		case	iIOPort_stx
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			php
 			stx	$_IO_temp
 			bra	$+b_in
 		case	iIOPort_sty
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 			php
 			sty	$_IO_temp
 			bra	$+b_in
 		case	iIOPort_sta
+			CoreCall_Begin
+			CoreCall_ResetMemoryPrefix
+			CoreCall_Continue
 		case	iIOPort_stai
 Mapper4__8001_stai:
 			php
