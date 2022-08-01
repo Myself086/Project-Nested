@@ -1629,6 +1629,7 @@ b_1:
 	.func	Interpret__Wait4Vblank
 
 Interpret__Wait4Vblank:
+	php
 	sep	#0x24
 	.mx	0x20
 
@@ -1648,8 +1649,8 @@ Interpret__Wait4Vblank:
 	pld
 	plb
 
-	// Change mode, clear thread lock, clear carry and keep it clear during the loop below
-	rep	#0x35
+	// Change mode back and clear thread lock (if necessary)
+	plp
 	.mx	0x00
 
 	// Reset free cycle counter
@@ -1662,7 +1663,7 @@ Interpret__Wait4Vblank:
 		// Start counting cycles, 21.00 cycles between the first 2 BNE
 		sep	#0x20
 		bit	$_Nmi_Count
-		rep	#0x20
+		rep	#0x21			// Clear carry and keep it clear during the loop below
 		lda	#21
 Interpret__Wait4Vblank_Loop:
 			// 10.66 cycles (10.66 total)
