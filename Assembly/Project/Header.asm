@@ -53,7 +53,7 @@ Start__Lock_1:
 
 	// Reset stack if necessary
 	tsc
-	and	#0xf800
+	and	#0xe000
 	beq	$+b_1
 		lda	#0x01ff
 		tcs
