@@ -1163,10 +1163,11 @@ Gfx__VramQueue_VramQ_PpuAddr:
 
 
 Gfx__VramQueue_VramQ_PpuAddrLow:
-	and	#0xff00
-	xba
-	ora	$0x7f
-	xba
+	sep	#0x20
+	.mx	0x30
+	lda	$0x80
+	rep	#0x20
+	.mx	0x10
 
 	// Next
 	ldx	$0x80
