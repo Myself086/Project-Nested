@@ -131,6 +131,7 @@ namespace Project_Nested
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "NES ROM File (*.nes)|*.nes";
             fileDialog.Title = "Select a ROM File";
+            fileDialog.InitialDirectory = Properties.Settings.Default.NesPath;
 
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -138,6 +139,10 @@ namespace Project_Nested
                 //try
 #endif
                 {
+                    // Save path
+                    Properties.Settings.Default.NesPath = fileDialog.FileName.Substring(0, fileDialog.FileName.LastIndexOf('\\'));
+                    Properties.Settings.Default.Save();
+
                     SaveGlobalSettings();
 
                     LoadNesFile(fileDialog.FileName);
@@ -584,9 +589,14 @@ namespace Project_Nested
             fileDialog.Filter = "Save RAM File (*.srm)|*.srm";
             fileDialog.Title = "Select SRM Files (multi file select enabled)";
             fileDialog.Multiselect = true;
+            fileDialog.InitialDirectory = Properties.Settings.Default.SrmPath;
 
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
+                // Save path
+                Properties.Settings.Default.SrmPath = fileDialog.FileName.Substring(0, fileDialog.FileName.LastIndexOf('\\'));
+                Properties.Settings.Default.Save();
+
                 foreach (var file in fileDialog.FileNames)
                 {
                     // Read file and find header

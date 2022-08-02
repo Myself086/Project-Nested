@@ -6,6 +6,7 @@ Dev build:
 - Fixed pushing P register during some COP (for patching)
 - Fixed memory range assumption after potential software interrupts
 - Fixed memory range assumption after PRG bank switching
+- Separated initial path for "Open Nes" and "Load SRM"
 
 v1.6:
 - Added support for .pal file for custom palette
