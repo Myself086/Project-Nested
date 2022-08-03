@@ -137,15 +137,15 @@ namespace Project_Nested.Optimize
                     {
                         var value = (SByte)operand;
                         return AddSuffix((value < 0) ?
-                            $"{COLOR_JUMP}\t{desc.name}▲\t{COLOR_DEFAULT}-${-value:x2}" :
-                            $"{COLOR_JUMP}\t{desc.name}▼\t{COLOR_DEFAULT}+${value:x2}");
+                            $"{COLOR_JUMP}\t{desc.name}{COLOR_DEFAULT}▲\t{COLOR_DEFAULT}-${-value:x2}" :
+                            $"{COLOR_JUMP}\t{desc.name}{COLOR_DEFAULT}▼\t{COLOR_DEFAULT}+${value:x2}");
                     }
                 case OperandType.Br16:
                     {
                         var value = (Int16)operand;
                         return AddSuffix((value < 0) ?
-                            $"{COLOR_JUMP}\t{desc.name}▲\t{COLOR_DEFAULT}-${-value:x4}" :
-                            $"{COLOR_JUMP}\t{desc.name}▼\t{COLOR_DEFAULT}+${value:x4}");
+                            $"{COLOR_JUMP}\t{desc.name}{COLOR_DEFAULT}▲\t{COLOR_DEFAULT}-${-value:x4}" :
+                            $"{COLOR_JUMP}\t{desc.name}{COLOR_DEFAULT}▼\t{COLOR_DEFAULT}+${value:x4}");
                     }
                 case OperandType.Jmp16:
                     return AddSuffix($"{COLOR_JUMP}\t{desc.name}\t${operand:x4}");
