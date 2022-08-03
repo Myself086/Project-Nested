@@ -62,7 +62,7 @@ namespace Project_Nested.Optimize
                 case OperandType.Br8:
                     return pc + 2 + (sbyte)operand;
                 case OperandType.Br16:
-                    return (pc & 0xff0000) | ((pc + 2 + (short)operand) & 0xffff);
+                    return (pc & 0xff0000) | ((pc + 3 + (short)operand) & 0xffff);
                 case OperandType.Jmp16:
                     return (pc & 0xff0000) + (ushort)operand;
                 case OperandType.Jmp24:
@@ -81,7 +81,7 @@ namespace Project_Nested.Optimize
                 case OperandType.Br8:
                     return pc + 2 + (sbyte)operand;
                 case OperandType.Br16:
-                    return (pc & 0xff0000) | ((pc + 2 + (short)operand) & 0xffff);
+                    return (pc & 0xff0000) | ((pc + 3 + (short)operand) & 0xffff);
                 case OperandType.Jmp16:
                     return (pc & 0xff0000) + (ushort)operand;
                 case OperandType.Jmp24:
