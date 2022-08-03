@@ -136,8 +136,8 @@ namespace Project_Nested.Optimize.Operations
 
                         switch (asm.invariantOpcode)
                         {
-                            case InstructionSet.CLC: if (flagC == 0) ChangeOpcode(InstructionSet.NOP); break;
-                            case InstructionSet.SEC: if (flagC == 1) ChangeOpcode(InstructionSet.NOP); break;
+                            case InstructionSet.CLC: if (flagC == 0) ChangeOpcode(InstructionSet.NOP); flagC = 0; break;
+                            case InstructionSet.SEC: if (flagC == 1) ChangeOpcode(InstructionSet.NOP); flagC = 1; break;
                             case InstructionSet.LSR: flagC = regA.lo.GetLowestBit(); FlagNZ_M(regA.Sr(m)); break;
                             case InstructionSet.TDC: regA.lo = regA.hi = 0; FlagNZ_M(regA); break;
                             case InstructionSet.LDA_Const: FlagNZ_M(regA.SetValue(asm.operand, m)); break;
