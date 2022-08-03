@@ -141,6 +141,7 @@ namespace Project_Nested.Optimize
                             $"{COLOR_JUMP}\t{desc.name}{COLOR_DEFAULT}▼\t{COLOR_DEFAULT}+${value:x2}");
                     }
                 case OperandType.Br16:
+                case OperandType.Per:
                     {
                         var value = (Int16)operand;
                         return AddSuffix((value < 0) ?

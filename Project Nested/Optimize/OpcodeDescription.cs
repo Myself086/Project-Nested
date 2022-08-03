@@ -83,6 +83,7 @@ namespace Project_Nested.Optimize
                 case OperandType.Jmp16:
                 case OperandType.JmpInd:
                 case OperandType.JmpIndLong:
+                case OperandType.Per:
                 case OperandType.Break:
                 case OperandType.Move:
                 case OperandType.Label:
@@ -196,6 +197,7 @@ namespace Project_Nested.Optimize
                 case OperandType.JmpInd:
                 case OperandType.JmpIndX:
                 case OperandType.JmpIndLong:
+                case OperandType.Per:
                 case OperandType.Move:
                 case OperandType.JmpLabel:
                     byteCount = 3;
@@ -233,6 +235,7 @@ namespace Project_Nested.Optimize
         Br8, Br16,                          // Branch
         Jmp16, Jmp24,                       // Jump
         JmpInd, JmpIndX, JmpIndLong,        // Indirect jump
+        Per,                                // PER opcode
         Break,                              // Break and cop
         Move,                               // Move positive/negative
         Return,

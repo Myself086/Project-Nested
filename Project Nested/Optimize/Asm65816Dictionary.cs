@@ -319,7 +319,7 @@ namespace Project_Nested.Optimize
             // PEI
             DefineOpcode(0xD4, new OpcodeDescription("PEI", OperandType.Dp, FlagAndRegs.SP | FlagAndRegs.DP, FlagAndRegs.SP | FlagAndRegs.Write));
             // PER
-            DefineOpcode(0x62, new OpcodeDescription("PER", OperandType.Br16, FlagAndRegs.SP, FlagAndRegs.SP | FlagAndRegs.Write));
+            DefineOpcode(0x62, new OpcodeDescription("PER", OperandType.Per, FlagAndRegs.SP, FlagAndRegs.SP | FlagAndRegs.Write));
             // PHA
             DefineOpcode(0x48, new OpcodeDescription("PHA", OperandType.None, FlagAndRegs.SP | FlagAndRegs.A, FlagAndRegs.SP | FlagAndRegs.Write));
             // PHB
