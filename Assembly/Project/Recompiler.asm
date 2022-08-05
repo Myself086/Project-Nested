@@ -1489,7 +1489,7 @@ b_3:
 	pha
 	lda	$.memPrefixTable+2
 	.unlocal	=memPrefixTable
-	jsr	$_Recompiler__Build_Inline2
+	jsr	$_Recompiler__Build_Inline
 
 	// Rewrite 4 bytes that were already written
 	ldy	#2
