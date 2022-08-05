@@ -134,17 +134,17 @@ b_exit:
 		return
 
 Hdma__UpdateScrolling:
-	// Is UpdateScroll busy?
-	lda	#0x80
-	tsb	$_Scanline_Busy
-	bne	$-b_exit
-
 	// Change DP and DB
 	pea	$_HDMA_VSTACK_PAGE
 	pld
 	lda	#.HDMA_BUFFER_BANK/0x10000
 	pha
 	plb
+
+	// Is UpdateScroll busy?
+	lda	#0x80
+	tsb	$.Scanline_Busy
+	bne	$-b_exit
 
 	// Is this a new frame?
 	lda	$.Scanline_HDMA
