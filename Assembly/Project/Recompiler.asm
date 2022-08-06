@@ -735,6 +735,12 @@ Recompiler__Build_loop2_loop_in1:
 					ora	$.stackDepth
 					sta	$.stackDepth
 
+					// New last address
+					ldy	#0x0002
+					lda	[$.destRead],y
+					inc	a
+					sta	$.lastReadAddr
+
 					// Reset block flags, keep start address for this block
 					stz	$.blockFlags
 					lda	[$.destRead]
@@ -913,6 +919,12 @@ b_3:
 					lda	[$.destRead],y
 					ora	$.stackDepth
 					sta	$.stackDepth
+
+					// New last address
+					ldy	#0x0002
+					lda	[$.destRead],y
+					inc	a
+					sta	$.lastReadAddr
 
 					// Reset block flags, keep start address for this block
 					stz	$.blockFlags

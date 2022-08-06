@@ -10,6 +10,7 @@ Dev build:
 - Fixed AOT optimization understanding PER opcode, used for emulating JSR to RAM
 - Fixed AOT optimization CLC and SEC actually changing carry flag when solving constants
 - Fixed a crash when a scanline change is interrupted
+- Fixed unconditional branch detection when a label points to the branch
 
 v1.6:
 - Added support for .pal file for custom palette
