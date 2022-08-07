@@ -217,33 +217,39 @@ case_value__:
 	.macro	case		value
 case_destination__:
 		.pushaddr
-		.addr	case_value__+{0}*2
+		.def	value__		{0}
+		.addr	case_value__+value__*2
 		.data16	_case_destination__
 		.pulladdr
 	.endm
 
 	.macro	casex		value
-		.def	case_param1__	=Zero+{0}/2
+		.def	value__		{0}
+		.def	case_param1__	=Zero+value__/2
 		case	case_param1__
 	.endm
 
 	.macro	cases		value1, value2
 case_destination__:
 		.pushaddr
-		.addr	case_value__+{0}*2
-		.fill16	_Zero+{1}-{0}+1, _case_destination__
+		.def	value__		{0}
+		.addr	case_value__+value__*2
+		.fill16	_Zero+{1}-value__+1, _case_destination__
 		.pulladdr
 	.endm
 
 	.macro	casesx		value1, value2
-		.def	case_param1__	=Zero+{0}/2
-		.def	case_param2__	=Zero+{1}/2
+		.def	value1__	{0}
+		.def	value2__	{1}
+		.def	case_param1__	=Zero+value1__/2
+		.def	case_param2__	=Zero+value2__/2
 		cases	case_param1__, case_param2__
 	.endm
 
 	.macro	caseat		value, destination
 		.pushaddr
-		.addr	case_value__+{0}*2
+		.def	value__		{0}
+		.addr	case_value__+value__*2
 		.data16	_Zero+{1}
 		.pulladdr
 	.endm
