@@ -64,6 +64,21 @@ Inline__Sei:
 
 	// ---------------------------------------------------------------------------
 
+	.mx	0x30
+Inline__PlaIndirect:
+	tsc
+	inc	a			// Support stack wrap
+	tcs
+	phx
+	tax
+	lda	$0x01ff,x
+	plx
+	ora	#0xff		// Fix flags
+
+	.data8	0
+
+	// ---------------------------------------------------------------------------
+
 Inline__Plp:
 	plp
 	sep	#0x30

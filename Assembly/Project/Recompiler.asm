@@ -138,6 +138,12 @@ Recompiler__SetBank:
 
 	// ---------------------------------------------------------------------------
 
+	// To use with local variable popSlideFlags in Recompiler__Build
+	.def	PopSlideFlags_Txs				0x01
+	.def	PopSlideFlags_PlaStaPpu			0x02
+
+	// ---------------------------------------------------------------------------
+
 	.mx	0x00
 	.func	Recompiler__Build		_romAddr, _compileType
 	// Compile type flags
@@ -203,6 +209,10 @@ b_1:
 	sta	$.writeAddr+1
 	sty	$.heapStackIndex+0
 	stx	$.writeAddr+0
+
+	// Pop slide detection
+	.local	.popSlideFlags
+	stz	$.popSlideFlags
 
 	// Set bank for readAddr
 	lda	$.romAddr
@@ -313,6 +323,7 @@ Recompiler__Build_loop1_loop_switch:
 				.data16	_Recompiler__Build_loop1_loop_switch_IllegalNop
 				.data16	_Recompiler__Build_loop1_loop_switch_LoadConst
 				.data16	_Recompiler__Build_loop1_loop_switch_Jsl
+				.data16	_Recompiler__Build_loop1_loop_switch_Txs
 
 Recompiler__Build_loop1_loop_switch_LoadConst:
 					// Is this instruction followed by a conditional branch?
@@ -509,6 +520,21 @@ Recompiler__Build_loop1_loop_switch_Pull:
 					lda	#_Opcode_F_UsePull
 					tsb	$.recompileFlags
 
+					// Is it followed by STA to PPU?
+					lda	[$.readAddr]
+					eor	#0x8d68
+					bne	$+b_1
+						tyx
+						ldy	#2
+						lda	[$.readAddr],y
+						txy
+						and	#0xe000
+						eor	#0x2000
+						bne	$+b_1
+							lda	#_PopSlideFlags_PlaStaPpu
+							tsb	$.popSlideFlags
+b_1:
+
 					// Is it followed by another pull?
 					lda	#0x6868
 					eor	[$.readAddr]
@@ -598,6 +624,12 @@ Recompiler__Build_loop1_loop_switch_Jsl:
 					ldy	$.opcodeX2
 					bcc	$+Recompiler__Build_loop1_loop_switch_Error
 					clc
+					bra	$+Recompiler__Build_loop1_loop_switch_Regular
+
+
+Recompiler__Build_loop1_loop_switch_Txs:
+					lda	#_PopSlideFlags_Txs
+					tsb	$.popSlideFlags
 					bra	$+Recompiler__Build_loop1_loop_switch_Regular
 
 
@@ -3293,6 +3325,20 @@ Recompiler__Build_OpcodeType_Pha:
 
 
 Recompiler__Build_OpcodeType_Pla:
+	// Are we using pop slides?
+	lda	$.popSlideFlags
+	eor	#0xffff
+	and	#_PopSlideFlags_Txs|PopSlideFlags_PlaStaPpu
+	bne	$+b_1
+		andbne	$=RomInfo_StackEmulation, #_RomInfo_StackEmu_Page01, $+b_1
+			lda	#_Inline__PlaIndirect/0x10000
+			ldx	#_Inline__PlaIndirect
+			ldy	#0
+			jsr	$_Recompiler__Build_Inline2
+
+			rts
+b_1:
+
 	// Write opcode as is
 	lda	#0x6868
 	sta	[$.writeAddr]

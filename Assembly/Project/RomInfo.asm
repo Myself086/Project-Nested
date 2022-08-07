@@ -116,13 +116,14 @@ RomInfo_DebugOverlay:
 
 	// 16 bits of "Stack emulation" flags
 RomInfo_StackEmulation:
-	.data16	0x030f
+	.data16	0x070f
 	.def	RomInfo_StackEmu_LazyDoubleReturn		0x0001
 	.def	RomInfo_StackEmu_StackUnderflow			0x0002
 	.def	RomInfo_StackEmu_NativeReturn			0x0004
 	.def	RomInfo_StackEmu_SafeTsx				0x0008
 	.def	RomInfo_StackEmu_NativeReturnInterrupt	0x0100
 	.def	RomInfo_StackEmu_Page01					0x0200
+	.def	RomInfo_StackEmu_PopSlide				0x0400
 	.def	RomInfo_StackEmu_NATIVE_MASK			0xff00
 
 RomInfo_StackResetRange:
@@ -426,6 +427,15 @@ RomInfo_Description:
 		RomInfo_SummaryMac	"Decides whether to put stack in page 01 or 09."
 		RomInfo_SummaryMac	"Can fix some games and break other games."
 		RomInfo_DefineMac	"public bool StackEmulation.Page01 : Stack page 01", RomInfo_StackEmulation, RomInfo_StackEmu_Page01
+
+		RomInfo_SummaryMac	"Attempts to fix pop slide when the following code is present:"
+		RomInfo_SummaryMac	" TXS"
+		RomInfo_SummaryMac	" -- and --"
+		RomInfo_SummaryMac	" PLA"
+		RomInfo_SummaryMac	" STA $2007"
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Requires disabling stack page 01."
+		RomInfo_DefineMac	"public bool StackEmulation.PopSlide : Pop slide detection", RomInfo_StackEmulation, RomInfo_StackEmu_PopSlide
 
 	RomInfo_DefineMac	"private void Tab_Banks : Bank and range related rules.", 0, 0
 
