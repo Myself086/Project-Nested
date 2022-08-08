@@ -436,6 +436,10 @@ Main__InitEmulation:
 	stx	$_Program_BankNum_e000
 	lda	$=RomInfo_BankLut_e0,x
 	sta	$_Program_Bank_3+2
+
+	// Set bank number for PRG RAM
+	lda	#0xb0
+	sta	$_Program_Bank_Sram+2
 	rep	#0x30
 	.mx	0x00
 
