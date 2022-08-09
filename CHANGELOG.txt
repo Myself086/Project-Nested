@@ -12,6 +12,7 @@ Dev build:
 - Fixed a crash when a scanline change is interrupted
 - Fixed unconditional branch detection when a label points to the branch
 - Added some support for pop slides (unfinished)
+- Added every missing official opcodes to the interpreter (minus BRK)
 
 v1.6:
 - Added support for .pal file for custom palette
