@@ -345,6 +345,11 @@ b_exit:
 		sta	$.HDMA_CHR_Back
 		sta	$.HDMA_SpriteCHR_Back
 		sta	$.HDMA_LayersEnabled_Back
+		bcc	$+b_1__
+			inc	$.HDMA_CHR_Back+1
+			inc	$.HDMA_SpriteCHR_Back+1
+			inc	$.HDMA_LayersEnabled_Back+1
+b_1__:
 	.endm
 
 
@@ -409,13 +414,14 @@ Hdma__UpdateScrolling_In:
 		sec
 		Hdma__UpdateScrolling_IsPast240_Mac2	0
 		bcc	$+Hdma__UpdateScrolling_No240a
-			rep	#0x21
-			.mx	0x00
-			lda	$=HDMA_BUFFER_BANK+3,x
-			adc	#0x0010
-			sta	$=HDMA_BUFFER_BANK+3,x
-			sep	#0x20
-			.mx	0x20
+			ldx	$.HDMA_Scroll_Back
+			lda	$_HDMA_BUFFER_BANK+3,x
+			//clc						// Assume carry set from BCC
+			adc	#0x0f
+			sta	$_HDMA_BUFFER_BANK+3,x
+			bcc	$+b_2
+				inc	$_HDMA_BUFFER_BANK+3+1,x
+b_2:
 Hdma__UpdateScrolling_No240a:
 
 		pla
@@ -428,7 +434,7 @@ Hdma__UpdateScrolling_No240a:
 Hdma__UpdateScrolling_Over127:
 		// Repeat 128 times
 		lda	#0x80
-		sta	$=HDMA_BUFFER_BANK+5,x
+		sta	$_HDMA_BUFFER_BANK+5,x
 
 		// Change mode
 		rep	#0x20
@@ -455,7 +461,7 @@ Hdma__UpdateScrolling_Over127:
 
 		// Write length, repeat 128 times
 		lda	#0x80
-		sta	$=HDMA_BUFFER_BANK+5,x
+		sta	$_HDMA_BUFFER_BANK+5,x
 		sta	($.HDMA_CHR_Back),y
 		sta	($.HDMA_SpriteCHR_Back),y
 		sta	($.HDMA_LayersEnabled_Back),y
@@ -464,14 +470,14 @@ Hdma__UpdateScrolling_Over127:
 		lda	$.Scanline_HDMA
 		Hdma__UpdateScrolling_IsPast240_Mac2	0
 		bcc	$+Hdma__UpdateScrolling_No240b
-			rep	#0x21
-			.mx	0x00
 			ldx	$.HDMA_Scroll_Back
-			lda	$=HDMA_BUFFER_BANK+8,x
-			adc	#0x0010
-			sta	$=HDMA_BUFFER_BANK+8,x
-			sep	#0x20
-			.mx	0x20
+			lda	$_HDMA_BUFFER_BANK+8,x
+			//clc						// Assume carry set from BCC
+			adc	#0x0f
+			sta	$_HDMA_BUFFER_BANK+8,x
+			bcc	$+b_2
+				inc	$_HDMA_BUFFER_BANK+8+1,x
+b_2:
 Hdma__UpdateScrolling_No240b:
 
 		// Save HDMA index back, assume carry clear from bcc and adc
