@@ -17,6 +17,11 @@ Cop__Table:
 	Cop__Table		0x04, Cop__AddScanline			// Scanline += A
 	Cop__Table		0x05, Cop__IncScanline			// Scanline++
 
+	Cop__Table		0x06, Cop__QuickAddScanline		// Scanline += A; Read note below and where A < 128
+	Cop__Table		0x07, Cop__QuickIncScanline		// Scanline++;    Read note below
+	Cop__Table		0x08, Cop__EndQuickScanline		//                Read note below
+	// QuickScanline note: Only updates scroll values, must use Cop__EndQuickScanline at the end to synchronize every HDMA back to normal. Cannot cross nametable vertically.
+
 	// ---------------------------------------------------------------------------
 
 Cop__Error:
@@ -116,6 +121,47 @@ Cop__IncScanline:
 		call	Hdma__UpdateScrolling
 		pld
 		plb
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__QuickAddScanline:
+	CoreCall_Begin
+	CoreCall_Use	"A16Xnvzc"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+b_loop:
+		jsr	$=Hdma__QuickScanline
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__QuickIncScanline:
+	CoreCall_Begin
+	CoreCall_Use	"A16Xnvzc"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+b_loop:
+		lda	#1
+		jsr	$=Hdma__QuickScanline
+b_1:
+	CoreCall_Pull
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__EndQuickScanline:
+	CoreCall_Begin
+	CoreCall_Use	"A16XYnvzc"
+	CoreCall_Push
+	CoreCall_CopyUpTo	+b_1
+b_loop:
+		lda	#1
+		jsr	$=Hdma__EndQuickScanline
 b_1:
 	CoreCall_Pull
 	CoreCall_End

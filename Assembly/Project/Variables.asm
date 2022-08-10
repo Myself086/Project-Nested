@@ -119,7 +119,7 @@ IO_BG_MIRRORS:
 
 
 	.addr	0x0a27, 0x0a3f
-	// 23/25
+	// 25/25
 
 	// IO_4014_SpriteSize contains flags for how the sprite transfer was handled
 	//  bit 7: set = 8x16, clear = 8x8
@@ -176,7 +176,10 @@ Idle_CyclesTotal:
 
 
 	.addr	0x0a47, 0x0a5f
-	// 22/25
+	// 23/25
+
+QuickScanline_AdjustCount:
+	.fill	1
 
 Recompile_PrgRamTopRange:
 	.fill	2

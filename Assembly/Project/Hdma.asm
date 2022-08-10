@@ -634,6 +634,116 @@ Hdma__UpdateScrolling_SoundUpdateLine:
 
 	// ---------------------------------------------------------------------------
 
+	.mx	0x30
+	// Entry: A = Scanline increment (up to 127)
+Hdma__QuickScanline:
+	// Increment adjust count for later
+	pha
+	clc
+	adc	$_QuickScanline_AdjustCount
+	sta	$_QuickScanline_AdjustCount
+
+	// Was Y scroll changed midframe?
+	lda	#0x80
+	tsb	$_IO_SCROLL_Y+1
+	bne	$+b_1
+		// Adjust scroll value
+		lda	$_IO_SCROLL_Y
+		cmp	#0xf0
+		bcc	$+b_else
+			inc	$_IO_SCROLL_Y+1
+			sbc	$.Scanline_HDMA
+			sec
+			sbc	#0x10
+			bra	$+b_2
+b_else:
+			sec
+			sbc	$.Scanline_HDMA
+			bcs	$+b_2
+				inc	$_IO_SCROLL_Y+1
+				sbc	#0x0f
+b_2:
+		sta	$_IO_SCROLL_Y
+b_1:
+
+	pla
+
+	rep	#0x31
+	.mx	0x00
+
+	// Skip 'A' scanlines
+	inc	a
+	ldx	$_HDMA_Scroll_Back
+	sta	$=HDMA_BUFFER_BANK+0,x
+
+	// Copy new scroll values
+	lda	$_IO_SCROLL_X
+	sta	$=HDMA_BUFFER_BANK+1,x
+	lda	$_IO_SCROLL_Y
+	sta	$=HDMA_BUFFER_BANK+3,x
+
+	// Increment HDMA pointer, assume carry clear from REP
+	txa
+	//clc
+	adc	#5
+	sta	$_HDMA_Scroll_Back
+
+	sep	#0x30
+	.mx	0x30
+
+	rtl
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x30
+	// Entry: A = Scanline increment (up to 127)
+Hdma__EndQuickScanline:
+	ldy	$_QuickScanline_AdjustCount
+	stz	$_QuickScanline_AdjustCount
+
+	tya
+	clc
+	adc	$_Scanline_HDMA
+	sta	$_Scanline_HDMA
+
+	rep	#0x31
+	.mx	0x00
+
+	// Copy data from previous HDMA element
+	ldx	$_HDMA_CHR_Back
+	lda	$_HDMA_BUFFER_BANK-1,x
+	sta	$_HDMA_BUFFER_BANK+1,x
+	tya
+	sta	$_HDMA_BUFFER_BANK+0,x
+	inx
+	inx
+	stx	$_HDMA_CHR_Back
+	//
+	ldx	$_HDMA_SpriteCHR_Back
+	lda	$_HDMA_BUFFER_BANK-1,x
+	sta	$_HDMA_BUFFER_BANK+1,x
+	tya
+	sta	$_HDMA_BUFFER_BANK+0,x
+	inx
+	inx
+	stx	$_HDMA_SpriteCHR_Back
+	//
+	ldx	$_HDMA_LayersEnabled_Back
+	lda	$_HDMA_BUFFER_BANK-1,x
+	sta	$_HDMA_BUFFER_BANK+1,x
+	tya
+	sta	$_HDMA_BUFFER_BANK+0,x
+	inx
+	inx
+	stx	$_HDMA_LayersEnabled_Back
+
+	sep	#0x30
+	.mx	0x30
+
+	rtl
+
+	// ---------------------------------------------------------------------------
+
 	.mx	0x20
 	//.func	Hdma__SwapBuffers
 	// Entry: DB = HDMA_BUFFER_BANK/0x10000, DP = HDMA_VSTACK_PAGE
