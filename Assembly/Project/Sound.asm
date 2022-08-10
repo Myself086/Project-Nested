@@ -171,12 +171,9 @@ Sound__Init_HdmaTable_End:
 
 	.mx	0x20
 	.func	Sound__Update
+	// Entry: DP = HDMA_VSTACK_PAGE, DB = 0x7e
+	// Return: mx = Unknown
 Sound__Update:
-	// Change DP
-	phd
-	pea	$_HDMA_VSTACK_PAGE
-	pld
-
 	sep	#0x30
 	.mx	0x30
 
@@ -186,7 +183,6 @@ Sound__Update:
 	// Is sound buffer ready?
 	lda	$.Sound_Ready
 	beq	$+b_1
-		pld
 		return
 b_1:
 
@@ -199,7 +195,6 @@ b_1:
 	lda	#0xff
 	sta	$.Sound_Ready
 
-	pld
 	return
 
 	// ------------------------------------------------------------------------
@@ -336,7 +331,7 @@ Sound__EmulateLengthCounter_length_d3_mixed:
 	.mx	0x20
 	.macro	Sound__UpdateDsp_Mac	Offset
 		lda	$.Sound_NesRegs+{0}
-		sta	$=Sound__Init_HdmaTable_Start+0x7e0000+{0}*2,x
+		sta	$_Sound__Init_HdmaTable_Start+0x0000+{0}*2,x
 	.endm
 	.macro	Sound__UpdateDsp
 		ldx	$.HDMA_Sound_Side
