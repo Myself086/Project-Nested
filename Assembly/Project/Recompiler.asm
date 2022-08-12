@@ -240,8 +240,14 @@ b_2:
 
 			// Trick which operand is read from recompiling the following jump below
 			stz	$.readAddr+1
-			lda	#_romAddr-1
+			lda	#_fakeCode
 			sta	$.readAddr
+
+			// Write new code
+			lda	#0x004c
+			sta	$.fakeCode
+			lda	$.romAddr
+			sta	$.fakeCode+1
 
 			// Write JMP to RAM
 			lda	#_Zero+0x004c*2
