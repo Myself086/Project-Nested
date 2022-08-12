@@ -429,6 +429,7 @@ b_skip__:
 	CoreCall_DEFINE		CoreCall_ResetMemoryPrefix	""					// Resets memory prefix assumption when recompiling
 	//CoreCall_DEFINE	CoreCall_Continue			""					// Alias for Call+Pull+End
 	//CoreCall_DEFINE	CoreCall_ContinueAt			".data16 {0}"		// Alias for Call+Pull+End
+	CoreCall_DEFINE		CoreCall_PrgBankChange		".data8 {0}"		// Assume PRG range change for ranges {0}, 1 bit per range
 
 	.macro	CoreCall_Use	flags
 		.ifnamecontains	{0}, "A8"

@@ -145,6 +145,7 @@ RomInfo_CpuSettings:
 	.def	RomInfo_Cpu_RecompilePrgRam				0x0001
 	.def	RomInfo_Cpu_IllegalNop					0x0002
 	.def	RomInfo_Cpu_DynamicJsr					0x0004
+	.def	RomInfo_Cpu_SafePrgBankChange			0x0008
 
 RomInfo_AutoPlayThreshold:
 	.data16	200
@@ -341,6 +342,11 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Comes at a cost of performance."
 		RomInfo_DefineMac	"public bool Cpu.DynamicJsr : Dynamic JSR", RomInfo_CpuSettings, RomInfo_Cpu_DynamicJsr
+
+		RomInfo_SummaryMac	"Adds open link JMP after a potential bank change."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Comes at a cost of performance."
+		RomInfo_DefineMac	"public mapper<7> bool Cpu.SafePrgBankChange : Safe PRG bank change", RomInfo_CpuSettings, RomInfo_Cpu_SafePrgBankChange
 
 		RomInfo_SummaryMac	"Allow recompiling illegal NOP opcodes."
 		RomInfo_SummaryMac	"Activating this may break games that derail the disassembler."

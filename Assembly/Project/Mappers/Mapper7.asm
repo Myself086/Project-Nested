@@ -33,7 +33,11 @@ Mapper7__8000:
 		case	iIOPort_sty
 			CoreCall_Begin
 			CoreCall_ResetMemoryPrefix
-			CoreCall_Continue
+			CoreCall_Call		Mapper7__w8000_y_in
+			CoreCall_Pull
+			CoreCall_PrgBankChange	0xf0
+			CoreCall_End
+Mapper7__w8000_y_in:
 			php
 			phx
 			tyx
@@ -41,7 +45,11 @@ Mapper7__8000:
 		case	iIOPort_stx
 			CoreCall_Begin
 			CoreCall_ResetMemoryPrefix
-			CoreCall_Continue
+			CoreCall_Call		Mapper7__w8000_x_in
+			CoreCall_Pull
+			CoreCall_PrgBankChange	0xf0
+			CoreCall_End
+Mapper7__w8000_x_in:
 			php
 			phx
 			bra	$+b_in
@@ -50,7 +58,11 @@ Mapper7__8000:
 		case	iIOPort_stay
 			CoreCall_Begin
 			CoreCall_ResetMemoryPrefix
-			CoreCall_Continue
+			CoreCall_Call		Mapper7__w8000_a_in
+			CoreCall_Pull
+			CoreCall_PrgBankChange	0xf0
+			CoreCall_End
+Mapper7__w8000_a_in:
 		case	iIOPort_stai
 			php
 			phx

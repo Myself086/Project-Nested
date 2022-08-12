@@ -160,6 +160,7 @@ Recompiler__Build:
 	.local	.nesBank
 	.local	=writeAddr
 	.local	_thisOpcodeX2
+	.local	=fakeCode
 	// TODO: Replace stackTrace with stackDepth
 
 	// Change bank
@@ -2761,6 +2762,30 @@ Recompiler__Build_OpcodeType_Jmp_Infinite:
 	jmp	$_Recompiler__Build_Inline
 
 
+	// Entry: A = Destination
+Recompiler__Build_OpcodeType_Jmp_FakeSource:
+	// Write new code
+	ldx	#0x004c
+	stx	$.fakeCode
+	sta	$.fakeCode+1
+
+	// Change where code is read from
+	pei	($.readAddr)
+	stz	$.readAddr+1
+	lda	#_fakeCode
+	sta	$.readAddr
+
+	jsr	$_Recompiler__Build_OpcodeType_Jmp_OutOfRange
+
+	// Restore where code is read from
+	lda	$.bankStart+1
+	sta	$.readAddr+1
+	pla
+	sta	$.readAddr
+
+	rts
+
+
 Recompiler__Build_OpcodeType_JmpI:
 	// Flag this function as having a return and indirect jump
 	lda	#_Opcode_F_HasReturn|Opcode_F_IndirectJmp
@@ -3765,6 +3790,23 @@ b_1:
 	rts
 
 
+	// Entry: A = Address
+	// Return: A = Range bit, nz = A
+Recompiler__Build_ConvertAddressToRangeBit:
+	asl	a
+	rol	a
+	rol	a
+	rol	a
+	and	#0x0007
+	tax
+	lda	$_Recompiler__Build_ConvertAddressToRangeBit_Data,x
+	and	#0x00ff
+	rts
+
+Recompiler__Build_ConvertAddressToRangeBit_Data:
+	.data8	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+
+
 	// Entry: A = Call address, ZeroBank = Bank for call address
 Recompiler__Build_CoreCall:
 	tay
@@ -4146,6 +4188,33 @@ b_exit:
 
 	case	CoreCall_ResetMemoryPrefix
 		stz	$.memoryPrefix
+		break
+
+	case	CoreCall_PrgBankChange
+		// Is safe PRG bank change enabled?
+		andbne	$=RomInfo_CpuSettings, #_RomInfo_Cpu_SafePrgBankChange, $+b_1
+			inc	$.src
+			break
+b_1:
+
+		// Get range bit for the current address
+		lda	$.readAddr
+		jsr	$_Recompiler__Build_ConvertAddressToRangeBit
+
+		// Compare to expected range change and static range
+		and	[$.src]
+		inc	$.src
+		and	#0x00ff
+		beq	$+b_1
+			// Is range static? If not, add an open link jump
+			and	$=RomInfo_StaticRanges
+			bne	$+b_1
+				// TODO: Test every possible output
+				lda	$.readAddr
+				clc
+				adc	#3
+				jsr	$_Recompiler__Build_OpcodeType_Jmp_FakeSource
+b_1:
 		break
 
 	.unlocal	_pushFlags, _freeRegs, =src
