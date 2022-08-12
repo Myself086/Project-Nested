@@ -58,6 +58,7 @@ Mapper7__8000:
 			//bra	$+b_in
 b_in:
 			xba
+			lock
 
 			// Reset active bank
 			stz	$_Memory_NesBank
