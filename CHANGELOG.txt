@@ -15,6 +15,7 @@ Dev build:
 - Added every missing official opcodes to the interpreter (minus BRK)
 - Added option to safely change bank for mapper 7
 - Added proper error message when the recompiler can't allocate enough memory
+- Fixed reset code from being recompiled when the exe already did it
 
 v1.6:
 - Added support for .pal file for custom palette

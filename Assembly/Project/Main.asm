@@ -343,23 +343,22 @@ b_loop:
 	lda	#_JMPiU_Start/0x100
 	sta	$_JMPiU_Action+1
 
-	// Recompile from reset vector's address at 0xFFFC
-	.precall	Recompiler__Build		_romAddr, _compileType
+	// Call from reset vector's address at 0xFFFC
+	breakpoint
+	.precall	Recompiler__CallFunction		_originalFunction
 	lda	$_Program_Bank_3+1
-	sta	$.Param_romAddr+1
+	sta	$.Param_originalFunction+1
 	and	#0xff00
 	beq	$+b_TrapBank
 	lda	#0xfffc
-	sta	$.Param_romAddr
-	lda	[$.Param_romAddr]
+	sta	$.Param_originalFunction
+	lda	[$.Param_originalFunction]
 	bpl	$+b_TrapBit15
-	sta	$.Param_romAddr
-	stz	$.Param_compileType
+	sta	$.Param_originalFunction
 	call
 
 	// Prepare reset address
 	.local	=reset
-	ldy	#3
 	lda	[$.Recompiler_FunctionList+3],y
 	sta	$.reset
 	iny
