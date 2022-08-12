@@ -14,6 +14,7 @@ Dev build:
 - Added some support for pop slides (unfinished)
 - Added every missing official opcodes to the interpreter (minus BRK)
 - Added option to safely change bank for mapper 7
+- Added proper error message when the recompiler can't allocate enough memory
 
 v1.6:
 - Added support for .pal file for custom palette

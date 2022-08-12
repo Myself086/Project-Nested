@@ -158,7 +158,7 @@ Recompiler__Build:
 	.local	_recompileFlags, _stackTrace, _stackTraceReset, _stackDepth
 	.local	=bankStart
 	.local	.nesBank
-	.local	=writeAddr
+	.local	=writeAddr, _writeStart
 	.local	_thisOpcodeX2
 	.local	=fakeCode
 	// TODO: Replace stackTrace with stackDepth
@@ -210,6 +210,7 @@ b_1:
 	sta	$.writeAddr+1
 	sty	$.heapStackIndex+0
 	stx	$.writeAddr+0
+	stx	$.writeStart
 
 	// Pop slide detection
 	.local	.popSlideFlags
@@ -836,6 +837,11 @@ Recompiler__Build_loop2_loop_skip2:
 				txa
 b_1:
 
+			// Did we overflow memory?
+			ldx	$.writeAddr
+			cpx	$.writeStart
+			jcc	$_Recompiler__Build_MemoryOverflow
+
 			// Are we done?
 			cmp	$.lastReadAddr
 			bcc	$-Recompiler__Build_loop2_loop
@@ -1015,6 +1021,11 @@ b_1:
 				inc	$.writeAddr
 				txa
 b_1:
+
+			// Did we overflow memory?
+			ldx	$.writeAddr
+			cpx	$.writeStart
+			jcc	$_Recompiler__Build_MemoryOverflow
 
 			// Are we done?
 			cmp	$.lastReadAddr
@@ -3811,6 +3822,12 @@ Recompiler__Build_ConvertAddressToRangeBit:
 
 Recompiler__Build_ConvertAddressToRangeBit_Data:
 	.data8	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+
+
+Recompiler__Build_MemoryOverflow:
+	unlock
+	trap
+	Exception	"Out of Memory{}{}{}Recompiler.Build ran out of memory while writing code{}{}Try following step 5 on the exe's main window. This will reduce memory usage and improve performance."
 
 
 	// Entry: A = Call address, ZeroBank = Bank for call address
