@@ -329,7 +329,11 @@ Start__Irq_NesNmi:
 	cmp	#_VSTACK_PAGE
 	beq	$-Start__Irq_Return
 
-	// Is NMI emulation busy?
+	// Is side stack busy? This condition may not be necessary
+	lda	$_SideStack_Available
+	bne	$-Start__Irq_Return
+
+	// Is NMI emulation busy? IMPORTANT: Must be the last condition
 	lda	#0x8000
 	tsb	$_NmiReturn_Busy-1
 	bne	$-Start__Irq_Return
@@ -573,10 +577,8 @@ Start__Irq_NewNesNmi:
 	plb
 	rep	#0x30
 	.mx	0x00
-	.precall	Recompiler__CallFunction		_originalFunction
 	lda	$0xfffa
-	sta	$.Param_originalFunction
-	call
+	Recompiler__CallFunction	"//"
 	plb
 
 	// Write destination address

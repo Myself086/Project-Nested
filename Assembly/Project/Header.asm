@@ -83,7 +83,7 @@ Start__Reset:
 	.mx	0x20
 
 	// Set stack and keep it in X for Main
-	ldx	#_STACK_TOP
+	ldx	#_INIT_STACK_TOP
 	txs
 
 	// Change bank
@@ -110,7 +110,7 @@ Start__UnusedReset:
 	rep	#0x38
 	.mx	0x00
 
-	ldx	#_STACK_TOP
+	ldx	#_INIT_STACK_TOP
 	txs
 
 	lda	#_VSTACK_PAGE
@@ -130,7 +130,7 @@ Start__UnusedReset_Live:
 	lda	#0
 	sta	$=RomInfo_DebugCalls
 
-	ldx	#_STACK_TOP
+	ldx	#_INIT_STACK_TOP
 	txs
 	jmp	$=Main
 

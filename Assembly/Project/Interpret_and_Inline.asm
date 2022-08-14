@@ -753,10 +753,6 @@ Interpret__Jsr:
 	.mx	0x00
 
 	// Fix stack and call recompiler
-	.precall	Recompiler__CallFunction		_originalFunction
-	lda	$6,s
-	sta	$_Param_originalFunction
-	sta	$_originalCall
 	lda	$8,s
 	sta	$_StackEmu_Compare+8,x
 	sta	$_originalReturn
@@ -772,7 +768,10 @@ Interpret__Jsr:
 	// Change DP to our Vstack base address
 	lda	#_VSTACK_PAGE
 	tcd
-	call
+	// Call recompiler
+	lda	$6,s
+	sta	$.originalCall
+	Recompiler__CallFunction	"//"
 
 	// Do we rewrite this as call or jump?
 	.local	_functionListIndex
@@ -1106,10 +1105,8 @@ Interpret__StaticJsr:
 	sta	$.return2+1
 
 	// Call recompiler
-	.precall	Recompiler__CallFunction		_originalFunction
 	lda	$=StaticRec_Origins+2,x
-	sta	$.Param_originalFunction
-	call
+	Recompiler__CallFunction	"//"
 	// Keep returned value
 	.local	_functionListIndex
 	sty	$.functionListIndex
@@ -1409,9 +1406,8 @@ Interpret__Rts_Changed:
 
 	.mx	0x00
 	// Call new return address
-	.precall	Recompiler__CallFunction		_originalFunction
 	inc	a
-	sta	$.Param_originalFunction
+	Recompiler__CallFunction	"//"
 	phb
 	call
 	plb
@@ -1571,10 +1567,8 @@ b_1:
 		plb
 		rep	#0x30
 		.mx	0x00
-		.precall	Recompiler__CallFunction		_originalFunction
 		lda	$0xfffa
-		sta	$.Param_originalFunction
-		call
+		Recompiler__CallFunction	"//"
 		plb
 
 		// Write destination address

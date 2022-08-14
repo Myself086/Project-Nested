@@ -191,10 +191,8 @@ b_irq:
 				pld
 				rep	#0x30
 				.mx	0x00
-				.precall	Recompiler__CallFunction		_originalFunction
 				lda	$0xfffe
-				sta	$.Param_originalFunction
-				call
+				Recompiler__CallFunction	"//"
 				plb
 
 				// Write destination address

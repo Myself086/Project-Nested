@@ -119,7 +119,6 @@ JMPi__Linker_in:
 	unlock
 
 	// Get function pointer
-	.precall	Recompiler__CallFunction		_originalFunction
 	lda	$.rawLSB
 	lsr	a				// Carry set when using RtsNes
 	lda	$.rawLSB
@@ -129,8 +128,7 @@ JMPi__Linker_in:
 	adc	#0				// Add 1 if RtsNes
 	cmp	$_Recompile_PrgRamTopRange
 	bcc	$+b_else
-		sta	$.Param_originalFunction
-		call
+		Recompiler__CallFunction	"//"
 
 		// Add node for JMPi and change return address
 		.precall	JMPi__Add	=originalCall, =newAddr

@@ -88,12 +88,8 @@ b_loop:
 	sta	[$.extraCode],y
 
 	// Find destination
-	.precall	Recompiler__CallFunction		_originalFunction
-	lda	$.call+0
-	sta	$.Param_originalFunction+0
-	lda	$.call+1
-	sta	$.Param_originalFunction+1
-	call
+	//lda	$.call
+	Recompiler__CallFunction	"//"
 
 	// Write destination
 	lda	[$.Recompiler_FunctionList+3],y
@@ -179,12 +175,8 @@ b_loop:
 	sta	[$.extraCode],y
 
 	// Find destination
-	.precall	Recompiler__CallFunction		_originalFunction
-	lda	$.call+0
-	sta	$.Param_originalFunction+0
-	lda	$.call+1
-	sta	$.Param_originalFunction+1
-	call
+	//lda	$.call
+	Recompiler__CallFunction	"//"
 
 	// Write destination
 	lda	[$.Recompiler_FunctionList+3],y

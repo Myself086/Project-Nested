@@ -176,7 +176,7 @@ Idle_CyclesTotal:
 
 
 	.addr	0x0a47, 0x0a5f
-	// 23/25
+	// 25/25
 
 QuickScanline_AdjustCount:
 	.fill	1
@@ -209,6 +209,11 @@ IndirectX_Sbc_Action:
 IndirectX_Lda_Action:
 	.fill	2
 IndirectX_Sta_Action:
+	.fill	2
+
+
+	// Side stack for the recompiler: equals zero when available, non-zero when busy and contains the previous stack to be restored
+SideStack_Available:
 	.fill	2
 
 
@@ -641,7 +646,8 @@ IRQ_VSTACK_START:
 	.def		VSTACK_PAGE		0x1e00
 	.def		VSTACK_START	0x1e2a
 	.def		VSTACK_TOP		0x1ebf
-	.def		STACK_TOP		0x1eff
+	.def		SIDE_STACK_TOP	0x1eff
+	.def		INIT_STACK_TOP	0x09ff
 	.vstack		_VSTACK_START
 	.vstacktop	_VSTACK_TOP
 

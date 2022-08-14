@@ -4757,19 +4757,37 @@ b_loop_in:
 	
 	// ---------------------------------------------------------------------------
 
+	.macro	Recompiler__CallFunction		CommentLock
+		// A = Original address
+		{0}lock
+			ldx	$_SideStack_Available
+			trapne
+			tsx
+			stx	$_SideStack_Available
+			ldx	#_SIDE_STACK_TOP
+			txs
+		{0}unlock
+		call	Recompiler__CallFunction
+		ldx	$_SideStack_Available
+		txs
+		stz	$_SideStack_Available
+	.endm
+
 	.mx	0x00
-	.func	Recompiler__CallFunction		_originalFunction
+	.func	Recompiler__CallFunction
+	// Entry: A = Original address
 	// Return: A = Y = index for known calls
 Recompiler__CallFunction:
-	.local	_originalFunction_b
+	.local	=originalFunction
 	.local	_base, _add
 
 	// Find this function's bank
-	lda	$.originalFunction+1
+	sta	$.originalFunction
+	xba
 	and	#0x00e0
 	tax
 	lda	$_Program_BankNum,x
-	sta	$.originalFunction_b
+	sta	$.originalFunction+2
 
 	// Was this function recompiled statically?
 	jsr	$_Recompiler__CallFunction_FindStatic
@@ -4799,7 +4817,7 @@ Recompiler__CallFunction_SkipStatic:
 	// Find this function
 	lda	$.originalFunction+0
 	sta	[$.Recompiler_FunctionList]
-	lda	$.originalFunction_b
+	lda	$.originalFunction+2
 	ldy	#0x0002
 	sta	[$.Recompiler_FunctionList],y
 

@@ -344,18 +344,17 @@ b_loop:
 	sta	$_JMPiU_Action+1
 
 	// Call from reset vector's address at 0xFFFC
-	breakpoint
-	.precall	Recompiler__CallFunction		_originalFunction
+	.local	=temp
 	lda	$_Program_Bank_3+1
-	sta	$.Param_originalFunction+1
+	sta	$.temp+1
 	and	#0xff00
 	beq	$+b_TrapBank
 	lda	#0xfffc
-	sta	$.Param_originalFunction
-	lda	[$.Param_originalFunction]
+	sta	$.temp
+	lda	[$.temp]
 	bpl	$+b_TrapBit15
-	sta	$.Param_originalFunction
-	call
+	.unlocal	=temp
+	Recompiler__CallFunction	"//"
 
 	// Prepare reset address
 	.local	=reset
