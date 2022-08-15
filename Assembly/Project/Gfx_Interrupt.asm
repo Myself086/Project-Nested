@@ -244,6 +244,10 @@ b_2:
 		stx	$0x00
 b_SkipVblankUpdates:
 
+	// Set vblank bit
+	ldx	#0x80
+	stx	$_IO_2002
+
 	// Change mode
 	.mx	0x00
 	rep	#0x30

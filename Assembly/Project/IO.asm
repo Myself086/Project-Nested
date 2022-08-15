@@ -176,9 +176,8 @@ b_in:
 		beq	$+IO__r2002_NoSprite0
 			stz	$_IO_2002_CallCount
 			ora	$_IO_2002
-			eor	#0x80
-			sta	$_IO_2002
 			sta	$_IO_Temp
+			stz	$_IO_2002
 
 			// Change scanline to sprite 0
 			lda	$_Sprite0Line
@@ -215,9 +214,8 @@ b_in:
 IO__r2002_NoSprite0:
 		ora	$_IO_2002
 		and	#0xbf
-		eor	#0x80
-		sta	$_IO_2002
 		sta	$_IO_Temp
+		stz	$_IO_2002
 
 		IO__r2002_SaveScanline
 
@@ -235,9 +233,8 @@ IO__r2002_NewCall:
 
 	lda	$_IO_2002
 	and	#0xbf
-	eor	#0x80
-	sta	$_IO_2002
 	sta	$_IO_Temp
+	stz	$_IO_2002
 
 	IO__r2002_SaveScanline
 
