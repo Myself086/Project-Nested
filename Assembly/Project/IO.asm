@@ -132,8 +132,13 @@ b_1:
 IO__r2002_a:
 	CoreCall_Begin
 	CoreCall_ResetMemoryPrefix
-	CoreCall_Call		IO__r2002_a_i
-	CoreCall_End
+	CoreCall_IfSet		RomInfo_SyncPpuStatusToSnes, 0x80, +b_else
+		CoreCall_Call		IO__r2002_a_i
+		CoreCall_End
+b_else:
+		// TODO: Fix indirect read
+		CoreCall_Call		IO__r2002_a_Sync
+		CoreCall_End
 
 IO__r2002_a_i:
 	php
@@ -237,6 +242,79 @@ IO__r2002_NewCall:
 	stz	$_IO_2002
 
 	IO__r2002_SaveScanline
+
+	pla
+	plp
+	rtl
+
+IO__r2002_a_Sync:
+	.vstack		_VSTACK_START
+	php
+	pha
+	lock
+
+	lda	$0x2137
+	lda	$0x213d
+	lsr	$0x213d
+	bcs	$+b_in
+	cmp	#0xf0
+	bcc	$+b_else
+b_in:
+		// > 0xe0
+		lda	$_IO_2002
+		sta	$_IO_Temp
+		stz	$_IO_2002
+		bra	$+b_1
+b_else:
+		// Sprite overflow (not supported)
+		stz	$_IO_Temp
+
+		// Sprite 0
+		cmp	$_Sprite0Line
+		ror	$_IO_Temp
+
+		// Vblank
+		lda	$_IO_2002
+		asl	a
+		ror	$_IO_Temp
+		stz	$_IO_2002
+
+		bit	$_IO_Temp
+		bvc	$+b_2
+			lda	$_Sprite0Line
+			cmp	$_Scanline_HDMA
+			beq	$+b_3
+			bcc	$+b_3
+				// Change scanline to sprite 0
+				sta	$_Scanline
+
+				// Add new HDMA coordinates
+				phx
+				phy
+				rep	#0x14
+				.mx	0x20
+
+				phb
+				phd
+				call	Hdma__UpdateScrolling
+				pld
+				plb
+
+				// Change mode back and set interrupt
+				sep	#0x34
+				.mx	0x30
+
+				// Reset memory range
+				stz	$_Memory_NesBank
+
+				ply
+				plx
+				pla
+				plp
+				rtl
+b_3:
+b_2:
+b_1:
 
 	pla
 	plp

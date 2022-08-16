@@ -140,6 +140,10 @@ RomInfo_ChrRamClone:
 RomInfo_ImprovedPpuStatusLoop:
 	.data8	0x80
 
+	// Negative when using synchronized PPUSTATUS to SNES
+RomInfo_SyncPpuStatusToSnes:
+	.data8	0x00
+
 RomInfo_CpuSettings:
 	.data16	0x0000
 	.def	RomInfo_Cpu_RecompilePrgRam				0x0001
@@ -506,6 +510,11 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"May cause issues with some games."
 		RomInfo_DefineMac	"public bool ImprovedPpuStatusLoopDetection : Improved PPUSTATUS loop detection.", RomInfo_ImprovedPpuStatusLoop, 0x80
+
+		RomInfo_SummaryMac	"Synchronized PPUSTATUS to SNES. Works better with 'NMI mode, at vblank' disabled."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"May cause issues with some games."
+		RomInfo_DefineMac	"public bool SyncPpuStatusToSnes : Sync PPUSTATUS to SNES.", RomInfo_SyncPpuStatusToSnes, 0x80
 
 		RomInfo_SummaryMac	"Determines how many lines to skip after an IRQ hit."
 		RomInfo_DefineMac	"public mapper<4> byte IrqOffset : Mapper IRQ hit offset.", RomInfo_IrqOffset, 0
