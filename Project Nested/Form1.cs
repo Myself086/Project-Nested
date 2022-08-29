@@ -297,7 +297,7 @@ namespace Project_Nested
             if (injector != null)
             {
                 Clipboard.Clear();
-                Clipboard.SetText(injector.GetAllSettings());
+                Clipboard.SetText(injector.GetAllSettings(false, false));
             }
         }
 
@@ -456,7 +456,7 @@ namespace Project_Nested
             }
             else if (injector != null)
             {
-                var data = injector.GetAllSettings();
+                var data = injector.GetAllSettings(false, false);
                 File.WriteAllText(profilePath + title + ".txt", data);
 
                 SaveGlobalSettings();

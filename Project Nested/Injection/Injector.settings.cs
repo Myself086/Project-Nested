@@ -82,25 +82,37 @@ namespace Project_Nested.Injection
             return new Dictionary<string, Setting>(settings);
         }
 
-        public string GetAllSettings()
+        public string GetAllSettings(bool skipDefaultValues, bool singleLine)
         {
             StringBuilder sb = new StringBuilder();
+
+            void AppendLine(string str)
+            {
+                if (singleLine)
+                    sb.AppendLine(str);
+                else
+                {
+                    sb.Append(str);
+                    sb.Append(';');
+                }
+            }
 
             // Settings
             foreach (var item in settings)
                 if (item.Value.IsPublic && !item.Value.IsGlobal && item.Value.IsVariable)
-                    sb.AppendLine(item.Value.ToString());
+                    if (!skipDefaultValues || !item.Value.IsDefaultValue())
+                        AppendLine(item.Value.ToString());
 
             // Unknown settings
             foreach (var item in unknownSettings)
-                sb.AppendLine(item);
+                AppendLine(item);
 
             // Calls
-            sb.AppendLine(ConvertCallsToString(this.calls));
+            AppendLine(ConvertCallsToString(this.calls));
 
             // Patches
             foreach (var item in patches)
-                sb.AppendLine(item.Value.ToString());
+                AppendLine(item.Value.ToString());
 
             return sb.ToString();
         }
