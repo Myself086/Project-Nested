@@ -291,25 +291,103 @@ namespace Project_Nested
         }
 #endif
 
-        private void btnSettingsText_Click(object sender, EventArgs e)
+        #endregion
+        // --------------------------------------------------------------------
+        #region Menu strip / File
+
+        private void openNesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            btnOpen_Click(sender, e);
+        }
+
+        private void saveSnesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            btnSave_Click(sender, e);
+        }
+
+        private void saveSnesPlayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            btnSaveAndPlay_Click(sender, e);
+        }
+
+        private void loadSRMToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            btnLoadSrm_Click(sender, e);
+        }
+
+        private void reloadBothROMsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Reload NES and SNES files
+            LoadNesFile(this.filename);
+
+            // Reset lookup tables for optimization
+            Optimize.Asm65816Dictionary.Reset();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Menu strip / Profile
+
+        const string MESSAGE_NO_GAME_LOADED = "No game loaded.";
+
+        private void copySettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (injector != null)
             {
                 Clipboard.Clear();
-                Clipboard.SetText(injector.GetAllSettings(false, false));
+                Clipboard.SetText(injector.GetAllSettings(true, false));
             }
+            else
+                MessageBox.Show(MESSAGE_NO_GAME_LOADED);
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private void copySettingsSingleLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (e.KeyCode == Keys.F5)
+            if (injector != null)
             {
-                // Reload NES and SNES files
-                LoadNesFile(this.filename);
-
-                // Reset lookup tables for optimization
-                Optimize.Asm65816Dictionary.Reset();
+                Clipboard.Clear();
+                Clipboard.SetText(injector.GetAllSettings(true, true));
             }
+            else
+                MessageBox.Show(MESSAGE_NO_GAME_LOADED);
+        }
+
+        private void pasteSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (injector != null)
+            {
+                if (Clipboard.ContainsText())
+                {
+                    injector.ResetSettings(true);
+                    injector.SetAllSettings(Clipboard.GetText());
+                }
+            }
+            else
+                MessageBox.Show(MESSAGE_NO_GAME_LOADED);
+        }
+
+        #endregion
+        // --------------------------------------------------------------------
+        #region Menu strip / Help
+
+        private void sendFeedbackToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://github.com/Myself086/Project-Nested/issues?page=1&q=is%3Aissue+is%3Aopen");
+        }
+
+        private void aboutProjectNestedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(
+                "Designed and made by Myself086\n" +
+                "Audio by Memblers\n" +
+                "\n" +
+                "Thanks to the nesdev.com community.\n"
+                );
         }
 
         #endregion
@@ -672,20 +750,6 @@ namespace Project_Nested
             panel.AutoScroll = false;
             gui = new SettingsGUI(injector, panel);
             panel.AutoScroll = true;
-        }
-
-        #endregion
-        // --------------------------------------------------------------------
-        #region Credits
-
-        private void btnCredits_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show(
-                "Designed and made by Myself086\n" +
-                "Sound by Memblers\n" +
-                "\n" +
-                "Thanks to the nesdev.com community.\n"
-                );
         }
 
         #endregion
