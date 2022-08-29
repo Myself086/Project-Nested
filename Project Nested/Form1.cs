@@ -169,8 +169,7 @@ namespace Project_Nested
 
                 this.filename = filename;
 
-                if (SelectProfile(ConvertPathToTitle(filename), true))
-                    LoadProfile(profileSelected.Title);
+                SelectProfile(ConvertPathToTitle(filename), true);
                 LoadGlobalSettings();
 
                 ShowRomInfo();
@@ -550,6 +549,11 @@ namespace Project_Nested
                 {
                     // Load profile
                     UnloadProfile();
+                }
+                else
+                {
+                    // Load profile
+                    LoadProfile(selected.Title);
                 }
             }
         }

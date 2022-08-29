@@ -19,6 +19,7 @@ Dev build:
 - Added exclusive stack for the recompiler, reducing the likeliness of overflowing the game's stack
 - Fixed how vblank bit is set
 - Added new sprite zero detection (optional)
+- Fixed various issues around loading profiles
 
 v1.6:
 - Added support for .pal file for custom palette
