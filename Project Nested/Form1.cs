@@ -162,6 +162,7 @@ namespace Project_Nested
             if (injector.IsLoaded(true))
             {
                 injector.KnownCallCountChanged += Injector_KnownCallCountChanged;
+                Injector_KnownCallCountChanged();
 
                 injector.save = () => btnSave_Click(null, null);
                 injector.saveAndPlay = () => btnSaveAndPlay_Click(null, null);
