@@ -175,6 +175,36 @@ namespace Project_Nested.Injection
             return null;
         }
 
+        public void SetAllSettings(string commandLines)
+        {
+            // Find splits
+            List<int> splits = new List<int>();
+            bool quote = false;
+            splits.Add(-1);
+            for (int i = 0; i < commandLines.Length; i++)
+            {
+                var c = commandLines[i];
+                if (c == '\"')
+                    quote = !quote;
+                else if (c == '\r' || c == '\n' || c == ';')
+                    if (!quote)                 // Skip 'new line' if it's within quotation marks
+                        splits.Add(i);
+            }
+            splits.Add(commandLines.Length);
+
+            // Split lines
+            var lines = new string[splits.Count - 1];
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var start = splits[i + 0] + 1;
+                var end = splits[i + 1] - 1;
+
+                lines[i] = commandLines.Substring(start, end - start + 1);
+            }
+
+            SetAllSettings(lines);
+        }
+
         public void SetAllSettings(string[] commandLines)
         {
             foreach (var item in commandLines)
