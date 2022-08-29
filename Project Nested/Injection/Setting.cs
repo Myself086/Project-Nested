@@ -24,7 +24,7 @@ namespace Project_Nested.Injection
         public bool IsResizable { get; private set; }
         public bool IsHex { get; private set; }
 
-        private string DefaultValue;
+        public string DefaultValue { get; private set; }
 
         private List<int> validMappers;
         public bool IsValidMapper(int mapper) => validMappers == null || validMappers.Contains(mapper);

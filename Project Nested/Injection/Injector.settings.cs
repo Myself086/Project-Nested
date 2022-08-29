@@ -58,10 +58,22 @@ namespace Project_Nested.Injection
 
         public void ResetSettings()
         {
-            patches.Clear();
-            calls.Clear();
+            ResetSettings(false);
+        }
 
-            KnownCallCountChanged?.Invoke();
+        public void ResetSettings(bool keepCalls)
+        {
+            patches.Clear();
+            if (!keepCalls)
+            {
+                calls.Clear();
+                KnownCallCountChanged?.Invoke();
+            }
+
+            unknownSettings.Clear();
+            foreach (var item in settings)
+                if (item.Value.IsPublic && !item.Value.IsGlobal && item.Value.IsVariable)
+                    item.Value.SetValue(item.Value.DefaultValue);
         }
 
         public Dictionary<string, Setting> GetAllSettingsObject()
