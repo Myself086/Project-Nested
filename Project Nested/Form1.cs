@@ -363,7 +363,10 @@ namespace Project_Nested
             {
                 if (Clipboard.ContainsText())
                 {
-                    injector.ResetSettings(true);
+                    bool keepCalls = injector.KnownCallCount > 0
+                        && MessageBox.Show("Merge known calls?", "Pasting profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
+
+                    injector.ResetSettings(keepCalls);
                     injector.SetAllSettings(Clipboard.GetText());
                 }
             }
