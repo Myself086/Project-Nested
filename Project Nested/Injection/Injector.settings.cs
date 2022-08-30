@@ -88,7 +88,7 @@ namespace Project_Nested.Injection
 
             void AppendLine(string str)
             {
-                if (singleLine)
+                if (!singleLine)
                     sb.AppendLine(str);
                 else
                 {

@@ -519,7 +519,7 @@ namespace Project_Nested
         private void LoadProfile(string title)
         {
             // Load all lines and apply changes
-            var lines = File.ReadAllLines(profilePath + title + ".txt");
+            var lines = File.ReadAllText(profilePath + title + ".txt");
             injector.ResetSettings();
             injector.SetAllSettings(lines);
 
