@@ -135,8 +135,7 @@ b_exit:
 
 Hdma__UpdateScrolling:
 	// Change DP and DB
-	pea	$_HDMA_VSTACK_PAGE
-	pld
+	ldatcd8		HDMA_VSTACK_PAGE
 	lda	#.HDMA_BUFFER_BANK/0x10000
 	pha
 	plb
@@ -187,10 +186,9 @@ b_irq:
 			beq	$+b_2
 				phb
 				sta	$_IRQ_NesBank
-				pea	$_VSTACK_PAGE
-				pld
 				rep	#0x30
 				.mx	0x00
+				ldatcd16	VSTACK_PAGE
 				lda	$0xfffe
 				Recompiler__CallFunction	"//"
 				plb
@@ -210,8 +208,7 @@ b_2:
 			stz	$_Memory_NesBank
 
 			// Zero page
-			pea	$0x0000
-			pld
+			ldatcd8		0x0000
 
 			// Are we using native return from interrupt?
 			lda	$=RomInfo_StackEmulation+1

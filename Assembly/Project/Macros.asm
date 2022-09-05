@@ -41,6 +41,25 @@ b_inc16__:
 	.endm
 
 	// ---------------------------------------------------------------------------
+	// DP related macros
+
+	// Load DP while in 8-bit mode where A register is free
+	// Takes 9 cycles instead of 11.33 for PEA+PLD variant
+	.macro	ldatcd8		addr
+		.def	temp__		{0}
+		lda	#.temp__/0x100
+		xba
+		lda	#.temp__
+		tcd
+	.endm
+
+	.macro	ldatcd16	addr
+		.def	temp__		{0}
+		lda	#_temp__
+		tcd
+	.endm
+
+	// ---------------------------------------------------------------------------
 	// Breakpoint
 
 	// 7e0afe
