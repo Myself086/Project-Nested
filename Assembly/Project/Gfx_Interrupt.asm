@@ -361,16 +361,6 @@ Start__Irq_NesNmi:
 	lda	$_JMPiU_Action
 	sta	$_NmiReturn_JMPiU
 
-	// Next frame
-	call	Interpret__Wait4Vblank
-
-	// Get NMI address
-	lda	$_Program_Bank_3+2
-	cmp	$_NMI_NesBank
-	beq	$+b_1
-		jsr	$_Start__Irq_NewNesNmi
-b_1:
-
 	// Pull from interrupt stack and copy some registers
 	pla
 	sta	$_NmiReturn_DP
@@ -383,6 +373,16 @@ b_1:
 	lda	$_s
 	sta	$_NmiReturn_Stack
 	tcs
+
+	// Next frame
+	call	Interpret__Wait4Vblank
+
+	// Get NMI address
+	lda	$_Program_Bank_3+2
+	cmp	$_NMI_NesBank
+	beq	$+b_1
+		jsr	$_Start__Irq_NewNesNmi
+b_1:
 
 	// Fix DP
 	lda	#0

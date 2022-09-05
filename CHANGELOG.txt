@@ -21,6 +21,7 @@ Dev build:
 - Added new sprite zero detection (optional)
 - Fixed various issues around loading profiles
 - Added menu strip to the exe, including copy/paste profile
+- Fixed stack issue when NES IRQ is enabled
 
 v1.6:
 - Added support for .pal file for custom palette
