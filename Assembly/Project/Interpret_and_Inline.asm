@@ -956,11 +956,6 @@ b_1:
 		iny
 		sta	[$.return],y
 
-		// Fix stack
-		//         1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-		// Before: d, d, b, p, r, r, r, o, o
-		// After:  d, d, b, p, r, r, r, o, o
-
 		// Original return
 		ldy	#0x0001
 		lda	[$.return],y
@@ -979,6 +974,9 @@ b_1:
 			sta	[$.return]
 
 			// Fix stack, remove the original return
+			//         1, 2, 3, 4, 5, 6, 7, 8, 9
+			// Before: d, d, b, p, r, r, r, o, o
+			// After:        d, d, b, p, r, r, r
 			lda	$6,s
 			sta	$8,s
 			lda	$4,s
