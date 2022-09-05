@@ -482,8 +482,6 @@ Start__Irq_NesNmi_Return:
 	plb
 	rti
 
-	//Start__Irq_Return
-
 
 	.mx	0x30
 Start__Irq_NesNmi_FakeReturn:
