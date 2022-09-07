@@ -315,7 +315,8 @@
             // copySettingsToolStripMenuItem
             // 
             this.copySettingsToolStripMenuItem.Name = "copySettingsToolStripMenuItem";
-            this.copySettingsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.C)));
+            this.copySettingsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.C)));
             this.copySettingsToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
             this.copySettingsToolStripMenuItem.Text = "Copy Settings";
             this.copySettingsToolStripMenuItem.Click += new System.EventHandler(this.copySettingsToolStripMenuItem_Click);
@@ -323,16 +324,18 @@
             // copySettingsSingleLineToolStripMenuItem
             // 
             this.copySettingsSingleLineToolStripMenuItem.Name = "copySettingsSingleLineToolStripMenuItem";
-            this.copySettingsSingleLineToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.X)));
-            this.copySettingsSingleLineToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
+            this.copySettingsSingleLineToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.X)));
+            this.copySettingsSingleLineToolStripMenuItem.Size = new System.Drawing.Size(288, 22);
             this.copySettingsSingleLineToolStripMenuItem.Text = "Copy Settings - Single Line";
             this.copySettingsSingleLineToolStripMenuItem.Click += new System.EventHandler(this.copySettingsSingleLineToolStripMenuItem_Click);
             // 
             // pasteSettingsToolStripMenuItem
             // 
             this.pasteSettingsToolStripMenuItem.Name = "pasteSettingsToolStripMenuItem";
-            this.pasteSettingsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.V)));
-            this.pasteSettingsToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
+            this.pasteSettingsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.V)));
+            this.pasteSettingsToolStripMenuItem.Size = new System.Drawing.Size(288, 22);
             this.pasteSettingsToolStripMenuItem.Text = "Paste Settings";
             this.pasteSettingsToolStripMenuItem.Click += new System.EventHandler(this.pasteSettingsToolStripMenuItem_Click);
             // 
