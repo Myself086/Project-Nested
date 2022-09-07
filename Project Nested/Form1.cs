@@ -103,11 +103,6 @@ namespace Project_Nested
             // Disable some GUI objects
             EnableGUI(false);
 
-#if !DEBUG
-            // Remove debug-only objects
-            this.btnSettingsText.Visible = false;
-#endif
-
             // Remove some placeholder texts
             lblMapper.Text = "No file loaded.";
         }
