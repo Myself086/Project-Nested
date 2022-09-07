@@ -177,9 +177,9 @@ RomInfo_InputMap:
 	// ---------------------------------------------------------------------------
 
 	// Version number
-	[80ffdB] = 0x06							// !
+	[80ffdB] = 0x07							// !
 	.macro	RomInfo_VersionString
-		.string0	"1.6"					// !
+		.string0	"1.7"					// !
 	.endm
 
 RomInfo_Title:
