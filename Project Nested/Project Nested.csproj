@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="AutoPlay.cs" />
     <Compile Include="ByteArrayExtension.cs" />
+    <Compile Include="Crc32.cs" />
     <Compile Include="Emulation\c65816.wdm.cs" />
     <Compile Include="Emulation\IO.cs" />
     <Compile Include="EmulatorPool.cs" />

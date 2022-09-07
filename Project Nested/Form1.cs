@@ -363,11 +363,31 @@ namespace Project_Nested
             {
                 if (Clipboard.ContainsText())
                 {
-                    bool keepCalls = injector.KnownCallCount > 0
-                        && MessageBox.Show("Merge known calls?", "Pasting profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
+                    void Crc32MismatchCallback(object sender2, Crc32EventArgs e2)
+                    {
+                        MessageBox.Show(
+                            "CRC32 mismatch.\n\n" +
+                            "Settings will be loaded but game may have issues or not work.\n\n" +
+                            $"Game CRC32: {(sender2 as Injector).GetCrc32():x8}\n" +
+                            $"Pasting settings for CRC32: {e2.Crc32:x8}\n",
+                            "Warning");
+                    }
 
-                    injector.ResetSettings(keepCalls);
-                    injector.SetAllSettings(Clipboard.GetText());
+                    injector.Crc32Mismatched += Crc32MismatchCallback;
+                    try
+                    {
+                        bool keepCalls = injector.KnownCallCount > 0
+                            && MessageBox.Show("Merge known calls?", "Pasting profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
+
+                        injector.ResetSettings(keepCalls);
+                        injector.SetAllSettings(Clipboard.GetText());
+                    }
+                    catch (Exception ex)
+                    {
+                        injector.Crc32Mismatched -= Crc32MismatchCallback;
+                        throw ex;
+                    }
+                    injector.Crc32Mismatched -= Crc32MismatchCallback;
                 }
             }
             else

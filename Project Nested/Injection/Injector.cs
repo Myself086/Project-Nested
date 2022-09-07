@@ -994,6 +994,12 @@ namespace Project_Nested.Injection
 
         #endregion
         // --------------------------------------------------------------------
+        #region NES ROM Crc32
+
+        public uint GetCrc32() => CRC32.Crc32(0, SrcDataCopy, SrcDataCopy.Length);
+
+        #endregion
+        // --------------------------------------------------------------------
         #region Validation error
 
         public bool IsLoaded(bool showWarning)

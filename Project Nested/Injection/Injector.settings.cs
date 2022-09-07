@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 
 namespace Project_Nested.Injection
 {
+    public class Crc32EventArgs : EventArgs
+    {
+        public uint Crc32 { get; set; }
+    }
     partial class Injector
     {
         #region Rom settings
@@ -16,6 +20,8 @@ namespace Project_Nested.Injection
         public event Action KnownCallCountChanged;
 
         public List<int> excludedCalls = new List<int>();
+
+        public event EventHandler<Crc32EventArgs> Crc32Mismatched;
 
         private void LoadSettings()
         {
@@ -96,6 +102,9 @@ namespace Project_Nested.Injection
                     sb.Append(';');
                 }
             }
+
+            // Crc32
+            AppendLine($"Crc32: {this.GetCrc32():x8}");
 
             // Settings
             foreach (var item in settings)
@@ -238,6 +247,13 @@ namespace Project_Nested.Injection
                         calls.Add(addr);
                 }
                 KnownCallCountChanged?.Invoke();
+            }
+            else if (commandLine.ToLowerInvariant().StartsWith("crc32:"))
+            {
+                var colon = commandLine.IndexOf(':');
+                var crc32 = Convert.ToUInt32(commandLine.Substring(colon + 1).Trim(), 16);
+                if (crc32 != GetCrc32())
+                    Crc32Mismatched?.Invoke(this, new Crc32EventArgs() { Crc32 = crc32 });
             }
             else
             {
