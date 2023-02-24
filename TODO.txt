@@ -11,6 +11,7 @@
 - Fix stack tracing for cross-bank JMP and indirect JMP
 - Fix memory emulation for STA (ZP,X) when writing to ROM
 - Stack wrap
+- Implement illegal 6502 opcodes
 
 ----------------------------------------------------------------
 	IO ports
