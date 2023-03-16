@@ -1,4 +1,7 @@
 
+Dev build:
+- Fixed left column flicker
+
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok
 - Fixed some registers when using NMI at vblank with non-native return from interrupt (bug from v1.6)

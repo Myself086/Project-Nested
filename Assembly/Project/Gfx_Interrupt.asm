@@ -228,7 +228,7 @@ b_2:
 		stx	$0x00
 
 		// Clip 8 pixels on the left of the screen if set
-		ldy	$_IO_2001
+		ldy	$_IO_2001_EarlyValue
 		ldx	$_Gfx__WindowClip_LUT,y
 		stx	$0x2e
 

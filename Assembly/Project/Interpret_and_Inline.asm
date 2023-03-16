@@ -1640,6 +1640,10 @@ Interpret__Wait4Vblank:
 	sep	#0x24
 	.mx	0x20
 
+	// Copy content of register 2001 for avoiding left column flicker
+	lda	$_IO_2001
+	sta	$_IO_2001_EarlyValue
+
 	lda	#0xef
 	sta	$_Scanline
 	phb
