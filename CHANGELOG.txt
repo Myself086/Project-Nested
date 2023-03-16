@@ -1,6 +1,7 @@
 
 Dev build:
 - Fixed left column flicker
+- Properly fixed echo buffer write disabled (thanks to ikari_01)
 
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok

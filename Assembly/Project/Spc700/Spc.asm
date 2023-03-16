@@ -1738,7 +1738,7 @@ clear2:
         mov 0xF3,y
         clrc
         adc a,#0x10
-        cmp a,#0x8C
+        cmp a,#0x6C
         bne clear2
 
         mov a,#0x0D
