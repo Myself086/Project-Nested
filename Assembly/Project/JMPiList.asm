@@ -98,19 +98,24 @@ JMPi__Linker_in:
 	sta	$_rawLSB
 
 	// Fix stack and push
-	plp
-	phd
-	phk
-	php
-	phb
-	stx	$_x
-	sty	$_y
 	//sta	$_a
 	stz	$_a+1
+	stx	$_x
+	sty	$_y
+	plx		// Pull P
+	phd
+	phk
+	phx
+	phb
 
 	// Change mode
 	rep	#0x30
 	.mx	0x00
+
+	// Remove interrupt flag
+	pla
+	and	#0xfbff
+	pha
 
 	// Change dp
 	lda	#_VSTACK_PAGE
