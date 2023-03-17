@@ -78,7 +78,7 @@
 
 
 	.addr	0x0a07, 0x0a1f
-	// 24/25
+	// 25/25
 
 	// Unused
 StackPointer_6502:
@@ -106,6 +106,8 @@ IO_2001:
 	.fill	2
 IO_2000_EarlyValue:
 	.fill	2
+IO_2001_EarlyValue:
+	.fill	1
 
 IO_2007r:
 	.fill	1
