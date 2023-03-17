@@ -260,8 +260,10 @@ namespace Project_Nested.Injection
 
             void UpdateLabel()
             {
-                label.Text = string.Format(EDIT_PATCH_TEXT, injector.patches.Count, injector.patches.Sum(f => f.Value.Data != null ? f.Value.Data.Length : 1));
+                if (!label.IsDisposed)
+                    label.Text = string.Format(EDIT_PATCH_TEXT, injector.patches.Count, injector.patches.Sum(f => f.Value.Data != null ? f.Value.Data.Length : 1));
             }
+            injector.PatchesCountChanged += UpdateLabel;
 
             button.Click += (sender, e) =>
             {
@@ -273,8 +275,7 @@ namespace Project_Nested.Injection
                 form.FormClosed += (sender2, e2) =>
                 {
                     // Update label
-                    if (!label.IsDisposed)
-                        UpdateLabel();
+                    UpdateLabel();
                 };
             };
 

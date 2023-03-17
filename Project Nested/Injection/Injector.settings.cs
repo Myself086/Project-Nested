@@ -14,6 +14,7 @@ namespace Project_Nested.Injection
         #region Rom settings
 
         public Dictionary<string, Patch> patches = new Dictionary<string, Patch>();
+        public event Action PatchesCountChanged;
 
         List<int> calls = new List<int>();
         public int KnownCallCount => calls.Count;
@@ -70,6 +71,7 @@ namespace Project_Nested.Injection
         public void ResetSettings(bool keepCalls)
         {
             patches.Clear();
+            PatchesCountChanged?.Invoke();
             if (!keepCalls)
             {
                 calls.Clear();
@@ -234,6 +236,7 @@ namespace Project_Nested.Injection
                     var patch = new Patch(line);
                     patches[patch.GetAddressString()] = patch;
                 }
+                PatchesCountChanged?.Invoke();
             }
             else if (commandLine.ToLowerInvariant().StartsWith("calls:"))
             {
