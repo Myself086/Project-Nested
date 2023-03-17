@@ -466,6 +466,9 @@ namespace Project_Nested
         /// <returns>True if a valid profile was selected.</returns>
         private bool SelectProfile(string title, bool autoComplete)
         {
+            // Unload selected profile
+            comboGameProfile.SelectedIndex = comboGameProfile.FindStringExact(NO_PROFILE_TEXT);
+
             if (!autoComplete)
             {
                 // Find exact match
