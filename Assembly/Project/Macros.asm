@@ -390,8 +390,26 @@ This__:
 b_skip__:
 	.endm
 
+	.macro	Mapper_Main					index, destination
+		.pushaddr
+			.addr	=MapperTable_Main+{0}*2
+			.data16	{1}
+		.pulladdr
+	.endm
+
+	.macro	Mapper_Init					index, destination
+		.pushaddr
+			.addr	=MapperTable_Init+{0}*2
+			.data16	{1}
+		.pulladdr
+	.endm
+
 	.macro	IOPort_CompareEnd
 		jmp	$=Recompiler__GetIOAccess_DefaultMapper
+	.endm
+
+	.macro	IOPort_InitEnd
+		rts
 	.endm
 
 	// ---------------------------------------------------------------------------

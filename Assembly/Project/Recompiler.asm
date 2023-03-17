@@ -4317,7 +4317,7 @@ b_skip4000:
 	// Do we have a mapper?
 	txa
 	ldx	$_Mapper_x2
-	jmp	($_MapperTable,x)
+	jmp	($_MapperTable_Main,x)
 
 	// Return default value
 Recompiler__GetIOAccess_DefaultMapper:
@@ -4645,12 +4645,32 @@ Recompiler__GetIOAccess_4017:
 		caseat	iIOPort_stay	IO__w4017_a_y
 		caseat	iIOPort_stai	IO__w4017_a_i
 
+	// ---------------------------------------------------------------------------
+
+	.mx	0x20
+	.func	Recompiler__InitMapper
+Recompiler__InitMapper:
+	php
+
+	rep	#0x10
+	sep	#0x20
+	ldx	$_Mapper_x2
+	jsr	($_MapperTable_Init,x)
+
+	plp
+	return
 
 	// ---------------------------------------------------------------------------
 
-MapperTable:
+MapperTable_Main:
 	.data16	_Recompiler__GetIOAccess_DefaultMapper
 	.fill	0x3fe, 0xff
+
+MapperTable_Init:
+	.fill16	0x200, MapperTable_Init_Default
+
+MapperTable_Init_Default:
+	IOPort_InitEnd
 
 	// ---------------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 
 	.pushaddr
-		.addr	=MapperTable+1*2
-		.data16	_Mapper1__Main
+		Mapper_Main		1, Mapper1__Main
+		Mapper_Init		1, Mapper1__Init
 
 		.addr	=Mapper_Memory
 Mapper1_temp:
@@ -80,6 +80,20 @@ Mapper1__e000:
 		caseat	iIOPort_stx		Mapper1__we000_x
 		caseat	iIOPort_sty		Mapper1__we000_y
 		caseat	iIOPort_stai	Mapper1__we000_a_i
+
+	//	-----------------------------------------------------------------------
+
+	.mx	0x20
+Mapper1__Init:
+	// Reset shift
+	lda	#0xf0
+	sta	$_Mapper1_value
+
+	// Reset PRG bank size
+	lda	#0x60
+	sta	$_Mapper1_control
+
+	IOPort_InitEnd
 
 	//	-----------------------------------------------------------------------
 

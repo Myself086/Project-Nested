@@ -1,7 +1,6 @@
 
 	.pushaddr
-		.addr	=MapperTable+4*2
-		.data16	_Mapper4__Main
+		Mapper_Main		4, Mapper4__Main
 
 		.addr	=Mapper_Memory
 Mapper4_BankSelect:

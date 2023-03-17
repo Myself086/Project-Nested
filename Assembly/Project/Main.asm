@@ -250,6 +250,7 @@ b_loop:
 	call	Chr__Initialize
 	call	Gui__Init
 	call	Sound__Init
+	call	Recompiler__InitMapper
 
 	sep	#0x20
 	.mx	0x20

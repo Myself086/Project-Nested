@@ -1,7 +1,6 @@
 
 	.pushaddr
-		.addr	=MapperTable+7*2
-		.data16	_Mapper7__Main
+		Mapper_Main		7, Mapper7__Main
 	.pulladdr
 
 	.mx	0x00
