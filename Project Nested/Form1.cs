@@ -646,8 +646,7 @@ namespace Project_Nested
                 }
                 else if (selected.FilePath == NO_PROFILE)
                 {
-                    // Load profile
-                    UnloadProfile();
+                    // Do nothing
                 }
                 else
                 {
