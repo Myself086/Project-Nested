@@ -92,8 +92,8 @@ Hdma__InitChannels:
 	sta	$0x4330
 	stx	$0x4334
 
-	// Sound ports 0 and 1
-	lda	#0x4001
+	// Sound ports 0, 1, 2, 3
+	lda	#0x4004
 	sta	$0x4310
 	stx	$0x4314
 

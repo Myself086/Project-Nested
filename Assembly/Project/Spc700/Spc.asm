@@ -155,19 +155,23 @@ wait:
         call !check_timers2
 
 wait2:
-        mov a,0xF4
-		cmp	a,0xF4
+        mov x,0xF4
+		movw	ya, 0xF5         // Pre-emptively read ready's 2-byte transfer
+		cmp	x,0xF4               // Make sure port 0 wasn't in the middle of changing
 		bne	wait2
 
-        cmp a,#0xF5              // wait for port 0 to be 0xF5 (Reset)
+        cmp x,#0xF5              // wait for port 0 to be 0xF5 (Reset)
         beq to_reset
-        cmp a,#0xD7              // wait for port 0 to be 0xD7 (CPU ready)
+        cmp x,#0xD7              // wait for port 0 to be 0xD7 (CPU ready)
         bne wait
-        mov 0xF4,a               // reply to CPU with 0xD7 (begin transfer)
+        mov 0xF4,x               // reply to CPU with 0xD7 (begin transfer)
+
+		// Transfer exception for the last 2 bytes
+		movw	sound_ctrl, ya   // sound_ctrl and no4016
 
 		// 63.613 cycles per scanline
 		// Transfer via HDMA must take no more than 66 cycles per byte
-		// Cycles used during transfer: 25 = 3+2 + 3+5+4 + 2+2+4
+		// Cycles used during transfer: 35 = 3+2 + 3+5+4+3+5 + 2+2+2+4
 
         mov x,#0
 xfer:
@@ -176,10 +180,13 @@ xfer:
 
 		mov a,0xF5               // load data on port 1
 		mov 0xF4,x               // reply to CPU on port 0
-		mov 0x40+x,a             // store data at 0x40 - 0x55
+		mov 0x40+x,a             // store data at 0x40 - 0x53 (even)
+		mov a,0xF6               // load data on port 2
+		mov 0x41+x,a             // store data at 0x40 - 0x53 (odd)
 
 		inc x
-		cmp x,#0x17
+		inc x
+		cmp x,#0x14
 		bne xfer
 
 		jmp	!square0
