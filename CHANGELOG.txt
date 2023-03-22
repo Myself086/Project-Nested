@@ -6,6 +6,7 @@ Dev build:
 - Fixed interrupt flag when linking indirect jump or non-native return
 - Added initializer for mappers
 - Selecting "< No profile >" or creating new profile no longer reset settings
+- Added limited DMC support (req. static range c000 & e000 whenever possible)
 
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok

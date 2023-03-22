@@ -67,12 +67,21 @@ Sound__Init_Transfer_Feedback:
 		cpx	#_Spc_Code_End-Spc_Code_Start
 		bcc	$-Sound__Init_Transfer
 
+	// If static range c000 and e000 are enabled, transfer the range to the SPC
+	//lda	$=RomInfo_StaticRanges
+	//and	#0xc0
+	//eor	#0xc0
+	//bne	$+b_1
+		jsr	$_Sound__Init_TransferDmcData
+b_1:
+
 	// Execute SPC code, ignore carry
-	adc	#0x02
-	ora	#0x01
 	ldy	#0x0400
 	sty	$0x2142
 	stz	$0x2141
+	txa
+	adc	#0x02
+	ora	#0x01
 	sta	$0x2140
 
 	// Activate audio
@@ -120,6 +129,68 @@ b_trap:
 	unlock
 	trap
 	Exception	"Audio Initialization Failed{}{}{}HDMA buffers must be initialized before audio."
+
+
+	.mx	0x20
+Sound__Init_TransferDmcData:
+	// Change to the first PRG ROM bank
+	lda	$=RomInfo_StartBankPRG
+	pha
+	plb
+
+	// Send start address
+	ldy	#0xbfff
+	sty	$0x2142
+	// Kick
+	lda	#0x01
+	sta	$0x2141
+	txa
+	adc	#0x02
+	ora	#0x01
+	sta	$0x2140
+
+	// Start at index 0
+	ldx	#0
+	
+	// Wait for kick back from SPC
+b_loop:
+		cmp	$0x2140
+		bne	$-b_loop
+
+	// Transfer static ROM range flags at 0xbfff
+	lda	$=RomInfo_StaticRanges
+	sta	$0x2141
+	txa
+	sta	$0x2140
+
+	// Wait for feedback
+b_loop:
+		cmp	$0x2140
+		bne	$-b_loop
+
+	// Start data transfer
+b_loop:
+		// Load and send byte
+		lda	$0xbfff,x
+		sta	$0x2141
+
+		// Send index LSB
+		txa
+		sta	$0x2140
+
+		// Next index
+		inx
+
+		// Wait for feedback
+b_loop2:
+			cmp	$0x2140
+			bne	$-b_loop2
+
+		// Are we done transferring?
+		cpx	#0x4000
+		bcc	$-b_loop
+	
+	rts
 
 
 Sound__Init_HdmaTable:

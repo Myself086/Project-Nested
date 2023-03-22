@@ -2230,6 +2230,15 @@ b_1:
 		stz	$_Sound_noise_length
 b_1:
 
+	lsr	$_IO_Temp
+	bcc	$+b_1
+		// Channel 4
+		lda	#0x10
+		tsb	$_Sound_NesRegs+0x15
+		bne	$+b_1
+			tsb	$_Sound_ExtraControl
+b_1:
+
 	xba
 	plp
 	rtl
