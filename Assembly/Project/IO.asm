@@ -2191,8 +2191,8 @@ IO__w4015_in:
 	php
 	xba
 
-	lda	$_IO_Temp
 IO__w4015_in2:
+	lda	$_IO_Temp
 	eor	#0xff
 	and	#0x1f
 	trb	$_Sound_NesRegs+0x15
