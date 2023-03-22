@@ -27,9 +27,9 @@ RomInfo_Mapper:
 
 	// Starting SNES banks for PRG and CHR
 RomInfo_StartBankPRG:
-	.data8	0x87
+	.data8	0x88
 RomInfo_StartBankCHR:
-	.data8	0xc7
+	.data8	0xc8
 
 	// Cartridge flags
 RomInfo_CartFlags:
