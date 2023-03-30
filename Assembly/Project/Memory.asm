@@ -337,6 +337,13 @@ b_return:
 	// Entry: A.lo = Bank number, X = Length
 	// Return: A = Bytes available, Carry = true when memory can be allocated
 Memory__CanAllocCart:
+	// Is this bank valid?
+	bit	#0x00ff
+	bne	$+b_1
+		clc
+		return
+b_1:
+
 	phb
 	// Change bank and set carry for later
 	sep	#0x21
@@ -423,6 +430,57 @@ b_trap:
 	unlock
 	trap
 	Exception	"Zero Memory Failed{}{}{}Memory.Zero attempted to clear the wrong array."
+
+	// ---------------------------------------------------------------------------
+
+	.mx	0x00
+	.func	Memory__TakeSramBank
+	// Return: A = SRAM bank or null, P.z = A
+Memory__TakeSramBank:
+	phb
+
+	ldx	$_Memory__CartBanks
+	beq	$+b_returnNull
+	.local	_bankCount, =listP
+	lda	$=Memory__CartBanks_CONSTBANK-1,x
+	and	#0x00ff
+	beq	$+b_returnNull
+	sta	$.bankCount
+	ldy	#_Memory__CartBanks_CONSTBANK/0x100
+	sty	$.listP+1
+	stx	$.listP
+b_loop:
+		// Is this bank empty?
+		smx	#0x20
+		lda	[$.listP]
+		pha
+		smx	#0x00
+		plb
+		lda	$_Memory_Top-0x8000
+		cmp	$_Memory_Bottom-0x8000
+		bne	$+b_1
+			// Remove this bank from Memory__CartBanks and return it to caller
+			smx	#0x20
+			lda	[$.listP]
+			xba
+			lda	#0
+			sta	[$.listP]
+			smx	#0x00
+
+			plb
+			xba							// Must be at the end to affect P.z
+			return
+b_1:
+
+		// Next
+		inc	$.listP
+		dec	$.bankCount
+		bne	$-b_loop
+
+b_returnNull:
+	plb
+	lda	#0
+	return
 
 	// ---------------------------------------------------------------------------
 
