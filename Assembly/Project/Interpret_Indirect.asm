@@ -37,7 +37,8 @@ b_{0}_40_e:
 			{
 				sta	$_Memory_NesBank
 			}
-			lda	#0xb0
+			//lda	#0xb0
+			lda	$_Program_Bank_Sram+2
 			pha
 			plb
 			rtl
@@ -119,7 +120,8 @@ b_sta_40_e:
 
 	SegmentNext
 		sta	$_Memory_NesBank
-		lda	#0xb0
+		//lda	#0xb0
+		lda	$_Program_Bank_Sram+2
 		pha
 		plb
 		rtl
@@ -174,7 +176,8 @@ b_sta_40_e:
 
 	SegmentNext
 		sta	$_Memory_NesBank
-		lda	#0xb0
+		//lda	#0xb0
+		lda	$_Program_Bank_Sram+2
 		pha
 		plb
 		rtl

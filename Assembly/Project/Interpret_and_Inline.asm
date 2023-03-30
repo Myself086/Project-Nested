@@ -225,8 +225,8 @@ Inline_StoreDirectKnown_{0}:
 Interpret_LoadDirect_Call_60:
 	lda	#0x60
 	sta	$_Memory_NesBank
-	lda	#0xb0
-	//lda	$_Program_Bank_Sram
+	//lda	#0xb0
+	lda	$_Program_Bank_Sram+2
 	pha
 	plb
 	rtl
@@ -277,8 +277,8 @@ Interpret_CmdDirectKnown_Call_60:
 	xba
 	lda	#0x60
 	sta	$_Memory_NesBank
-	lda	#0xb0
-	//lda	$_Program_Bank_Sram
+	//lda	#0xb0
+	lda	$_Program_Bank_Sram+2
 	pha
 	plb
 	xba
@@ -339,8 +339,8 @@ Interpret_StoreDirectKnown_Call_60:
 	xba
 	lda	#0x60
 	sta	$_Memory_NesBank
-	lda	#0xb0
-	//lda	$_Program_Bank_Sram
+	//lda	#0xb0
+	lda	$_Program_Bank_Sram+2
 	pha
 	plb
 	xba
@@ -474,8 +474,8 @@ Interpret_DirectBankCrossing_60:
 	bcs	$+b_1
 		lda	#0x60
 		sta	$_Memory_NesBank
-		lda	#0xb0
-		//lda	$_Program_Bank_Sram
+		//lda	#0xb0
+		lda	$_Program_Bank_Sram+2
 		pha
 		plb
 		rtl

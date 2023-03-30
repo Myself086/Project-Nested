@@ -294,6 +294,11 @@ RomInfo_Description:
 
 		RomInfo_DefineMac	"private readonly hex byte MemoryEmulation.StaticRange : Static range", RomInfo_StaticRanges, 0
 
+		RomInfo_SummaryMac	"Defines RAM range 0x6000-0x7fff as static."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Improves performance slightly since v1.6"
+		RomInfo_DefineMac	"public bool MemoryEmulation.StaticRange_60 : Static SRAM", RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+
 		RomInfo_SummaryMac	"Defines ROM range 0x8000-0x9fff as static."
 		RomInfo_SummaryMac	"May improve compatibility."
 		RomInfo_SummaryMac	""
