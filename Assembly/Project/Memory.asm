@@ -100,7 +100,7 @@ b_cart:
 b_loop:
 		// Can we allocte enough memory in this bank?
 		lda	[$.listP]
-		and	#0x00ff
+		//and	#0x00ff
 		ldx	$.length
 		call	Memory__CanAllocCart
 		bcs	$+b_1
@@ -334,7 +334,7 @@ b_return:
 
 	.mx	0x00
 	.func	Memory__CanAllocCart
-	// Entry: A = Bank number, X = Length
+	// Entry: A.lo = Bank number, X = Length
 	// Return: A = Bytes available, Carry = true when memory can be allocated
 Memory__CanAllocCart:
 	phb
