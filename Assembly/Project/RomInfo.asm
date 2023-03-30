@@ -527,7 +527,7 @@ RomInfo_Description:
 		RomInfo_DefineMac	"public bool SyncPpuStatusToSnes : Sync PPUSTATUS to SNES.", RomInfo_SyncPpuStatusToSnes, 0x80
 
 		RomInfo_SummaryMac	"Determines how many lines to skip after an IRQ hit."
-		RomInfo_DefineMac	"public mapper<4> byte IrqOffset : Mapper IRQ hit offset.", RomInfo_IrqOffset, 0
+		RomInfo_DefineMac	"public mapper<4,69> byte IrqOffset : Mapper IRQ hit offset.", RomInfo_IrqOffset, 0
 
 	RomInfo_DefineMac	"public void Tab_Ppu : PPU emulation.", 0, 0
 

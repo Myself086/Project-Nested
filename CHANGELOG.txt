@@ -8,6 +8,7 @@ Dev build:
 - Selecting "< No profile >" or creating new profile no longer reset settings
 - Added limited DMC support (req. static range c000 & e000 whenever possible)
 - Fixed an issue with writing to $4015 via direct indexed addressing mode
+- Added mapper 69
 
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok
