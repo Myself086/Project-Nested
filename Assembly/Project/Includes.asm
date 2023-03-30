@@ -141,7 +141,7 @@ BankEnd_c2:
 	// ---------------------------------------------------------------------------
 	// Bank 82
 
-	Include_CrossOver	0xfffe
+	Include_CrossOver	0xffff
 
 	// Nothing here yet
 
