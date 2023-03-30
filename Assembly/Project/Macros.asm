@@ -100,6 +100,18 @@ trap__:
 	.endm
 
 
+	.macro	trapvc
+trap__:
+		bvc	$-trap__
+	.endm
+
+
+	.macro	trapvs
+trap__:
+		bvs	$-trap__
+	.endm
+
+
 	.macro	trappl
 trap__:
 		bpl	$-trap__
