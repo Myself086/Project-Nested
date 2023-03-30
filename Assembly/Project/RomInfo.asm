@@ -174,6 +174,9 @@ RomInfo_InputFlags:
 RomInfo_InputMap:
 	.data8	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
+RomInfo_RomCacheBankCount:
+	.data8	4
+
 	// ---------------------------------------------------------------------------
 
 	// Version number
@@ -314,6 +317,13 @@ RomInfo_Description:
 		RomInfo_SummaryMac	""
 		RomInfo_SummaryMac	"Improves performance slightly since v1.6"
 		RomInfo_DefineMac	"public bool MemoryEmulation.StaticRange_e0 : Static range e000", RomInfo_StaticRanges, 0x80
+
+		RomInfo_SummaryMac	"Number of SRAM banks used for ROM cache."
+		RomInfo_SummaryMac	""
+		RomInfo_SummaryMac	"Requires SRAM size over 16KB."
+		RomInfo_SummaryMac	"May cause major slowdowns if this value is too low. Max 30."
+		RomInfo_SummaryMac	"May cause 'out of memory' errors if this value is too high."
+		RomInfo_DefineMac	"public mapper<69> byte MemoryEmulation.RomCacheBankCount : PRG ROM cache bank count", RomInfo_RomCacheBankCount, 0
 
 	RomInfo_DefineMac	"public void Tab_Cartridge : Cartridge settings.", 0, 0
 

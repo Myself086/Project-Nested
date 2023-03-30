@@ -243,7 +243,7 @@ ChrRam_Write_End:
 
 
 	.addr	0x0a87, 0x0a9f
-	// 21/25
+	// 23/25
 
 	// Page in bank 0x7e
 ChrRam_Page:
@@ -279,6 +279,11 @@ IndirectY_Sbc_Action:
 Memory__CartBanks:
 	.fill	2
 	.def	Memory__CartBanks_CONSTBANK		0x7f0000
+
+	// Pointer+2 to list of banks that can be used as ROM cache
+RomCache_DescListPointer:
+	.fill	2
+	.def	RomCache_Desc_CONSTBANK			0x7f0000
 
 
 	.addr	0x0aa7, 0x0abf
