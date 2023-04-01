@@ -173,6 +173,9 @@ StaticRec__MainForExe:
 	.mx	0x00
 	.func	StaticRec__Main
 StaticRec__Main:
+	// Apply SelfMod
+	call	SelfMod__Apply
+
 	// Change bank
 	phk
 	plb

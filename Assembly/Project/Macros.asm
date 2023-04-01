@@ -541,6 +541,70 @@ dest__:
 	.def	CoreCallFlag_Lock		0x0020
 
 	// ---------------------------------------------------------------------------
+	// Self-modifying code related macros
+
+	.def	SelfMod_COUNT		0
+	.macro	SelfMod_DEFINE		name	param
+		// Defines a SelfMod instruction
+		.def	{0}				SelfMod_COUNT
+		.def	SelfMod_COUNT	SelfMod_COUNT+1
+		.macro	{0}
+			.data8	{0}
+			{1}
+		.endm
+	.endm
+
+	.macro	d_24_8	arg0, arg1
+		.data24	{0}
+		.data8	{1}
+	.endm
+
+	.macro	d_24_16	arg0, arg1
+		.data24	{0}
+		.data16	{1}
+	.endm
+
+	.def	SelfMod_Begin	SelfMod_COUNT
+	.def	SelfMod_COUNT	SelfMod_COUNT+1
+	.macro	SelfMod_Begin
+this__:
+		.pushaddr
+			.addr	SelfMod_Table_WritePointer
+			.data8	SelfMod_Begin
+			.data24	this__
+	.endm
+
+	.macro	SelfMod_End
+SelfMod_Table_WritePointer:
+		.pulladdr
+	.endm
+
+	//SelfMod_DEFINE	SelfMod_Begin				".data24 this__"	// Begin SelfMod and sets condition to true
+	//SelfMod_DEFINE	SelfMod_End					""					// End SelfMod
+	SelfMod_DEFINE	SelfMod_EndOfList				""					// Ends SelfMod table, only used in SelfMod.asm
+	SelfMod_DEFINE	SelfMod_Do						".data8 {0}"		// Replace {0} bytes if condition is true
+	SelfMod_DEFINE	SelfMod_Copy8					"d_24_8 {0} {1}"	// Copy 8-bit from address {0} to relative {1} (Must be after "Do")
+	SelfMod_DEFINE	SelfMod_Copy16					"d_24_8 {0} {1}"	// Copy 16-bit from address {0} to relative {1} (Must be after "Do")
+	SelfMod_DEFINE	SelfMod_Copy24					"d_24_8 {0} {1}"	// Copy 24-bit from address {0} to relative {1} (Must be after "Do")
+	SelfMod_DEFINE	SelfMod_Copy32					"d_24_8 {0} {1}"	// Copy 32-bit from address {0} to relative {1} (Must be after "Do")
+	SelfMod_DEFINE	SelfMod_IfSet					"d_24_8 {0} {1}"	// Condition = bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_IfClear					"d_24_8 {0} {1}"	// Condition = not bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_OrSet					"d_24_8 {0} {1}"	// Condition |= bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_OrClear					"d_24_8 {0} {1}"	// Condition |= not bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_AndSet					"d_24_8 {0} {1}"	// Condition &= bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_AndClear				"d_24_8 {0} {1}"	// Condition &= not bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_EorSet					"d_24_8 {0} {1}"	// Condition ^= bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_EorClear				"d_24_8 {0} {1}"	// Condition ^= not bit mask {1} at address {0}
+	SelfMod_DEFINE	SelfMod_IfEq8					"d_24_8 {0} {1}"	// Condition = value at address {0} == {1}
+	SelfMod_DEFINE	SelfMod_IfNe8					"d_24_8 {0} {1}"	// Condition = value at address {0} != {1}
+	SelfMod_DEFINE	SelfMod_OrEq8					"d_24_8 {0} {1}"	// Condition |= value at address {0} == {1}
+	SelfMod_DEFINE	SelfMod_OrNe8					"d_24_8 {0} {1}"	// Condition |= value at address {0} != {1}
+	SelfMod_DEFINE	SelfMod_AndEq8					"d_24_8 {0} {1}"	// Condition &= value at address {0} == {1}
+	SelfMod_DEFINE	SelfMod_AndNe8					"d_24_8 {0} {1}"	// Condition &= value at address {0} != {1}
+	SelfMod_DEFINE	SelfMod_EorEq8					"d_24_8 {0} {1}"	// Condition ^= value at address {0} == {1}
+	SelfMod_DEFINE	SelfMod_EorNe8					"d_24_8 {0} {1}"	// Condition ^= value at address {0} != {1}
+
+	// ---------------------------------------------------------------------------
 	// Data segmentation related macros
 
 	.macro	SegmentStart	ByteCount

@@ -129,6 +129,7 @@ BankEnd_81:
 	.addr	0xc20000, 0xc2ffff
 
 	.include	"Project/RomCache.asm"
+	.include	"Project/SelfMod.asm"
 
 	// Sound
 Spc_Code_Start:
