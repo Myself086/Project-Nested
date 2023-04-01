@@ -175,6 +175,8 @@ b_else2:
 			sta	$_Program_Bank_Sram+2
 			Mapper69__a000_ExitMac
 b_else:
+		phy
+
 		// ROM
 		.vstack		_VSTACK_START
 		rmx	#0x04
@@ -194,6 +196,7 @@ b_else:
 		sta	$_Program_BankNum_6000
 
 		pld
+		ply
 		Mapper69__a000_ExitMac
 
 
