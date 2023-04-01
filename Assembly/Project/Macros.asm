@@ -429,7 +429,7 @@ b_skip__:
 
 	.def	CoreCall_COUNT		0
 	.macro	CoreCall_DEFINE		name	param
-		// Defines a CoreCall instrutions
+		// Defines a CoreCall instruction
 		.def	{0}				CoreCall_COUNT
 		.def	CoreCall_COUNT	CoreCall_COUNT+1
 		.macro	{0}
