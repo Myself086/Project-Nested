@@ -281,40 +281,61 @@ b_1:
 	// Do debug render
 	Gui__Render
 
-	// Increment NMI count, up to 3
+	// NMI at vblank only
+	SelfMod_Begin
+	SelfMod_IfSet		RomInfo_NmiMode, RomInfo_NmiMode_AtSnesNmi
+	SelfMod_AndClear	RomInfo_NmiMode, RomInfo_NmiMode_DetectIdling
+	SelfMod_Do	+b_1
+		lda	#1
+		sta	$.Nmi_Count
+		jmp	$_Start__Irq_NesNmi
+b_1:
+	SelfMod_End
+
+	// NMI auto detect only
+	SelfMod_Begin
+	SelfMod_IfClear		RomInfo_NmiMode, RomInfo_NmiMode_AtSnesNmi
+	SelfMod_AndSet		RomInfo_NmiMode, RomInfo_NmiMode_DetectIdling
+	SelfMod_Do	+b_1
+		lda	$.Nmi_Count
+		cmp	#_Nmi_Count_TOP
+		bcs	$+b_2
+			inc	a
+			sta	$.Nmi_Count
+b_2:
+		Start__Irq_Return
+b_1:
+	SelfMod_End
+
+	// Both NMI modes on at the same time
 	lda	$.Nmi_Count
 	cmp	#_Nmi_Count_TOP
-	bcs	$+b_else
+	bcs	$+Start__Irq_NesNmi
 		inc	a
 		sta	$.Nmi_Count
 		cmp	#_Nmi_Count_TOP
-		bcc	$+b_1
-b_else:
-		// Is Vblank loop busy?
-		ldx	$.Vblank_Busy
-		bne	$+b_1
-		// Are we emulating Nes NMI now?
-		lda	$=RomInfo_NmiMode
-		and	#_RomInfo_NmiMode_AtSnesNmi
-		bne	$+Start__Irq_NesNmi
+		bcs	$+Start__Irq_NesNmi
 b_1:
 
 Start__Irq_Return:
-	// Restore stack pointer (top half)
-	lda	$.s
+	.macro	Start__Irq_Return				// 11 bytes
+		// Restore stack pointer (top half)
+		lda	$.s
 
-	// Pull from interrupt stack
-	pld
-	ply
-	plx
+		// Pull from interrupt stack
+		pld
+		ply
+		plx
 
-	// Restore stack pointer and A
-	//lda	$_s
-	tcs
-	lda	$_a
+		// Restore stack pointer and A
+		//lda	$_s
+		tcs
+		lda	$_a
 
-	plb
-	rti
+		plb
+		rti
+	.endm
+	Start__Irq_Return
 
 
 Start__Irq_NesNmi:
@@ -323,6 +344,10 @@ Start__Irq_NesNmi:
 	//.local	_keepIOTemp16
 	//.local	.keepIOTemp
 	//.local	_keepJMPiU
+
+	// Is Vblank loop busy?
+	ldx	$.Vblank_Busy
+	bne	$-Start__Irq_Return
 
 	// Is NMI enabled?
 	bit	$_IO_2000-1
