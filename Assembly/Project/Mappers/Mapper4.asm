@@ -520,7 +520,8 @@ Mapper4__c001:
 				cmp	#0x01
 				adc	$_Mapper4_IRQ_Latch
 				clc
-				adc	$=RomInfo_IrqOffset
+				adc	#0
+				SelfMod_QuickCopy	RomInfo_IrqOffset, 8, -1
 				sta	$_Mapper4_IRQ_Line
 				and	$_Mapper4_IRQ_Enabled
 				sta	$_Scanline_IRQ
@@ -543,7 +544,8 @@ Mapper4__c001_stai:
 			cmp	#0x01
 			adc	$_Mapper4_IRQ_Latch
 			clc
-			adc	$=RomInfo_IrqOffset
+			adc	#0
+			SelfMod_QuickCopy	RomInfo_IrqOffset, 8, -1
 			sta	$_Mapper4_IRQ_Line
 			and	$_Mapper4_IRQ_Enabled
 			sta	$_Scanline_IRQ

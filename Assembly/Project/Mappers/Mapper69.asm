@@ -278,7 +278,8 @@ b_2:
 		cmp	#0x01
 		adc	$0x4214
 		clc
-		adc	$=RomInfo_IrqOffset
+		adc	#0
+		SelfMod_QuickCopy	RomInfo_IrqOffset, 8, -1
 		sta	$_Scanline_IRQ
 b_1:
 	Mapper69__a000_ExitMac
