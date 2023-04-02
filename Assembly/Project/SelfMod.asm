@@ -5,7 +5,7 @@
 	// Can be debugged with a SNES emulator that allows writing ROM areas, it'll find its way here without alteration
 
 	// Change this value to 0 to prevent using SelfMod during conversion
-	.def	SelfMod__Apply_SealValue		0x00
+	.def	SelfMod__Apply_SealValue		0xff
 
 	// ---------------------------------------------------------------------------
 
