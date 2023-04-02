@@ -96,8 +96,6 @@ SelfMod__Apply_Switch:
 			inc	$.table
 			and	#0x00ff
 			tax
-			tay
-			dey
 
 			// Copy table offset (can be moved inside the if statement but is safer here until testing)
 			lda	$.table
@@ -108,6 +106,9 @@ SelfMod__Apply_Switch:
 			sta	$.validDo
 			bpl	$+b_1
 				// Copy bytes
+				txy
+				dey
+				bmi	$+b_1
 				smx	#0x20
 b_loop:
 					// Copy byte
