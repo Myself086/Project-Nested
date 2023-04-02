@@ -37,7 +37,15 @@ b_{0}_40_e:
 			{
 				sta	$_Memory_NesBank
 			}
-			//lda	#0xb0
+			SelfMod_Begin
+			SelfMod_IfSet	RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+			SelfMod_Do	+b_1__
+				lda	#0xb0
+				pha
+				plb
+				rtl
+b_1__:
+			SelfMod_End
 			lda	$_Program_Bank_Sram+2
 			pha
 			plb
@@ -120,7 +128,15 @@ b_sta_40_e:
 
 	SegmentNext
 		sta	$_Memory_NesBank
-		//lda	#0xb0
+		SelfMod_Begin
+		SelfMod_IfSet	RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+		SelfMod_Do	+b_1
+			lda	#0xb0
+			pha
+			plb
+			rtl
+b_1:
+		SelfMod_End
 		lda	$_Program_Bank_Sram+2
 		pha
 		plb
@@ -176,7 +192,15 @@ b_sta_40_e:
 
 	SegmentNext
 		sta	$_Memory_NesBank
-		//lda	#0xb0
+		SelfMod_Begin
+		SelfMod_IfSet	RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+		SelfMod_Do	+b_1
+			lda	#0xb0
+			pha
+			plb
+			rtl
+b_1:
+		SelfMod_End
 		lda	$_Program_Bank_Sram+2
 		pha
 		plb

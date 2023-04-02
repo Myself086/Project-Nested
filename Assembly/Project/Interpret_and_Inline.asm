@@ -225,7 +225,15 @@ Inline_StoreDirectKnown_{0}:
 Interpret_LoadDirect_Call_60:
 	lda	#0x60
 	sta	$_Memory_NesBank
-	//lda	#0xb0
+	SelfMod_Begin
+	SelfMod_IfSet	RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+	SelfMod_Do	+b_1
+		lda	#0xb0
+		pha
+		plb
+		rtl
+b_1:
+	SelfMod_End
 	lda	$_Program_Bank_Sram+2
 	pha
 	plb
@@ -277,7 +285,16 @@ Interpret_CmdDirectKnown_Call_60:
 	xba
 	lda	#0x60
 	sta	$_Memory_NesBank
-	//lda	#0xb0
+	SelfMod_Begin
+	SelfMod_IfSet	RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+	SelfMod_Do	+b_1
+		lda	#0xb0
+		pha
+		plb
+		xba
+		rtl
+b_1:
+	SelfMod_End
 	lda	$_Program_Bank_Sram+2
 	pha
 	plb
@@ -339,7 +356,17 @@ Interpret_StoreDirectKnown_Call_60:
 	xba
 	lda	#0x60
 	sta	$_Memory_NesBank
-	//lda	#0xb0
+	SelfMod_Begin
+	SelfMod_IfSet	RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+	SelfMod_Do	+b_1
+		lda	#0xb0
+		pha
+		plb
+		xba
+		plp
+		rtl
+b_1:
+	SelfMod_End
 	lda	$_Program_Bank_Sram+2
 	pha
 	plb
@@ -474,7 +501,15 @@ Interpret_DirectBankCrossing_60:
 	bcs	$+b_1
 		lda	#0x60
 		sta	$_Memory_NesBank
-		//lda	#0xb0
+		SelfMod_Begin
+		SelfMod_IfSet	RomInfo_MemoryEmulation, RomInfo_MemEmu_StaticSram
+		SelfMod_Do	+b_2
+			lda	#0xb0
+			pha
+			plb
+			rtl
+b_2:
+		SelfMod_End
 		lda	$_Program_Bank_Sram+2
 		pha
 		plb
