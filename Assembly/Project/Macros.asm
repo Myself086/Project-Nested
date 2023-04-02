@@ -604,6 +604,14 @@ SelfMod_Table_WritePointer:
 	SelfMod_DEFINE	SelfMod_EorEq8					"d_24_8 {0} {1}"	// Condition ^= value at address {0} == {1}
 	SelfMod_DEFINE	SelfMod_EorNe8					"d_24_8 {0} {1}"	// Condition ^= value at address {0} != {1}
 
+	.macro	SelfMod_QuickCopy	var, bitSize, relativeOffset
+		SelfMod_Begin
+		SelfMod_Do	0
+temp__:
+		SelfMod_Copy{1}	{0}, -temp__{2}
+		SelfMod_End
+	.endm
+
 	// ---------------------------------------------------------------------------
 	// Data segmentation related macros
 
