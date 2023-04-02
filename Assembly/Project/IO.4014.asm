@@ -280,14 +280,14 @@ IO__w4014_RangeFixExit:
 	// What size are sprites?
 	lda	$_IO_2000_EarlyValue
 	and	#0x20
-	beq	$+IO__w4014_8x8
-		jmp	$_IO__w4014_8x16
-IO__w4014_8x8:
-
-	// Sprite limit?
-	lda	$=RomInfo_SpriteLimit
-	bpl	$+IO__w4014_8x8_nolimit
+	SelfMod_Begin
+	SelfMod_IfSet	RomInfo_SpriteLimit, 0x80
+	SelfMod_Do	+b_1
+		jne	$_IO__w4014_8x16_limit
 		jmp	$_IO__w4014_8x8_limit
+b_1:
+	SelfMod_End
+	jne	$_IO__w4014_8x16_nolimit
 
 IO__w4014_8x8_nolimit:
 	// Change mode
@@ -315,7 +315,8 @@ IO__w4014_8x8_nolimit:
 
 	// Update sprite 0 hit, assume carry clear from REP
 	lda	$0x00
-	adc	$=RomInfo_SpriteZeroOffset
+	adc	#0
+	SelfMod_QuickCopy	RomInfo_SpriteZeroOffset, 8, -1
 	bcc	$+b_1
 		lda	#0xf0
 b_1:
@@ -469,7 +470,8 @@ IO__w4014_8x8_limit:
 
 	// Update sprite 0 hit, assume carry clear from REP
 	lda	$0x00
-	adc	$=RomInfo_SpriteZeroOffset
+	adc	#0
+	SelfMod_QuickCopy	RomInfo_SpriteZeroOffset, 8, -1
 	bcc	$+b_1
 		lda	#0xf0
 b_1:
@@ -675,15 +677,7 @@ b_1:
 
 
 	.mx	0x30
-IO__w4014_8x16:
-
-	// Sprite limit?
-	lda	$=RomInfo_SpriteLimit
-	bpl	$+IO__w4014_8x16_nolimit
-		jmp	$_IO__w4014_8x16_limit
-
 IO__w4014_8x16_nolimit:
-
 	// Change mode and clear carry for sprite 0 math
 	.mx	0x10
 	rep	#0x21
@@ -714,7 +708,8 @@ IO__w4014_8x16_nolimit:
 
 	// Update sprite 0 hit, assume carry clear from REP
 	lda	$0x00
-	adc	$=RomInfo_SpriteZeroOffset
+	adc	#0
+	SelfMod_QuickCopy	RomInfo_SpriteZeroOffset, 8, -1
 	bcc	$+b_1
 		lda	#0xf0
 b_1:
@@ -884,7 +879,8 @@ IO__w4014_8x16_limit:
 
 	// Update sprite 0 hit, assume carry clear from REP
 	lda	$0x00
-	adc	$=RomInfo_SpriteZeroOffset
+	adc	#0
+	SelfMod_QuickCopy	RomInfo_SpriteZeroOffset, 8, -1
 	bcc	$+b_1
 		lda	#0xf0
 b_1:
