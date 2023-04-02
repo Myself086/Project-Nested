@@ -1986,12 +1986,8 @@ change_pulse_rtn:
 	// Use: temp 1-8 (1-6 internally only after the calls were made)
 update_dmc:
 	bbs	sound_ctrl, 4, +b_1
-		mov	0xf2, #0x40					// Volume off
-		mov	0xf3, #0x00
-		mov	0xf2, #0x41
-		mov	0xf3, #0x00
-
-		// TODO: Play silent instrument or key off
+		mov	0xf2, #0x5c					// Key off
+		or	0xf3, #0x10
 
 		ret
 b_1:
@@ -2009,6 +2005,9 @@ b_1:
 
 	bbc	no4016, 4, +b_return
 		clr1	no4016, 4
+
+		mov	0xf2, #0x5c					// Remove key off
+		and	0xf3, #0xef
 
 		// Start DMC instrument
 		movw	ya, pcm_addr			// pcm_addr and pcm_length
