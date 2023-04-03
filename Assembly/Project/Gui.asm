@@ -126,7 +126,7 @@ b_loop:
 	ldx	#0x3000
 	stx	$0x2116
 
-	// Transfer CHR data (TODO)
+	// Transfer CHR data
 	stz	$0x4300
 	lda	#0x18
 	sta	$0x4301
