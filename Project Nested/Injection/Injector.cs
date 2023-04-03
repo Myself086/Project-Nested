@@ -964,6 +964,11 @@ namespace Project_Nested.Injection
             return mapper;
         }
 
+        public Int32 ReadSubMapper()
+        {
+            return SrcData[8] >> 4;
+        }
+
         public Int32 ReadPrgSize()
         {
             // Incomplete but unlikely to support massive ROMs

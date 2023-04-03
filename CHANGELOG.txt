@@ -10,6 +10,7 @@ Dev build:
 - Fixed an issue with writing to $4015 via direct indexed addressing mode
 - Added mapper 69
 - Added self-modifying code to the emulator core based on settings during conversion
+- Added showing submapper number on the exe
 
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok

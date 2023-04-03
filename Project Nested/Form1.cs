@@ -756,8 +756,9 @@ namespace Project_Nested
 
         private void ShowRomInfo()
         {
-            lblMapper.Text = string.Format("Mapper: {0}{1}\n{2} PRG banks\n{3} CHR banks",
+            lblMapper.Text = string.Format("Mapper: {0}{1}{2}\n{3} PRG banks\n{4} CHR banks",
                 injector.ReadMapper(),
+                injector.ReadSubMapper() > 0 ? "." + injector.ReadSubMapper().ToString() : "",
                 injector.mapperSupported ? "" : "\nNot supported",
                 injector.ReadPrgBanks(),
                 injector.ReadChrBanks());
