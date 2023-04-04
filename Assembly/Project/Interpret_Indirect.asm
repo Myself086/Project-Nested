@@ -6,7 +6,7 @@
 
 	// ---------------------------------------------------------------------------
 
-	.macro	Interpret_Indirect_Switch		OpcodeName, IsLda, IndexRegister
+	.macro	Interpret_Indirect_Switch		OpcodeName, IsLdaY, IndexRegister
 		.align	0x100
 Interpret__{0}Indirect{2}_Page:
 		// Break this page into segments of 0x20 bytes
@@ -167,7 +167,7 @@ b_sta_e0_e:
 	Interpret_Indirect_Switch	And, 0, "X"
 	Interpret_Indirect_Switch	Eor, 0, "X"
 	Interpret_Indirect_Switch	Adc, 0, "X"
-	Interpret_Indirect_Switch	Lda, 1, "X"
+	Interpret_Indirect_Switch	Lda, 0, "X"
 	Interpret_Indirect_Switch	Cmp, 0, "X"
 	Interpret_Indirect_Switch	Sbc, 0, "X"
 
