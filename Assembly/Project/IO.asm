@@ -869,12 +869,9 @@ IO__w2007_skip00:
 		lda	$_NameTable_Remap_Main-0x20,x
 		xba
 		lda	$_IO_PPUADDR
-		rep	#0x11
-		.mx	0x20
-		tax
-
 		rep	#0x10
 		.mx	0x20
+		tax
 
 		lda	$_IO_Temp
 		cmp	$=Nes_Nametables-0x2000,x
