@@ -86,6 +86,7 @@ namespace Project_Nested.Injection
         SettingWrapper<byte> ChrBankLut_high => new SettingWrapper<byte>(settings, "ChrBankLut_hi", true);
 
         SettingWrapper<byte> StaticRange => new SettingWrapper<byte>(settings, "MemoryEmulation.StaticRange");
+        SettingWrapper<bool> StaticRange_Sram => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_60");
         SettingWrapper<bool> StaticRange_80 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_80");
         SettingWrapper<bool> StaticRange_a0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_a0");
         SettingWrapper<bool> StaticRange_c0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_c0");
@@ -203,29 +204,31 @@ namespace Project_Nested.Injection
             {
                 case 0:
                     WriteBanks(0x4000, 0x2000, PrgBankMirrorMode.None, new byte[] { 0, 0, 0, 0 });
-                    SetInitialBooleans(StaticRange_80, StaticRange_a0, StaticRange_c0, StaticRange_e0);
+                    SetInitialBooleans(StaticRange_Sram, StaticRange_80, StaticRange_a0, StaticRange_c0, StaticRange_e0);
                     break;
                 case 1:
                     WriteBanks(0x4000, 0x1000, PrgBankMirrorMode.DirectMirror, new byte[] { 0, 0, 0xff, 0xff });
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
+                    SetInitialBooleans(StaticRange_Sram);
                     break;
                 case 2:
                     WriteBanks(0x4000, 0x2000, PrgBankMirrorMode.DirectMirror, new byte[] { 0, 0, 0xff, 0xff });
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
-                    SetInitialBooleans(StaticRange_c0, StaticRange_e0);
+                    SetInitialBooleans(StaticRange_Sram, StaticRange_c0, StaticRange_e0);
                     break;
                 case 3:
                     WriteBanks(0x4000, 0x2000, PrgBankMirrorMode.None, new byte[] { 0, 0, 0, 0 });
-                    SetInitialBooleans(StaticRange_80, StaticRange_a0, StaticRange_c0, StaticRange_e0);
+                    SetInitialBooleans(StaticRange_Sram, StaticRange_80, StaticRange_a0, StaticRange_c0, StaticRange_e0);
                     break;
                 case 4:
                     WriteBanks(0x2000, 0x400, PrgBankMirrorMode.Cascade, new byte[] { 0, 1, 0xfe, 0xff });
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
-                    SetInitialBooleans(StaticRange_e0);
+                    SetInitialBooleans(StaticRange_Sram, StaticRange_e0);
                     break;
                 case 7:
                     WriteBanks(0x8000, 0x2000, PrgBankMirrorMode.DirectMirror, new byte[] { 0, 0, 0, 0 });
                     this.ForcedFlags = ForcedFlagEnum.AbsolutePrgBank | ForcedFlagEnum.IndirectLoad | ForcedFlagEnum.IndirectStore;
+                    SetInitialBooleans(StaticRange_Sram);
                     break;
                 case 69:
                     WriteBanks(0x2000, 0x400, PrgBankMirrorMode.Cascade, new byte[] { 0, 1, 2, 0xff });

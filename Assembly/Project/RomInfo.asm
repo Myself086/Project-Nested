@@ -38,7 +38,7 @@ RomInfo_CartFlags:
 
 	// 16 bits of "Memory emulation" flags
 RomInfo_MemoryEmulation:
-	.data16	0x002f
+	.data16	0x000f
 	.def	RomInfo_MemEmu_Load					0x0001
 	.def	RomInfo_MemEmu_Store				0x0002
 	.def	RomInfo_MemEmu_AbsBank				0x0004
