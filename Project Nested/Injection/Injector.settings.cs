@@ -106,7 +106,8 @@ namespace Project_Nested.Injection
             }
 
             // Crc32
-            AppendLine($"Crc32: {this.GetCrc32():x8}");
+            AppendLine($"File_CRC32: {this.GetFileCrc32():x8}");
+            AppendLine($"ROM_CRC32: {this.GetRomCrc32():x8}");
 
             // Settings
             foreach (var item in settings)
@@ -251,11 +252,11 @@ namespace Project_Nested.Injection
                 }
                 KnownCallCountChanged?.Invoke();
             }
-            else if (commandLine.ToLowerInvariant().StartsWith("crc32:"))
+            else if (commandLine.ToUpperInvariant().StartsWith("ROM_CRC32:"))
             {
                 var colon = commandLine.IndexOf(':');
                 var crc32 = Convert.ToUInt32(commandLine.Substring(colon + 1).Trim(), 16);
-                if (crc32 != GetCrc32())
+                if (crc32 != GetRomCrc32())
                     Crc32Mismatched?.Invoke(this, new Crc32EventArgs() { Crc32 = crc32 });
             }
             else

@@ -1008,7 +1008,8 @@ namespace Project_Nested.Injection
         // --------------------------------------------------------------------
         #region NES ROM Crc32
 
-        public uint GetCrc32() => CRC32.Crc32(0, SrcDataCopy, SrcDataCopy.Length);
+        public uint GetFileCrc32() => CRC32.Crc32(0, SrcDataCopy, SrcDataCopy.Length);
+        public uint GetRomCrc32() => CRC32.Crc32(0, SrcDataCopy, 0x10, SrcDataCopy.Length - 0x10);
 
         #endregion
         // --------------------------------------------------------------------

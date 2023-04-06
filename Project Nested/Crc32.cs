@@ -76,5 +76,22 @@ namespace Project_Nested
 
             return crc ^ ~0U; //0xFFFFFFFF
         }
+
+        /// <summary>
+        /// Calculate the crc32 checksum of the given memory block.
+        /// </summary>
+        /// <param name="crc">The start value for the crc</param>
+        /// <param name="buf">Memory block</param>
+        /// <param name="start">Index of first byte</param>
+        /// <param name="size">Number of bytes</param>
+        public static uint Crc32(uint crc, byte[] buf, int start, int size)
+        {
+            crc = crc ^ ~0U; //0xFFFFFFFF
+            int i = start;
+            while (size-- > 0)
+                crc = crc32_tab[(crc ^ buf[i++]) & 0xFF] ^ (crc >> 8);
+
+            return crc ^ ~0U; //0xFFFFFFFF
+        }
     }
 }

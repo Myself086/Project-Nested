@@ -363,7 +363,7 @@ namespace Project_Nested
                         MessageBox.Show(
                             "CRC32 mismatch.\n\n" +
                             "Settings will be loaded but game may have issues or not work.\n\n" +
-                            $"Game CRC32: {(sender2 as Injector).GetCrc32():x8}\n" +
+                            $"Game CRC32: {(sender2 as Injector).GetRomCrc32():x8}\n" +
                             $"Pasting settings for CRC32: {e2.Crc32:x8}\n",
                             "Warning");
                     }
