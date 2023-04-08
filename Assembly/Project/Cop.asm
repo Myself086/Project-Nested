@@ -22,6 +22,9 @@ Cop__Table:
 	Cop__Table		0x08, Cop__EndQuickScanline		//                Read note below
 	// QuickScanline note: Only updates scroll values, must use Cop__EndQuickScanline at the end to synchronize every HDMA back to normal. Cannot cross nametable vertically.
 
+	Cop__Table		0x09, Cop__GetVBlankStatus		// P.z = Non-zero when ready, P.n = 0, A = Awaiting VBlank count
+	Cop__Table		0x0a, Cop__TestVBlankStatus		// P.z = Non-zero when ready, P.n = 0
+
 	// ---------------------------------------------------------------------------
 
 Cop__Error:
@@ -164,6 +167,28 @@ b_loop:
 		jsr	$=Hdma__EndQuickScanline
 b_1:
 	CoreCall_Pull
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__GetVBlankStatus:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		lda	$_Nmi_Count
+b_1:
+	CoreCall_End
+
+	// ---------------------------------------------------------------------------
+
+Cop__TestVBlankStatus:
+	CoreCall_Begin
+	CoreCall_CopyUpTo	+b_1
+		xba
+		lda	$_Nmi_Count
+		php
+		xba
+		plp
+b_1:
 	CoreCall_End
 
 	// ---------------------------------------------------------------------------

@@ -13,6 +13,7 @@ Dev build:
 - Added showing submapper number on the exe
 - Fixed bank change when emulating LDA (zp,X)
 - Fixed how CRC32 is calculated
+- Added new COP instructions for patching
 
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok

@@ -19,13 +19,21 @@ Bxx (Any conditional branch) -> BRWxx - Conditional branch with Wait4Interrupt i
 
 COP table can be found in the top section of Assembly/Project/Cop.asm
 
-Here's the COP table as of v1.5:
+Here's the COP table as of v1.8:
 	Cop__Table		0x00, Cop__Wait4Interrupt
 	Cop__Table		0x01, Cop__Wait4VBlank
 	Cop__Table		0x02, Cop__GetScanline			// A = Scanline
 	Cop__Table		0x03, Cop__SetScanline			// Scanline = A
 	Cop__Table		0x04, Cop__AddScanline			// Scanline += A
 	Cop__Table		0x05, Cop__IncScanline			// Scanline++
+
+	Cop__Table		0x06, Cop__QuickAddScanline		// Scanline += A; Read note below and where A < 128
+	Cop__Table		0x07, Cop__QuickIncScanline		// Scanline++;    Read note below
+	Cop__Table		0x08, Cop__EndQuickScanline		//                Read note below
+	// QuickScanline note: Only updates scroll values, must use Cop__EndQuickScanline at the end to synchronize every HDMA back to normal. Cannot cross nametable vertically.
+
+	Cop__Table		0x09, Cop__GetVBlankStatus		// P.z = Non-zero when ready, P.n = 0, A = Awaiting VBlank count
+	Cop__Table		0x0a, Cop__TestVBlankStatus		// P.z = Non-zero when ready, P.n = 0
 
 More will be added as needed.
 
