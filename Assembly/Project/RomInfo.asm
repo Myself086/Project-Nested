@@ -50,7 +50,7 @@ RomInfo_MemoryEmulation:
 RomInfo_PrgBankNumbers:
 	.data8	0,0,0,0
 
-	// Which bits of PRG count towards bank boundaries
+	// Which bits of memory count towards PRG bank boundaries
 RomInfo_PrgBankingMask:
 	.data16	0
 
