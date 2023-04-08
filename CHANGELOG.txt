@@ -14,6 +14,7 @@ Dev build:
 - Fixed bank change when emulating LDA (zp,X)
 - Fixed how CRC32 is calculated
 - Added new COP instructions for patching
+- Added "ROL A" and "ROR A" to the interpreter
 
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok
