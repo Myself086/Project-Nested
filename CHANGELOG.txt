@@ -15,6 +15,7 @@ Dev build:
 - Fixed how CRC32 is calculated
 - Added new COP instructions for patching
 - Added "ROL A" and "ROR A" to the interpreter
+- Added mapper 1 sub-mapper SUROM
 
 v1.7:
 - Fixed "Header skipped file address format" from incrementing each time you press Ok
