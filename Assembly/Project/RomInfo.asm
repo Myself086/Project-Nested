@@ -174,6 +174,9 @@ RomInfo_InputFlags:
 RomInfo_InputMap:
 	.data8	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
+RomInfo_ReservedSnesBanks:
+	.data8	0x00, 0x00
+
 RomInfo_RomCacheBankCount:
 	.data8	4
 
@@ -565,6 +568,13 @@ RomInfo_Description:
 		RomInfo_DefineMac	"private global byte[12] Input.Map", RomInfo_InputMap, 0
 
 		RomInfo_DefineMac	"public Button CustomInput : Custom input", Zero, 0
+
+	RomInfo_DefineMac	"public void Tab_Enhancement : SNES enhancement pack settings.", 0, 0
+
+		RomInfo_SummaryMac	"Bank number must be between $c8-$ff or $40-$7d."
+		RomInfo_SummaryMac	"Addresses $0000-$7fff within each bank is then free to use."
+		RomInfo_SummaryMac	"Low range of fast ROM is $c8 but subject to change. Avoid using $c8-$ce if possible."
+		RomInfo_DefineMac	"public hex byte[2] Enhance.ReservedBanks : Reserved SNES banks", RomInfo_ReservedSnesBanks, 0
 
 	RomInfo_DefineMac	"public void Tab_Gui : Graphical user interface settings.", 0, 0
 

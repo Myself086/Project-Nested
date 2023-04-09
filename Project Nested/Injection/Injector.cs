@@ -92,6 +92,8 @@ namespace Project_Nested.Injection
         SettingWrapper<bool> StaticRange_c0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_c0");
         SettingWrapper<bool> StaticRange_e0 => new SettingWrapper<bool>(settings, "MemoryEmulation.StaticRange_e0");
 
+        SettingWrapper<byte> ReservedBanks => new SettingWrapper<byte>(settings, "Enhance.ReservedBanks");
+
         enum PrgBankMirrorMode
         {
             None,               // NROM
@@ -406,14 +408,24 @@ namespace Project_Nested.Injection
                 if (i != 0 && (i & 0x7fff) == 0)
                     NewHiRomBank++;
 
-                // Check for boundaries
-                switch (NewHiRomBank)
+                // Check reserved banks and boundaries
+                while (NewHiRomBank >= ReservedBanks[0] && NewHiRomBank <= ReservedBanks[1])
                 {
-                    case 0x00:
-                        NewHiRomBank = 0x40;
-                        break;
-                    case 0x7e:
-                        throw new IndexOutOfRangeException();
+                    // Zero this reserved bank
+                    for (int u = 0; u < 0x8000; u++)
+                        OutData[NewHiRomBank_FileAddress + u] = 0;
+
+                    // Check for boundaries
+                    switch (NewHiRomBank)
+                    {
+                        case 0x00:
+                            NewHiRomBank = 0x40;
+                            break;
+                        case 0x7e:
+                            throw new IndexOutOfRangeException();
+                    }
+
+                    NewHiRomBank++;
                 }
 
                 // Add reference to this bank

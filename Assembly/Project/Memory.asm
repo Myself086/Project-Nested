@@ -700,23 +700,35 @@ Memory__FormatRom:
 	stz	$.DP_Zero
 
 b_loop:
-		// Set bank and add it to list
+		// Is this bank reserved?
 		lda	$.thisBank
-		sta	$.DP_ZeroBank
-		ldy	$.bankCount
-		sta	[$.list],y
-		iny
-		sty	$.bankCount
+		smx	#0x20
+		cmp	$=RomInfo_ReservedSnesBanks+0			// Low bound
+		bcc	$+b_in
+		cmp	$=RomInfo_ReservedSnesBanks+1			// High bound
+		bcc	$+b_1
+		beq	$+b_1
+b_in:
+			smx	#0x00
 
-		// Write bottom and top addresses
-		lda	#0x0000
-		ldy	#_Memory_Bottom-0x8000
-		sta	[$.DP_Zero],y
-		ldy	#_Memory_Top-0x8000
-		sta	[$.DP_Zero],y
-		lda	#_Memory_HeapStack-0x8000-4
-		ldy	#_Memory_HeapStack-0x8000
-		sta	[$.DP_Zero],y
+			// Set bank and add it to list
+			sta	$.DP_ZeroBank
+			ldy	$.bankCount
+			sta	[$.list],y
+			iny
+			sty	$.bankCount
+
+			// Write bottom and top addresses
+			lda	#0x0000
+			ldy	#_Memory_Bottom-0x8000
+			sta	[$.DP_Zero],y
+			ldy	#_Memory_Top-0x8000
+			sta	[$.DP_Zero],y
+			lda	#_Memory_HeapStack-0x8000-4
+			ldy	#_Memory_HeapStack-0x8000
+			sta	[$.DP_Zero],y
+b_1:
+		rep	#0x20
 
 b_loop_next:
 		// Are we done?
