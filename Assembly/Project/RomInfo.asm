@@ -183,9 +183,9 @@ RomInfo_RomCacheBankCount:
 	// ---------------------------------------------------------------------------
 
 	// Version number
-	[80ffdB] = 0x07							// !
+	[80ffdB] = 0x08							// !
 	.macro	RomInfo_VersionString
-		.string0	"1.7"					// !
+		.string0	"1.8"					// !
 	.endm
 
 RomInfo_Title:

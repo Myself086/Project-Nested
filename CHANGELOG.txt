@@ -1,5 +1,5 @@
 
-Dev build:
+v1.8:
 - Fixed left column flicker
 - Properly fixed echo buffer write disabled (thanks to ikari_01)
 - Fixed "Reload Both ROMs"
