@@ -1,4 +1,7 @@
 
+Dev build:
+- Fixed an issue with branch solver in AOT optimization
+
 v1.8:
 - Fixed left column flicker
 - Properly fixed echo buffer write disabled (thanks to ikari_01)

@@ -32,6 +32,7 @@ namespace Project_Nested.Optimize.Operations
                     ValueRange8 flagZ = ValueRange8.Unk;
                     ValueRange8 flagC = ValueRange8.Unk;
 
+                    bool removed = false;
                     for (int u = 0; u < block.Count; u++)
                     {
                         redo:
@@ -100,6 +101,7 @@ namespace Project_Nested.Optimize.Operations
                             {
                                 sender.DecLabelUsageCount(asm.labelNum);
                                 block.RemoveAt(u, iterationID);
+                                removed = true;
                             }
                         }
 
@@ -185,6 +187,12 @@ namespace Project_Nested.Optimize.Operations
                                     if (desc.change.HasFlag(FlagAndRegs.Carry)) flagC = ValueRange8.Unk;
                                 }
                                 break;
+                        }
+
+                        if (removed)
+                        {
+                            u--;
+                            removed = false;
                         }
                     }
                 }
