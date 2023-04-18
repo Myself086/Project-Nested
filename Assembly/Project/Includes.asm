@@ -136,6 +136,9 @@ Spc_Code_Start:
 	.fix "Sound"
 	.offsetfrom		0x0400
 	.includeSPC	"Project/Spc700/Spc.asm"
+	.includeSPC	"Project/Spc700/Spc.Memory.asm"
+	.includeSPC	"Project/Spc700/Dmc.asm"
+Spc_HeapStart:
 	.offsetend
 	.fix "Stuff"
 Spc_Code_End:
