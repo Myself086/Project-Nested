@@ -1,6 +1,7 @@
 
-Dev build:
+v1.8.1:
 - Fixed an issue with branch solver in AOT optimization
+- Removed Patreon link
 
 v1.8:
 - Fixed left column flicker

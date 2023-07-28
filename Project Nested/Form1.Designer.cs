@@ -40,7 +40,6 @@
             this.btnSaveProfile = new System.Windows.Forms.Button();
             this.lblInstructions = new System.Windows.Forms.Label();
             this.lblKnownCalls = new System.Windows.Forms.Label();
-            this.btnPatreon = new System.Windows.Forms.Button();
             this.btnCompatibility = new System.Windows.Forms.Button();
             this.btnSaveAndPlay = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -116,7 +115,7 @@
             this.panel.AutoScroll = true;
             this.panel.Location = new System.Drawing.Point(0, 19);
             this.panel.Name = "panel";
-            this.panel.Size = new System.Drawing.Size(391, 282);
+            this.panel.Size = new System.Drawing.Size(234, 151);
             this.panel.TabIndex = 10;
             // 
             // btnLoadSrm
@@ -180,21 +179,10 @@
             this.lblKnownCalls.TabIndex = 10;
             this.lblKnownCalls.Text = "0 known calls";
             // 
-            // btnPatreon
-            // 
-            this.btnPatreon.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPatreon.Location = new System.Drawing.Point(12, 404);
-            this.btnPatreon.Name = "btnPatreon";
-            this.btnPatreon.Size = new System.Drawing.Size(75, 23);
-            this.btnPatreon.TabIndex = 6;
-            this.btnPatreon.Text = "Patreon";
-            this.btnPatreon.UseVisualStyleBackColor = true;
-            this.btnPatreon.Click += new System.EventHandler(this.btnPatreon_Click);
-            // 
             // btnCompatibility
             // 
             this.btnCompatibility.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCompatibility.Location = new System.Drawing.Point(12, 375);
+            this.btnCompatibility.Location = new System.Drawing.Point(12, 404);
             this.btnCompatibility.Name = "btnCompatibility";
             this.btnCompatibility.Size = new System.Drawing.Size(75, 23);
             this.btnCompatibility.TabIndex = 5;
@@ -317,7 +305,7 @@
             this.copySettingsToolStripMenuItem.Name = "copySettingsToolStripMenuItem";
             this.copySettingsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.C)));
-            this.copySettingsToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
+            this.copySettingsToolStripMenuItem.Size = new System.Drawing.Size(288, 22);
             this.copySettingsToolStripMenuItem.Text = "Copy Settings";
             this.copySettingsToolStripMenuItem.Click += new System.EventHandler(this.copySettingsToolStripMenuItem_Click);
             // 
@@ -374,7 +362,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(496, 439);
             this.Controls.Add(this.btnCompatibility);
-            this.Controls.Add(this.btnPatreon);
             this.Controls.Add(this.lblKnownCalls);
             this.Controls.Add(this.btnSaveProfile);
             this.Controls.Add(this.lblGameProfile);
@@ -413,7 +400,6 @@
         private System.Windows.Forms.Label lblInstructions;
         private System.Windows.Forms.Panel panel;
         private System.Windows.Forms.Label lblKnownCalls;
-        private System.Windows.Forms.Button btnPatreon;
         private System.Windows.Forms.Button btnCompatibility;
         private System.Windows.Forms.Button btnSaveAndPlay;
         private System.Windows.Forms.MenuStrip menuStrip1;
